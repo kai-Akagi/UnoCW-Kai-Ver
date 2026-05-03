@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/gamemodel/GameModel.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/model/GameState.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/model/Card.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/network/NetworkLayer.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/gui/game/GameController.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/network/MessageSerializer.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/gui/game/GameView.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/gui/register/RegisterController.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/events/UnoGracePeriodEvent.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/events/GameStartedEvent.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/events/GameEvent.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/events/StartRequestedEvent.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/events/UnoPenaltyEvent.java</file>
+            <file>file:/S:/ProyectoUNOCW/uno/src/uno/events/NetworkPlayerRejectedEvent.java</file>
+        </group>
+    </open-files>
+</project-private>
