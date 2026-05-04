@@ -399,6 +399,7 @@ public class NetworkLayer {
                     Player cardPlyr = findPlayerByName(fields.get("player"));
                     if (cardPlyr != null && cardStr != null) {
                         int dashIdx = cardStr.indexOf('-');
+                        gameModel.setProcessingPlay(true);
                         if (dashIdx > 0) {
                             uno.model.Card.Color col = parseCardColor(cardStr.substring(0, dashIdx));
                             String val = cardStr.substring(dashIdx + 1);
@@ -409,6 +410,7 @@ public class NetworkLayer {
                             gameModel.playCard(cardPlyr,
                                 new uno.model.Card(uno.model.Card.Color.WILD, cardStr, null));
                         }
+                        gameModel.setProcessingPlay(false);
                     }
                 }
                 break;

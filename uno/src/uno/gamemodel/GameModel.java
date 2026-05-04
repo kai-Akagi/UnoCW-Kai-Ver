@@ -421,4 +421,12 @@ public class GameModel {
         } while (card != null && card.getColor() == Card.Color.WILD);
         return card;
     }
+
+    public void setProcessingPlay(boolean value) {
+    this.processingPlay = value;
 }
+
+
+}
+
+
