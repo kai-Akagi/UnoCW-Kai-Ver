@@ -468,6 +468,13 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_UNO_CALLED:
+                publishToLocalBus(type, fields);
+                // El Peer declaró UNO: avanzar el turno en el GameModel del Host
+                if (gameModel != null) {
+                    gameModel.onUnoDeclared();
+                }
+                break;
+
             case MessageSerializer.TYPE_START_REQUESTED:
                 publishToLocalBus(type, fields);
                 break;
