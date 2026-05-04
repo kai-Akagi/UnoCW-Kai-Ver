@@ -96,6 +96,13 @@ public class GameModel {
                             + e.getPlayer().getName() + "' carta=" + e.getCard()
                             + " topCard=" + gameState.getTopCard()
                             + " turnoActual=" + gameState.getCurrentPlayer().getName());
+                        // Re-publicar el turno actual para que la GUI del Host
+                        // vuelva a habilitar la mano sin cambiar el estado del juego.
+                        eventBus.publish(GameEventFactory.turnChanged(
+                            gameState.getCurrentPlayer(),
+                            gameState.getTopCard(),
+                            gameState.isClockwise()
+                        ));
                     }
                 } finally {
                     processingPlay = false;

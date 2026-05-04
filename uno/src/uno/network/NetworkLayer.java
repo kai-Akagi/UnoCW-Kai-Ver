@@ -525,8 +525,9 @@ public class NetworkLayer {
 
             case MessageSerializer.TYPE_CARD_PLAYED:
                 // El Host confirmó que esta carta fue jugada exitosamente.
-                // Solo el Peer que la jugó la elimina de su mano local.
-                if (session.isLocalPlayer(fields.get("player"))) {
+                // Solo el Peer (no el Host) elimina la carta: el Host ya la
+                // eliminó internamente en GameModel.playCard().
+                if (!session.isHost() && session.isLocalPlayer(fields.get("player"))) {
                     String confirmedText = fields.get("card");
                     uno.model.Card.Color confColor = null;
                     String confValue = confirmedText;
