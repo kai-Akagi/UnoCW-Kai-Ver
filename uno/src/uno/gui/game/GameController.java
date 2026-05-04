@@ -283,35 +283,26 @@ public class GameController {
             SwingUtilities.invokeLater(() -> view.render(vm));
         });
 
-        // Cambio de turno recibido por la red (Peer)
-        // Rastrea quién tenía el turno antes del ultimo TurnChanged recibido
-        // para poder decrementar el contador de cartas cuando un oponente juega.
-        final String[] lastTurnHolder = { null };
-
+        // Cambio de turno recibido por la red (Peer).
+        // El Host ya incluye el conteo exacto de cartas en el mensaje,
+        // así que no necesitamos inferirlo.
         eventBus.subscribe(NetworkTurnChangedEvent.class, event -> {
             NetworkTurnChangedEvent e = (NetworkTurnChangedEvent) event;
 
             final String  currentPlayerName = e.getCurrentPlayerName();
             final String  topCardText       = e.getTopCardText();
             final boolean eventClockwise    = e.isClockwise();
+            final java.util.Map<String, Integer> sizes = e.getHandSizes();
 
-            // Si el jugador que acaba de terminar su turno es un oponente (no nosotros),
-            // y tenía el turno antes, asumimos que jugó una carta → restar 1.
-            // Esta es una aproximación: si robó carta sin jugar, el contador no baja,
-            // pero NetworkCardDrawnPrivateEvent ya lo actualizará si recibió carta.
-            if (lastTurnHolder[0] != null
-                    && !session.isLocalPlayer(lastTurnHolder[0])
-                    && peerOpponentHandSizes.containsKey(lastTurnHolder[0])) {
-                int prev = peerOpponentHandSizes.get(lastTurnHolder[0]);
-                if (prev > 0) {
-                    peerOpponentHandSizes.put(lastTurnHolder[0], prev - 1);
-                }
+            // Actualizar peerOpponentHandSizes con los datos del Host (fuente de verdad)
+            if (sizes != null) {
+                sizes.forEach((name, count) -> {
+                    if (!session.isLocalPlayer(name)) {
+                        peerOpponentHandSizes.put(name, count);
+                    }
+                });
             }
-            lastTurnHolder[0] = currentPlayerName;
 
-            // Usamos invokeLater para que el render ocurra en el hilo de Swing,
-            // garantizando que todas las cartas privadas que llegaron antes
-            // (procesadas también en el EDT via SwingUtilities) ya están en la mano.
             SwingUtilities.invokeLater(() -> {
                 Card parsedTopCard = parseCard(topCardText);
                 String topValue = parsedTopCard != null ? parsedTopCard.getValue()
@@ -319,9 +310,6 @@ public class GameController {
                 Card.Color topColor = parsedTopCard != null ? parsedTopCard.getColor()
                                                             : Card.Color.WILD;
 
-                // Construir listas de oponentes con sus nombres y conteo de cartas.
-                // El Peer mantiene peerOpponentHandSizes actualizado: empieza en 7
-                // y se ajusta cuando recibe CardDrawnPrivate o inferimos de TurnChanged.
                 List<String> oppNames = new ArrayList<>();
                 List<Integer> oppSizes = new ArrayList<>();
                 for (uno.model.Player p : lobbyState.getConnectedPlayers()) {

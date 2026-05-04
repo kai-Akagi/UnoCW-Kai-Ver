@@ -177,8 +177,9 @@ public class GameEventFactory {
      * @param topCardText       Carta activa como texto (ej. "RED-7").
      */
     public static NetworkTurnChangedEvent networkTurnChanged(
-            String currentPlayerName, String topCardText, boolean clockwise) {
-        return new NetworkTurnChangedEvent(currentPlayerName, topCardText, clockwise);
+            String currentPlayerName, String topCardText, boolean clockwise,
+            java.util.Map<String, Integer> handSizes) {
+        return new NetworkTurnChangedEvent(currentPlayerName, topCardText, clockwise, handSizes);
     }
  
     /**

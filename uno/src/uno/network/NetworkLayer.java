@@ -247,8 +247,23 @@ public class NetworkLayer {
             eventBus.subscribe(CardPlayedEvent.class, event ->
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
 
-            eventBus.subscribe(TurnChangedEvent.class, event ->
-                    broadcast(MessageSerializer.serialize((GameEvent) event)));
+            eventBus.subscribe(TurnChangedEvent.class, event -> {
+                // Incluir el conteo exacto de cartas de cada jugador en el mensaje
+                // para que el Peer no necesite inferirlo y siempre tenga el dato correcto.
+                String base = MessageSerializer.serialize((GameEvent) event).trim();
+                if (gameModel != null && gameModel.getGameState() != null) {
+                    StringBuilder sizes = new StringBuilder();
+                    for (uno.model.Player p : gameModel.getGameState().getPlayers()) {
+                        if (sizes.length() > 0) sizes.append(";");
+                        sizes.append(p.getName()).append(":").append(p.getHandSize());
+                    }
+                    if (base.endsWith("}")) {
+                        base = base.substring(0, base.length() - 1)
+                               + ",\"sizes\":\"" + sizes + "\"}\n";
+                    }
+                }
+                broadcast(base);
+            });
  
             eventBus.subscribe(GameOverEvent.class, event ->
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
@@ -517,31 +532,49 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_TURN_CHANGED:
+                java.util.Map<String, Integer> parsedSizes = null;
+                String sizesStr = fields.get("sizes");
+                if (sizesStr != null && !sizesStr.isEmpty()) {
+                    parsedSizes = new java.util.HashMap<>();
+                    for (String entry : sizesStr.split(";")) {
+                        int colon = entry.indexOf(':');
+                        if (colon > 0) {
+                            try {
+                                parsedSizes.put(entry.substring(0, colon),
+                                    Integer.parseInt(entry.substring(colon + 1)));
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
+                }
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                         fields.get("currentPlayer"),
                         fields.get("topCard"),
-                        Boolean.parseBoolean(fields.getOrDefault("clockwise", "true"))));
+                        Boolean.parseBoolean(fields.getOrDefault("clockwise", "true")),
+                        parsedSizes));
                 break;
 
             case MessageSerializer.TYPE_CARD_PLAYED:
                 // El Host confirmó que esta carta fue jugada exitosamente.
                 // Solo el Peer (no el Host) elimina la carta: el Host ya la
                 // eliminó internamente en GameModel.playCard().
+                // Usamos removeCard() porque getHand() devuelve lista no modificable.
                 if (!session.isHost() && session.isLocalPlayer(fields.get("player"))) {
                     String confirmedText = fields.get("card");
-                    uno.model.Card.Color confColor = null;
+                    uno.model.Card.Color confColor = uno.model.Card.Color.WILD;
                     String confValue = confirmedText;
                     int confDash = confirmedText != null ? confirmedText.indexOf('-') : -1;
                     if (confDash > 0) {
                         confColor = parseCardColor(confirmedText.substring(0, confDash));
                         confValue = confirmedText.substring(confDash + 1);
-                    } else {
-                        confColor = uno.model.Card.Color.WILD;
                     }
-                    final uno.model.Card.Color fc = confColor;
-                    final String fv = confValue;
-                    session.getLocalPlayer().getHand().removeIf(
-                        c -> c.getColor() == fc && c.getValue().equals(fv));
+                    uno.model.Card toRemove = null;
+                    for (uno.model.Card c : session.getLocalPlayer().getHand()) {
+                        if (c.getColor() == confColor && c.getValue().equals(confValue)) {
+                            toRemove = c;
+                            break;
+                        }
+                    }
+                    if (toRemove != null) session.getLocalPlayer().removeCard(toRemove);
                 }
                 break;
 
@@ -551,7 +584,8 @@ public class NetworkLayer {
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                     fields.get("player"),
                     fields.get("topCard"),
-                    Boolean.parseBoolean(fields.getOrDefault("clockwise", "true"))));
+                    Boolean.parseBoolean(fields.getOrDefault("clockwise", "true")),
+                    null));
                 break;
  
             case MessageSerializer.TYPE_CARD_DRAWN_PRIVATE:
