@@ -545,21 +545,8 @@ public class NetworkLayer {
                 break;
 
             case MessageSerializer.TYPE_CARD_REJECTED:
-                // El Host rechazó la jugada del Peer. Restaurar la carta en la mano
-                // y re-publicar un NetworkTurnChangedEvent para re-habilitar la vista.
-                String rejCardText = fields.get("card");
-                if (rejCardText != null && session.isLocalPlayer(fields.get("player"))) {
-                    uno.model.Card.Color rejColor = uno.model.Card.Color.WILD;
-                    String rejValue = rejCardText;
-                    int rejDash = rejCardText.indexOf('-');
-                    if (rejDash > 0) {
-                        rejColor = parseCardColor(rejCardText.substring(0, rejDash));
-                        rejValue = rejCardText.substring(rejDash + 1);
-                    }
-                    uno.model.Card rejCard = new uno.model.Card(rejColor, rejValue, null);
-                    session.getLocalPlayer().addCard(rejCard);
-                }
-                // Reutilizar el handler de NetworkTurnChangedEvent para re-habilitar la mano
+                // El Host rechazó la jugada. La carta ya está en la mano del Peer
+                // (no se elimina optimistamente), así que solo re-habilitamos la vista.
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                     fields.get("player"),
                     fields.get("topCard"),
