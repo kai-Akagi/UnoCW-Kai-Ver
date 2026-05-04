@@ -243,6 +243,10 @@ public class NetworkLayer {
  
         // Solo el Host hace broadcast o envíos privados de eventos del juego
         if (session.isHost()) {
+            // Broadcast de carta jugada para que el Peer confirmado elimine la carta de su mano
+            eventBus.subscribe(CardPlayedEvent.class, event ->
+                    broadcast(MessageSerializer.serialize((GameEvent) event)));
+
             eventBus.subscribe(TurnChangedEvent.class, event ->
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
  
@@ -391,23 +395,34 @@ public class NetworkLayer {
  
             case MessageSerializer.TYPE_CARD_PLAYED:
                 // Ejecutar la jugada directamente en el GameModel del Host.
-                // No publicamos en el bus porque causaría doble procesamiento:
-                // el listener del GameModel lo procesa Y el listener de NetworkLayer
-                // intentaría enviarlo de vuelta al Host en bucle.
+                // Si la jugada es inválida, notificar al Peer con CARD_REJECTED
+                // para que restaure la carta en su mano y vuelva a habilitar su turno.
                 if (gameModel != null) {
                     String cardStr  = fields.get("card");
                     Player cardPlyr = findPlayerByName(fields.get("player"));
                     if (cardPlyr != null && cardStr != null) {
+                        boolean valid = false;
                         int dashIdx = cardStr.indexOf('-');
                         if (dashIdx > 0) {
                             uno.model.Card.Color col = parseCardColor(cardStr.substring(0, dashIdx));
                             String val = cardStr.substring(dashIdx + 1);
                             if (col != null) {
-                                gameModel.playCard(cardPlyr, new uno.model.Card(col, val, null));
+                                valid = gameModel.playCard(cardPlyr, new uno.model.Card(col, val, null));
                             }
                         } else {
-                            gameModel.playCard(cardPlyr,
+                            valid = gameModel.playCard(cardPlyr,
                                 new uno.model.Card(uno.model.Card.Color.WILD, cardStr, null));
+                        }
+                        if (!valid && gameModel.getGameState() != null) {
+                            uno.model.GameState st = gameModel.getGameState();
+                            String topText = st.getTopCard() != null ? st.getTopCard().toString() : "?";
+                            String cw = String.valueOf(st.isClockwise());
+                            sendPrivate(senderName,
+                                "{\"type\":\"" + MessageSerializer.TYPE_CARD_REJECTED + "\""
+                                + ",\"player\":\"" + fields.get("player") + "\""
+                                + ",\"card\":\"" + cardStr + "\""
+                                + ",\"topCard\":\"" + topText + "\""
+                                + ",\"clockwise\":\"" + cw + "\"}\n");
                         }
                     }
                 }
@@ -504,7 +519,51 @@ public class NetworkLayer {
             case MessageSerializer.TYPE_TURN_CHANGED:
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                         fields.get("currentPlayer"),
-                        fields.get("topCard")));
+                        fields.get("topCard"),
+                        Boolean.parseBoolean(fields.getOrDefault("clockwise", "true"))));
+                break;
+
+            case MessageSerializer.TYPE_CARD_PLAYED:
+                // El Host confirmó que esta carta fue jugada exitosamente.
+                // Solo el Peer que la jugó la elimina de su mano local.
+                if (session.isLocalPlayer(fields.get("player"))) {
+                    String confirmedText = fields.get("card");
+                    uno.model.Card.Color confColor = null;
+                    String confValue = confirmedText;
+                    int confDash = confirmedText != null ? confirmedText.indexOf('-') : -1;
+                    if (confDash > 0) {
+                        confColor = parseCardColor(confirmedText.substring(0, confDash));
+                        confValue = confirmedText.substring(confDash + 1);
+                    } else {
+                        confColor = uno.model.Card.Color.WILD;
+                    }
+                    final uno.model.Card.Color fc = confColor;
+                    final String fv = confValue;
+                    session.getLocalPlayer().getHand().removeIf(
+                        c -> c.getColor() == fc && c.getValue().equals(fv));
+                }
+                break;
+
+            case MessageSerializer.TYPE_CARD_REJECTED:
+                // El Host rechazó la jugada del Peer. Restaurar la carta en la mano
+                // y re-publicar un NetworkTurnChangedEvent para re-habilitar la vista.
+                String rejCardText = fields.get("card");
+                if (rejCardText != null && session.isLocalPlayer(fields.get("player"))) {
+                    uno.model.Card.Color rejColor = uno.model.Card.Color.WILD;
+                    String rejValue = rejCardText;
+                    int rejDash = rejCardText.indexOf('-');
+                    if (rejDash > 0) {
+                        rejColor = parseCardColor(rejCardText.substring(0, rejDash));
+                        rejValue = rejCardText.substring(rejDash + 1);
+                    }
+                    uno.model.Card rejCard = new uno.model.Card(rejColor, rejValue, null);
+                    session.getLocalPlayer().addCard(rejCard);
+                }
+                // Reutilizar el handler de NetworkTurnChangedEvent para re-habilitar la mano
+                eventBus.publish(GameEventFactory.networkTurnChanged(
+                    fields.get("player"),
+                    fields.get("topCard"),
+                    Boolean.parseBoolean(fields.getOrDefault("clockwise", "true"))));
                 break;
  
             case MessageSerializer.TYPE_CARD_DRAWN_PRIVATE:

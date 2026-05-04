@@ -53,6 +53,7 @@ public class MessageSerializer {
     public static final String TYPE_COLOR_CHOSEN       = "COLOR_CHOSEN";
     public static final String TYPE_LOBBY_STATE        = "LOBBY_STATE";
     public static final String TYPE_START_REQUESTED    = "START_REQUESTED";
+    public static final String TYPE_CARD_REJECTED      = "CARD_REJECTED";
 
     /** Constructor privado: clase de utilidad, no se instancia. */
     private MessageSerializer() {}
@@ -138,6 +139,7 @@ public class MessageSerializer {
         Map<String, String> fields = new HashMap<>();
         fields.put("currentPlayer", e.getCurrentPlayer().getName());
         fields.put("topCard",       e.getTopCard().toString());
+        fields.put("clockwise",     String.valueOf(e.isClockwise()));
         return json(TYPE_TURN_CHANGED, fields) + "\n";
     }
 

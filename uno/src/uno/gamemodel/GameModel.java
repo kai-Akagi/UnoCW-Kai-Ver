@@ -166,7 +166,8 @@ public class GameModel {
         // Publicar el primer turno. NetworkLayer hace broadcast a todos los peers.
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
     }
 
@@ -261,7 +262,8 @@ public class GameModel {
         // El turno pasa normalmente
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
 
         return true;
@@ -278,7 +280,8 @@ public class GameModel {
         unoCalled = true;
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
     }
 
@@ -301,7 +304,8 @@ public class GameModel {
         }
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
     }
 
@@ -336,7 +340,8 @@ public class GameModel {
         gameState.advanceTurn();
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
 
         return drawn;

@@ -16,14 +16,19 @@ public class NetworkTurnChangedEvent extends GameEvent {
     /** Representación en texto de la carta activa (ej. "RED-7", "SKIP"). */
     private final String topCardText;
 
+    /** Dirección del juego recibida del Host. */
+    private final boolean clockwise;
+
     /**
      * @param currentPlayerName El nombre del jugador activo.
      * @param topCardText       La carta activa como texto.
+     * @param clockwise         Dirección actual del juego.
      */
-    public NetworkTurnChangedEvent(String currentPlayerName, String topCardText) {
+    public NetworkTurnChangedEvent(String currentPlayerName, String topCardText, boolean clockwise) {
         super();
         this.currentPlayerName = currentPlayerName;
         this.topCardText       = topCardText;
+        this.clockwise         = clockwise;
     }
 
     /** @return El nombre del jugador activo. */
@@ -31,4 +36,7 @@ public class NetworkTurnChangedEvent extends GameEvent {
 
     /** @return La carta activa como texto. */
     public String getTopCardText() { return topCardText; }
+
+    /** @return {@code true} si el juego va en sentido normal. */
+    public boolean isClockwise() { return clockwise; }
 }
