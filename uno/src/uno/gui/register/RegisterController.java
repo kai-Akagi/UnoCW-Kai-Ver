@@ -68,6 +68,7 @@ public class RegisterController {
         }
  
         view.showError("");
+        name = name.trim().toLowerCase();
         askRoleAndProceed(name, avatarId);
     }
  
@@ -171,7 +172,7 @@ public class RegisterController {
  
         new Thread(() -> {
             try {
-                network.connectToHost(hostIp, NetworkLayer.DEFAULT_PORT);
+                
  
                 // Listeners de confirmación/rechazo: solo activos hasta recibir respuesta.
                 // Usamos referencias a los listeners para poder desuscribirlos después
@@ -219,6 +220,9 @@ public class RegisterController {
  
                 EventBus.getInstance().subscribe(PlayerJoinedEvent.class,         joinListener[0]);
                 EventBus.getInstance().subscribe(NetworkPlayerRejectedEvent.class, rejectListener[0]);
+                
+                
+                network.connectToHost(hostIp, NetworkLayer.DEFAULT_PORT);
  
             } catch (Exception e) {
                 SwingUtilities.invokeLater(() ->

@@ -196,6 +196,11 @@ public class GameModel {
                 + " | turno actual: " + gameState.getCurrentPlayer().getName());
             return false;
         }
+        
+        System.out.println("[DEBUG] Mano de " + actualPlayer.getName() + ": " 
+            + actualPlayer.getHand());
+        System.out.println("[DEBUG] Buscando carta: color=" + card.getColor() 
+            + " value=" + card.getValue());
 
         // Buscamos la carta en la mano real del jugador por valor y color
         // para no depender de la identidad de objeto (que falla con JSON reconstruido)
