@@ -178,8 +178,9 @@ public class GameEventFactory {
      */
     public static NetworkTurnChangedEvent networkTurnChanged(
             String currentPlayerName, String topCardText, boolean clockwise,
-            java.util.Map<String, Integer> handSizes) {
-        return new NetworkTurnChangedEvent(currentPlayerName, topCardText, clockwise, handSizes);
+            java.util.Map<String, Integer> handSizes, uno.model.Card.Color activeColor) {
+        return new NetworkTurnChangedEvent(currentPlayerName, topCardText, clockwise,
+                                           handSizes, activeColor);
     }
  
     /**

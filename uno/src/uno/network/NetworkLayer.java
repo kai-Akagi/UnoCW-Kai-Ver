@@ -248,18 +248,22 @@ public class NetworkLayer {
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
 
             eventBus.subscribe(TurnChangedEvent.class, event -> {
-                // Incluir el conteo exacto de cartas de cada jugador en el mensaje
-                // para que el Peer no necesite inferirlo y siempre tenga el dato correcto.
                 String base = MessageSerializer.serialize((GameEvent) event).trim();
                 if (gameModel != null && gameModel.getGameState() != null) {
+                    uno.model.GameState gs = gameModel.getGameState();
                     StringBuilder sizes = new StringBuilder();
-                    for (uno.model.Player p : gameModel.getGameState().getPlayers()) {
+                    for (uno.model.Player p : gs.getPlayers()) {
                         if (sizes.length() > 0) sizes.append(";");
                         sizes.append(p.getName()).append(":").append(p.getHandSize());
                     }
+                    // Incluir el color activo para que el Peer muestre el color
+                    // correcto cuando la carta activa es un comodín (WILD/WILD_DRAW_FOUR).
+                    String activeColorStr = gs.getActiveColor() != null
+                            ? gs.getActiveColor().name() : "";
                     if (base.endsWith("}")) {
                         base = base.substring(0, base.length() - 1)
-                               + ",\"sizes\":\"" + sizes + "\"}\n";
+                               + ",\"sizes\":\"" + sizes + "\""
+                               + ",\"activeColor\":\"" + activeColorStr + "\"}\n";
                     }
                 }
                 broadcast(base);
@@ -553,11 +557,17 @@ public class NetworkLayer {
                         }
                     }
                 }
+                uno.model.Card.Color parsedActiveColor = null;
+                String activeColorStr = fields.get("activeColor");
+                if (activeColorStr != null && !activeColorStr.isEmpty()) {
+                    parsedActiveColor = parseCardColor(activeColorStr);
+                }
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                         fields.get("currentPlayer"),
                         fields.get("topCard"),
                         Boolean.parseBoolean(fields.getOrDefault("clockwise", "true")),
-                        parsedSizes));
+                        parsedSizes,
+                        parsedActiveColor));
                 break;
 
             case MessageSerializer.TYPE_CARD_PLAYED:
@@ -592,7 +602,7 @@ public class NetworkLayer {
                     fields.get("player"),
                     fields.get("topCard"),
                     Boolean.parseBoolean(fields.getOrDefault("clockwise", "true")),
-                    null));
+                    null, null));
                 break;
  
             case MessageSerializer.TYPE_CARD_DRAWN_PRIVATE:

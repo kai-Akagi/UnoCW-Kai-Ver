@@ -21,35 +21,30 @@ public class NetworkTurnChangedEvent extends GameEvent {
 
     /**
      * Conteo exacto de cartas por jugador enviado por el Host.
-     * Clave = nombre del jugador, Valor = cartas en mano.
      * Es null cuando el mensaje no incluye esta información (ej. CARD_REJECTED).
      */
     private final java.util.Map<String, Integer> handSizes;
 
     /**
-     * @param currentPlayerName El nombre del jugador activo.
-     * @param topCardText       La carta activa como texto.
-     * @param clockwise         Dirección actual del juego.
-     * @param handSizes         Conteo de cartas por jugador (puede ser null).
+     * Color activo elegido tras un comodín. Null si la carta activa tiene su propio color.
+     * Se usa para mostrar el color correcto en la mesa cuando el topCard es WILD.
      */
+    private final uno.model.Card.Color activeColor;
+
     public NetworkTurnChangedEvent(String currentPlayerName, String topCardText,
-                                   boolean clockwise, java.util.Map<String, Integer> handSizes) {
+                                   boolean clockwise, java.util.Map<String, Integer> handSizes,
+                                   uno.model.Card.Color activeColor) {
         super();
         this.currentPlayerName = currentPlayerName;
         this.topCardText       = topCardText;
         this.clockwise         = clockwise;
         this.handSizes         = handSizes;
+        this.activeColor       = activeColor;
     }
 
-    /** @return El nombre del jugador activo. */
     public String getCurrentPlayerName() { return currentPlayerName; }
-
-    /** @return La carta activa como texto. */
-    public String getTopCardText() { return topCardText; }
-
-    /** @return {@code true} si el juego va en sentido normal. */
-    public boolean isClockwise() { return clockwise; }
-
-    /** @return Conteo de cartas por jugador, o null si no está disponible. */
+    public String getTopCardText()       { return topCardText; }
+    public boolean isClockwise()         { return clockwise; }
     public java.util.Map<String, Integer> getHandSizes() { return handSizes; }
+    public uno.model.Card.Color getActiveColor()         { return activeColor; }
 }

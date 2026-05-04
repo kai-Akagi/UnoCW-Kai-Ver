@@ -259,6 +259,11 @@ public class GameController {
             Card evTopCard = tce.getTopCard();
             String topValue = evTopCard != null ? evTopCard.getValue() : "?";
             Card.Color topColor = evTopCard != null ? evTopCard.getColor() : Card.Color.WILD;
+            // Mostrar el color activo cuando la carta es comodín
+            if (topColor == Card.Color.WILD) {
+                Card.Color ac = state.getActiveColor();
+                if (ac != null && ac != Card.Color.WILD) topColor = ac;
+            }
             String currentName = tce.getCurrentPlayer().getName();
             boolean isMyTurn = currentName.equals(session.getLocalPlayer().getName());
 
@@ -303,12 +308,18 @@ public class GameController {
                 });
             }
 
+            final uno.model.Card.Color networkActiveColor = e.getActiveColor();
             SwingUtilities.invokeLater(() -> {
                 Card parsedTopCard = parseCard(topCardText);
                 String topValue = parsedTopCard != null ? parsedTopCard.getValue()
                                                         : topCardText;
                 Card.Color topColor = parsedTopCard != null ? parsedTopCard.getColor()
                                                             : Card.Color.WILD;
+                // Mostrar el color activo cuando la carta es comodín
+                if (topColor == Card.Color.WILD && networkActiveColor != null
+                        && networkActiveColor != Card.Color.WILD) {
+                    topColor = networkActiveColor;
+                }
 
                 List<String> oppNames = new ArrayList<>();
                 List<Integer> oppSizes = new ArrayList<>();
