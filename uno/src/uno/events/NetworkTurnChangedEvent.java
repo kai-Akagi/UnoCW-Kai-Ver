@@ -1,9 +1,5 @@
 package uno.events;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Evento de red: cambio de turno recibido desde el Host.
  *
@@ -19,37 +15,36 @@ public class NetworkTurnChangedEvent extends GameEvent {
 
     /** Representación en texto de la carta activa (ej. "RED-7", "SKIP"). */
     private final String topCardText;
-    
-    private final Map<String, Integer> handSizes;
+
+    /** Dirección del juego recibida del Host. */
+    private final boolean clockwise;
 
     /**
-     * @param currentPlayerName El nombre del jugador activo.
-     * @param topCardText       La carta activa como texto.
-     * @param handSizes         Mapa nombre→cantidad de cartas de cada jugador.
+     * Conteo exacto de cartas por jugador enviado por el Host.
+     * Es null cuando el mensaje no incluye esta información (ej. CARD_REJECTED).
      */
+    private final java.util.Map<String, Integer> handSizes;
+
+    /**
+     * Color activo elegido tras un comodín. Null si la carta activa tiene su propio color.
+     * Se usa para mostrar el color correcto en la mesa cuando el topCard es WILD.
+     */
+    private final uno.model.Card.Color activeColor;
+
     public NetworkTurnChangedEvent(String currentPlayerName, String topCardText,
-                                        Map<String, Integer> handSizes) {
+                                   boolean clockwise, java.util.Map<String, Integer> handSizes,
+                                   uno.model.Card.Color activeColor) {
         super();
         this.currentPlayerName = currentPlayerName;
         this.topCardText       = topCardText;
-        this.handSizes = Collections.unmodifiableMap(
-                new LinkedHashMap<>(handSizes));
-
+        this.clockwise         = clockwise;
+        this.handSizes         = handSizes;
+        this.activeColor       = activeColor;
     }
 
-    /** @return El nombre del jugador activo. */
     public String getCurrentPlayerName() { return currentPlayerName; }
-
-    /** @return La carta activa como texto. */
-    public String getTopCardText() { return topCardText; }
-    
-    
-    /**
-     * @return Mapa inmutable de nombre→cantidad de cartas según el Host.
-     */
-    public Map<String, Integer> getHandSizes() { return handSizes; }
-
-    
-    
-    
+    public String getTopCardText()       { return topCardText; }
+    public boolean isClockwise()         { return clockwise; }
+    public java.util.Map<String, Integer> getHandSizes() { return handSizes; }
+    public uno.model.Card.Color getActiveColor()         { return activeColor; }
 }

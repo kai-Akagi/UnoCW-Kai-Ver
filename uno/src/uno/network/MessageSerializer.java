@@ -53,6 +53,7 @@ public class MessageSerializer {
     public static final String TYPE_COLOR_CHOSEN       = "COLOR_CHOSEN";
     public static final String TYPE_LOBBY_STATE        = "LOBBY_STATE";
     public static final String TYPE_START_REQUESTED    = "START_REQUESTED";
+    public static final String TYPE_CARD_REJECTED      = "CARD_REJECTED";
 
     /** Constructor privado: clase de utilidad, no se instancia. */
     private MessageSerializer() {}
@@ -138,17 +139,7 @@ public class MessageSerializer {
         Map<String, String> fields = new HashMap<>();
         fields.put("currentPlayer", e.getCurrentPlayer().getName());
         fields.put("topCard",       e.getTopCard().toString());
-        
-        // Serializar handSizes como "nombre1:cantidad1,nombre2:cantidad2,..."
-        // Formato simple sin JSON anidado para mantener el parser liviano.
-        StringBuilder sb = new StringBuilder();
-        e.getHandSizes().forEach((name, size) -> {
-        if (sb.length() > 0) sb.append(",");
-                sb.append(name).append(":").append(size);
-        });
-        
-        fields.put("handSizes", sb.toString());
-
+        fields.put("clockwise",     String.valueOf(e.isClockwise()));
         return json(TYPE_TURN_CHANGED, fields) + "\n";
     }
 
