@@ -440,6 +440,16 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_UNO_CALLED:
+                
+                publishToLocalBus(type, fields);
+                // El jugador declaró UNO durante el periodo de gracia.
+                // Notificar al GameModel para que avance el turno sin penalización.
+                if (gameModel != null) {
+                    gameModel.onUnoDeclared();
+                }
+                break;
+                
+                
             case MessageSerializer.TYPE_START_REQUESTED:
                 publishToLocalBus(type, fields);
                 break;
