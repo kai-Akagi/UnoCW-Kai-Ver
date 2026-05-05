@@ -315,6 +315,14 @@ public class GameController {
                 });
             }
 
+            final boolean isLocalTurn = currentPlayerName.equals(session.getLocalPlayer().getName());
+            // Red de seguridad: si llega nuestro turno y seguíamos en grace period,
+            // limpiarlo para que la mano y el mazo queden habilitados.
+            if (isLocalTurn && inUnoPeriod) {
+                inUnoPeriod = false;
+                SwingUtilities.invokeLater(() -> view.setUnoGraceMode(false));
+            }
+
             final uno.model.Card.Color networkActiveColor = e.getActiveColor();
             SwingUtilities.invokeLater(() -> {
                 Card parsedTopCard = parseCard(topCardText);
@@ -369,12 +377,17 @@ public class GameController {
             }
         });
 
-        // El jugador local quedó con 1 carta → periodo de gracia de 5 segundos
+        // El jugador local quedó con 1 carta → periodo de gracia de 5 segundos.
+        // Se verifica inUnoPeriod dentro del invokeLater para evitar que
+        // setUnoGraceMode(true) se ejecute si el jugador ya declaró UNO
+        // antes de que el invokeLater procesara (race condition en el EDT).
         eventBus.subscribe(UnoGracePeriodEvent.class, event -> {
             UnoGracePeriodEvent e = (UnoGracePeriodEvent) event;
             if (session.isLocalPlayer(e.getPlayer().getName())) {
                 inUnoPeriod = true;
-                SwingUtilities.invokeLater(() -> view.setUnoGraceMode(true));
+                SwingUtilities.invokeLater(() -> {
+                    if (inUnoPeriod) view.setUnoGraceMode(true);
+                });
             }
         });
 
