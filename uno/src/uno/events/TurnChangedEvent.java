@@ -26,14 +26,19 @@ public class TurnChangedEvent extends GameEvent {
      */
     private final Card topCard;
 
+    /** Dirección del juego al momento del cambio de turno. */
+    private final boolean clockwise;
+
     /**
      * @param currentPlayer El jugador que ahora debe jugar.
      * @param topCard       La carta activa en la mesa.
+     * @param clockwise     Dirección actual del juego.
      */
-    public TurnChangedEvent(Player currentPlayer, Card topCard) {
+    public TurnChangedEvent(Player currentPlayer, Card topCard, boolean clockwise) {
         super();
         this.currentPlayer = currentPlayer;
         this.topCard       = topCard;
+        this.clockwise     = clockwise;
     }
 
     /** @return El jugador que tiene el turno ahora. */
@@ -41,4 +46,7 @@ public class TurnChangedEvent extends GameEvent {
 
     /** @return La carta activa en la mesa. */
     public Card getTopCard() { return topCard; }
+
+    /** @return {@code true} si el juego va en sentido normal. */
+    public boolean isClockwise() { return clockwise; }
 }
