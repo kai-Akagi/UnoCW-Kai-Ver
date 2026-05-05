@@ -119,8 +119,12 @@ public class GameController {
             // Para comodines: pedir color primero, luego enviar jugada.
             Card.Color chosen = showColorChooser();
             if (chosen == null) {
-                // El jugador canceló: rehabilitar la mano
-                if (buildCurrentViewModel() != null) view.render(buildCurrentViewModel());
+                // El jugador canceló: restaurar la vista con el último estado conocido.
+                // buildCurrentViewModel() solo funciona para el Host (necesita GameState),
+                // así que usamos lastViewModel que funciona para Host y Peer.
+                GameViewModel restore = lastViewModel != null
+                        ? lastViewModel : buildCurrentViewModel();
+                if (restore != null) view.render(restore);
                 return;
             }
             // Enviar el color elegido al Host ANTES que la jugada.
@@ -189,6 +193,9 @@ public class GameController {
      * El turno no avanza hasta que el jugador presione UNO o el timer expire.
      */
     private boolean inUnoPeriod = false;
+
+    /** Último ViewModel renderizado. Permite restaurar la vista al cancelar un diálogo. */
+    private GameViewModel lastViewModel = null;
 
     /**
      * Mapa nombre→cartas para los oponentes del Peer.
@@ -285,7 +292,7 @@ public class GameController {
             System.out.println("[GameController] TurnChanged → current='" + currentName
                 + "' local='" + session.getLocalPlayer().getName()
                 + "' isMyTurn=" + isMyTurn + " hand=" + vm.localHand.size());
-            SwingUtilities.invokeLater(() -> view.render(vm));
+            SwingUtilities.invokeLater(() -> { lastViewModel = vm; view.render(vm); });
         });
 
         // Cambio de turno recibido por la red (Peer).
@@ -339,6 +346,7 @@ public class GameController {
                     oppNames, oppSizes,
                     eventClockwise
                 );
+                lastViewModel = vm;
                 view.render(vm);
             });
         });
