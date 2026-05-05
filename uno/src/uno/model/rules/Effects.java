@@ -54,13 +54,7 @@ class ReverseEffect implements CardEffect {
      */
     @Override
     public void apply(GameState gameState) {
-        gameState.flipDirection();
-        if (gameState.getPlayers().size() == 2) {
-            // Regla oficial 2 jugadores: REVERSE actúa como SKIP (el mismo jugador vuelve a jugar)
-            gameState.skipNextPlayer();
-        } else {
-            gameState.advanceTurn();
-        }
+        gameState.reverseDirection();
     }
 
     @Override

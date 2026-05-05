@@ -193,12 +193,9 @@ public class GameState {
      * Si iba en sentido normal, pasa a ir al revés, y viceversa.
      * Esto lo usa el efecto REVERSE.
      */
-    public void flipDirection() {
-        clockwise = !clockwise;
-    }
-
     public void reverseDirection() {
-        flipDirection();
+        clockwise = !clockwise;
+        // Avanzamos el turno en la nueva dirección
         advanceTurn();
     }
 

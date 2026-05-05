@@ -66,8 +66,15 @@ public class GameEventFactory {
      * @param currentPlayer El jugador que ahora tiene el turno.
      * @param topCard       La carta activa en la mesa.
      */
-    public static TurnChangedEvent turnChanged(Player currentPlayer, Card topCard, boolean clockwise) {
-        return new TurnChangedEvent(currentPlayer, topCard, clockwise);
+    public static TurnChangedEvent turnChanged(Player currentPlayer, Card topCard,
+            java.util.List<uno.model.Player> players) {
+        
+            java.util.Map<String, Integer> handSizes = new java.util.LinkedHashMap<>();
+                for (uno.model.Player p : players) {
+                    handSizes.put(p.getName(), p.getHandSize());
+                }
+        
+        return new TurnChangedEvent(currentPlayer, topCard, handSizes);
     }
  
     /**
@@ -177,10 +184,9 @@ public class GameEventFactory {
      * @param topCardText       Carta activa como texto (ej. "RED-7").
      */
     public static NetworkTurnChangedEvent networkTurnChanged(
-            String currentPlayerName, String topCardText, boolean clockwise,
-            java.util.Map<String, Integer> handSizes, uno.model.Card.Color activeColor) {
-        return new NetworkTurnChangedEvent(currentPlayerName, topCardText, clockwise,
-                                           handSizes, activeColor);
+            String currentPlayerName, String topCardText,
+            java.util.Map<String, Integer> handSizes) {
+        return new NetworkTurnChangedEvent(currentPlayerName, topCardText, handSizes);
     }
  
     /**
