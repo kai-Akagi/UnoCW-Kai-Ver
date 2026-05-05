@@ -504,9 +504,27 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_TURN_CHANGED:
+                
+                
+                // Deserializar handSizes desde "nombre1:cantidad1,nombre2:cantidad2"
+                java.util.Map<String, Integer> handSizes = new java.util.LinkedHashMap<>();
+                String handSizesStr = fields.get("handSizes");
+                if (handSizesStr != null && !handSizesStr.isBlank()) {
+                    for (String entry : handSizesStr.split(",")) {
+                        String[] parts = entry.split(":");
+                        if (parts.length == 2) {
+                            try {
+                                handSizes.put(parts[0], Integer.parseInt(parts[1]));
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
+                }
+ 
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                         fields.get("currentPlayer"),
-                        fields.get("topCard")));
+                        fields.get("topCard"),
+                        handSizes));
+                        
                 break;
  
             case MessageSerializer.TYPE_CARD_DRAWN_PRIVATE:

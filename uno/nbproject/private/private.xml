@@ -6,9 +6,7 @@
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameController.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameView.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gamemodel/GameModel.java</file>
-            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/model/rules/Effects.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/network/NetworkLayer.java</file>
-            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/model/Deck.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/network/PeerConnection.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/register/RegisterController.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/register/RegisterView.java</file>
@@ -16,6 +14,13 @@
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/events/bus/GameEventListener.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/scoreboard/ScoreboardView.java</file>
             <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/model/LobbyState.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/lobby/LobbyController.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/lobby/LobbyView.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/factory/CardFactory.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/network/MessageSerializer.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/model/Card.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/events/NetworkTurnChangedEvent.java</file>
+            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/events/TurnChangedEvent.java</file>
         </group>
     </open-files>
 </project-private>

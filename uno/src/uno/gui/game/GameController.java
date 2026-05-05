@@ -12,6 +12,7 @@ import uno.session.GameSession;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller de la pantalla del juego.
@@ -24,12 +25,6 @@ import java.util.List;
  *   <li>Escuchar eventos del {@link EventBus} (cambios de turno, cartas
  *       jugadas por otros) y pedirle a la View que se actualice.</li>
  * </ol>
- *
- * <p><b>Diferencia clave con el LobbyController:</b><br>
- * En el juego, el Controller también accede al {@link GameModel} local
- * para construir el {@link GameViewModel}. No lo modifica directamente
- * (las modificaciones pasan por el EventBus), pero sí lo lee para obtener
- * el estado actual y preparar los datos para la View.
  */
 public class GameController {
 
@@ -40,6 +35,12 @@ public class GameController {
     private final GameModel    gameModel;
     private final NetworkLayer networkLayer;
     private final LobbyState   lobbyState;
+
+    /**
+     * Indica si estamos en el periodo de gracia de UNO (5 segundos para declarar).
+     * El turno no avanza hasta que el jugador presione UNO o el timer expire.
+     */
+    private boolean inUnoPeriod = false;
 
     /**
      * Construye el Controller del juego.
@@ -86,18 +87,6 @@ public class GameController {
                 gameModel.startGame(new ArrayList<>(lobbyState.getConnectedPlayers()));
             }, "start-game-thread").start();
         }
-        // Inicializar el conteo de cartas de oponentes para el Peer.
-        // Todos empiezan con 7 cartas; el mapa se actualiza durante el juego.
-        if (!session.isHost()) {
-            for (uno.model.Player p : lobbyState.getConnectedPlayers()) {
-                if (!p.getName().equals(session.getLocalPlayer().getName())) {
-                    peerOpponentHandSizes.put(p.getName(), 7);
-                }
-            }
-        }
-
-        // Los Peers esperan CardDrawnPrivateEvent (sus cartas) y
-        // TurnChangedEvent (quién empieza) que llegarán del Host por la red.
     }
 
     // ─────────────────────────────────────────────
@@ -106,8 +95,6 @@ public class GameController {
 
     /**
      * Se llama cuando el jugador hace clic en una carta de su mano.
-     * Publica la intención en el EventBus local.
-     * La NetworkLayer la llevará al Host para validación.
      *
      * @param card La carta en la que hizo clic.
      */
@@ -115,38 +102,21 @@ public class GameController {
         view.disableHand();
         view.stopTurnTimer();
         if (card.getColor() == Card.Color.WILD) {
-            // Para comodines: pedir color primero, luego enviar jugada.
-                Card.Color chosen = showColorChooser();
-                if (chosen == null) {
-                    // El jugador canceló: rehabilitar la mano
-                    if (buildCurrentViewModel() != null) view.render(buildCurrentViewModel());
-                    return;
-                }
-                // Solo el Peer elimina la carta optimistamente de su mano local.
-                // El Host NO debe hacerlo: su session.getLocalPlayer() apunta al mismo
-                // objeto Player que está dentro del GameState. Si elimina la carta aquí,
-                // GameModel.playCard() no la encuentra al buscarel en gameState y rechaza
-                // la jugada como inválida. Para el Host, playCard() maneja la eliminación.
-                if (!session.isHost()) {
-                    session.getLocalPlayer().removeCard(card);
-                }
-
-                // Enviar el color elegido al Host ANTES que la jugada
-                eventBus.publish(GameEventFactory.colorChosen(
-                        session.getLocalPlayer(), chosen));
-                eventBus.publish(GameEventFactory.cardPlayed(
-                        session.getLocalPlayer(), card));
-            
-        } else {
-            // Solo el Peer elimina la carta optimistamente de su mano local.
-            // Misma razón que arriba: el Host comparte el objeto Player con GameState.
+            Card.Color chosen = showColorChooser();
+            if (chosen == null) {
+                if (buildCurrentViewModel() != null) view.render(buildCurrentViewModel());
+                return;
+            }
             if (!session.isHost()) {
                 session.getLocalPlayer().removeCard(card);
             }
-
-            eventBus.publish(
-                GameEventFactory.cardPlayed(session.getLocalPlayer(), card)
-            );
+            eventBus.publish(GameEventFactory.colorChosen(session.getLocalPlayer(), chosen));
+            eventBus.publish(GameEventFactory.cardPlayed(session.getLocalPlayer(), card));
+        } else {
+            if (!session.isHost()) {
+                session.getLocalPlayer().removeCard(card);
+            }
+            eventBus.publish(GameEventFactory.cardPlayed(session.getLocalPlayer(), card));
         }
     }
 
@@ -174,7 +144,7 @@ public class GameController {
         }
     }
 
-    /** Construye el ViewModel actual para el jugador local (Host) o null si no aplica. */
+    /** Construye el ViewModel actual para el jugador local (Host). */
     private GameViewModel buildCurrentViewModel() {
         if (gameModel.getGameState() == null) return null;
         return new GameViewModel(gameModel.getGameState(), session.getLocalPlayer());
@@ -182,40 +152,16 @@ public class GameController {
 
     /**
      * Se llama cuando el jugador presiona el botón de robar carta.
-     *
-     * <p>Publica una <b>intención</b> de robo, no el robo en sí.
-     * El Peer no sabe qué carta saldrá del mazo: esa decisión la toma
-     * el Host. La NetworkLayer lleva esta intención al Host, quien
-     * ejecuta el robo real en su GameModel y devuelve el resultado
-     * vía {@link uno.events.CardDrawnPrivateEvent} (al que robó)
-     * y {@link uno.events.CardDrawnPublicEvent} (a todos los demás).
      */
     public void onDrawClicked() {
-        eventBus.publish(
-            GameEventFactory.drawCardRequest(session.getLocalPlayer())
-        );
+        eventBus.publish(GameEventFactory.drawCardRequest(session.getLocalPlayer()));
     }
-
-    /**
-     * Indica si estamos en el periodo de gracia de UNO (5 segundos para declarar).
-     * El turno no avanza hasta que el jugador presione UNO o el timer expire.
-     */
-    private boolean inUnoPeriod = false;
-
-    /**
-     * Mapa nombre→cartas para los oponentes del Peer.
-     * El Peer no tiene GameState, así que mantiene este conteo localmente
-     * actualizando cuando recibe TurnChanged y CardDrawnPrivate.
-     */
-    private final java.util.Map<String, Integer> peerOpponentHandSizes =
-            new java.util.HashMap<>();
 
     /**
      * Se llama cuando el jugador presiona el botón "¡UNO!".
      */
     public void onUnoClicked() {
         if (inUnoPeriod) {
-            // Periodo de gracia activo: declarar UNO termina el turno sin penalización
             inUnoPeriod = false;
             view.stopTurnTimer();
             view.setUnoGraceMode(false);
@@ -230,14 +176,9 @@ public class GameController {
 
     /**
      * Se llama cuando el temporizador de turno llega a cero.
-     *
-     * <p>Si es el turno del jugador local, se fuerza un robo de carta
-     * para pasar el turno automáticamente, igual que si el jugador
-     * hubiera presionado "Robar" manualmente.
      */
     public void onTurnTimerExpired() {
         if (inUnoPeriod) {
-            // El timer de gracia UNO expiró sin que el jugador declarara → penalización
             inUnoPeriod = false;
             view.setUnoGraceMode(false);
             if (session.isHost()) {
@@ -260,8 +201,20 @@ public class GameController {
      * Suscribe este Controller a los eventos del juego que afectan la View.
      */
     private void registerEventListeners() {
+        
+        // Jugada inválida: rehabilitar la mano del jugador local si era su turno.
+        // Solo el Host genera este evento, pero todos los jugadores lo reciben.
+        // Solo actuamos si somos el jugador local cuya mano quedó deshabilitada.
+        eventBus.subscribe(InvalidPlayEvent.class, event ->{
+            if (gameModel.getGameState() != null &&
+        gameModel.getGameState().getCurrentPlayer().getName()
+            .equals(session.getLocalPlayer().getName())) {
+                SwingUtilities.invokeLater(() ->
+                    view.render(buildCurrentViewModel()));
+            }
+        });
 
-        // Cambio de turno: reconstruir el ViewModel y renderizar
+        // Cambio de turno local (Host): reconstruir el ViewModel desde GameState
         eventBus.subscribe(TurnChangedEvent.class, event -> {
             if (gameModel.getGameState() != null) {
                 GameViewModel vm = new GameViewModel(
@@ -277,34 +230,16 @@ public class GameController {
             }
         });
 
-        // Cambio de turno recibido por la red (Peer)
-        // Rastrea quién tenía el turno antes del ultimo TurnChanged recibido
-        // para poder decrementar el contador de cartas cuando un oponente juega.
-        final String[] lastTurnHolder = { null };
-
+        // Cambio de turno recibido por la red (Peer).
+        // Los conteos de cartas vienen directamente del Host — sin inferencia.
+        // El Host es la única fuente de verdad; el Peer solo lee y renderiza.
         eventBus.subscribe(NetworkTurnChangedEvent.class, event -> {
             NetworkTurnChangedEvent e = (NetworkTurnChangedEvent) event;
 
-            final String currentPlayerName = e.getCurrentPlayerName();
-            final String topCardText       = e.getTopCardText();
+            final String currentPlayerName        = e.getCurrentPlayerName();
+            final String topCardText              = e.getTopCardText();
+            final Map<String, Integer> handSizes  = e.getHandSizes();
 
-            // Si el jugador que acaba de terminar su turno es un oponente (no nosotros),
-            // y tenía el turno antes, asumimos que jugó una carta → restar 1.
-            // Esta es una aproximación: si robó carta sin jugar, el contador no baja,
-            // pero NetworkCardDrawnPrivateEvent ya lo actualizará si recibió carta.
-            if (lastTurnHolder[0] != null
-                    && !session.isLocalPlayer(lastTurnHolder[0])
-                    && peerOpponentHandSizes.containsKey(lastTurnHolder[0])) {
-                int prev = peerOpponentHandSizes.get(lastTurnHolder[0]);
-                if (prev > 0) {
-                    peerOpponentHandSizes.put(lastTurnHolder[0], prev - 1);
-                }
-            }
-            lastTurnHolder[0] = currentPlayerName;
-
-            // Usamos invokeLater para que el render ocurra en el hilo de Swing,
-            // garantizando que todas las cartas privadas que llegaron antes
-            // (procesadas también en el EDT via SwingUtilities) ya están en la mano.
             SwingUtilities.invokeLater(() -> {
                 Card parsedTopCard = parseCard(topCardText);
                 String topValue = parsedTopCard != null ? parsedTopCard.getValue()
@@ -312,15 +247,13 @@ public class GameController {
                 Card.Color topColor = parsedTopCard != null ? parsedTopCard.getColor()
                                                             : Card.Color.WILD;
 
-                // Construir listas de oponentes con sus nombres y conteo de cartas.
-                // El Peer mantiene peerOpponentHandSizes actualizado: empieza en 7
-                // y se ajusta cuando recibe CardDrawnPrivate o inferimos de TurnChanged.
+                // Leer conteos directamente del Host — sin cálculos ni aproximaciones
                 List<String> oppNames = new ArrayList<>();
                 List<Integer> oppSizes = new ArrayList<>();
                 for (uno.model.Player p : lobbyState.getConnectedPlayers()) {
                     if (!p.getName().equals(session.getLocalPlayer().getName())) {
                         oppNames.add(p.getName());
-                        oppSizes.add(peerOpponentHandSizes.getOrDefault(p.getName(), 7));
+                        oppSizes.add(handSizes.getOrDefault(p.getName(), 0));
                     }
                 }
 
@@ -338,7 +271,6 @@ public class GameController {
         });
 
         // El Peer recibe una carta privada del Host (cartas iniciales o robadas)
-        // y la agrega a la mano del jugador local.
         eventBus.subscribe(NetworkCardDrawnPrivateEvent.class, event -> {
             NetworkCardDrawnPrivateEvent e = (NetworkCardDrawnPrivateEvent) event;
             if (session.isLocalPlayer(e.getPlayerName())) {
@@ -348,11 +280,8 @@ public class GameController {
                     SwingUtilities.invokeLater(() ->
                         session.getLocalPlayer().addCard(cardToAdd));
                 }
-            } else {
-                // Una carta fue dada a un oponente (DrawTwo, DrawFour, etc.)
-                // Actualizar el contador local del Peer para mostrarlo en la GUI.
-                peerOpponentHandSizes.merge(e.getPlayerName(), 1, Integer::sum);
             }
+            // Los conteos de oponentes vienen del Host vía TURN_CHANGED — no se rastrean aquí.
         });
 
         // El jugador local quedó con 1 carta → periodo de gracia de 5 segundos
@@ -368,8 +297,7 @@ public class GameController {
         eventBus.subscribe(GameOverEvent.class, event -> {
             GameOverEvent e = (GameOverEvent) event;
             SwingUtilities.invokeLater(() ->
-                mainWindow.showScoreboard(e.getWinner().getName())
-            );
+                mainWindow.showScoreboard(e.getWinner().getName()));
         });
 
         // Un jugador gritó UNO (feedback visual)
@@ -378,10 +306,10 @@ public class GameController {
             SwingUtilities.invokeLater(() ->
                 JOptionPane.showMessageDialog(mainWindow,
                     "¡" + e.getPlayer().getName() + " gritó UNO!",
-                    "UNO", JOptionPane.INFORMATION_MESSAGE)
-            );
+                    "UNO", JOptionPane.INFORMATION_MESSAGE));
         });
     }
+
     // ─────────────────────────────────────────────
     // Utilidades de parseo de red
     // ─────────────────────────────────────────────
@@ -389,16 +317,12 @@ public class GameController {
     /**
      * Reconstruye un objeto {@link Card} a partir de su representación en texto.
      *
-     * <p>El formato es "COLOR-VALUE" (ej. "RED-7", "BLUE-SKIP", "WILD_DRAW_FOUR").
-     * Esto es necesario porque los sockets solo transportan texto, no objetos Java.
-     *
      * @param cardText El texto de la carta recibido por la red.
      * @return La carta reconstruida, o {@code null} si el formato es inválido.
      */
     private Card parseCard(String cardText) {
         if (cardText == null || cardText.isBlank()) return null;
 
-        // Comodines no tienen guión de color
         if (cardText.equals("WILD")) {
             return new Card(Card.Color.WILD, "WILD", null);
         }
@@ -406,7 +330,6 @@ public class GameController {
             return new Card(Card.Color.WILD, "WILD_DRAW_FOUR", null);
         }
 
-        // Formato: "COLOR-VALUE"
         int dashIdx = cardText.indexOf('-');
         if (dashIdx < 0) return null;
 
@@ -417,8 +340,6 @@ public class GameController {
         if (color == null) return null;
 
         return new Card(color, value, null);
-        // Nota: el efecto no se reconstruye porque el Peer no aplica efectos.
-        // Solo el Host ejecuta la lógica de reglas. El Peer solo muestra la carta.
     }
 
     /**
@@ -437,5 +358,4 @@ public class GameController {
             default:       return null;
         }
     }
-
 }

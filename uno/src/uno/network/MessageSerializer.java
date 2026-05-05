@@ -138,6 +138,17 @@ public class MessageSerializer {
         Map<String, String> fields = new HashMap<>();
         fields.put("currentPlayer", e.getCurrentPlayer().getName());
         fields.put("topCard",       e.getTopCard().toString());
+        
+        // Serializar handSizes como "nombre1:cantidad1,nombre2:cantidad2,..."
+        // Formato simple sin JSON anidado para mantener el parser liviano.
+        StringBuilder sb = new StringBuilder();
+        e.getHandSizes().forEach((name, size) -> {
+        if (sb.length() > 0) sb.append(",");
+                sb.append(name).append(":").append(size);
+        });
+        
+        fields.put("handSizes", sb.toString());
+
         return json(TYPE_TURN_CHANGED, fields) + "\n";
     }
 

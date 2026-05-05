@@ -96,6 +96,7 @@ public class GameModel {
                             + e.getPlayer().getName() + "' carta=" + e.getCard()
                             + " topCard=" + gameState.getTopCard()
                             + " turnoActual=" + gameState.getCurrentPlayer().getName());
+                            eventBus.publish(new InvalidPlayEvent());
                     }
                 } finally {
                     processingPlay = false;
@@ -166,7 +167,8 @@ public class GameModel {
         // Publicar el primer turno. NetworkLayer hace broadcast a todos los peers.
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.getPlayers()
         ));
     }
 
@@ -266,7 +268,9 @@ public class GameModel {
         // El turno pasa normalmente
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.getPlayers()
+                
         ));
 
         return true;
@@ -283,7 +287,8 @@ public class GameModel {
         unoCalled = true;
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.getPlayers()
         ));
     }
 
@@ -306,7 +311,8 @@ public class GameModel {
         }
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.getPlayers()
         ));
     }
 
@@ -341,7 +347,8 @@ public class GameModel {
         gameState.advanceTurn();
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.getPlayers()
         ));
 
         return drawn;
