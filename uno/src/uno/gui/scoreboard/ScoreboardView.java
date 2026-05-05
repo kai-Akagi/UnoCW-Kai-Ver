@@ -85,9 +85,7 @@ public class ScoreboardView extends JPanel {
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         backButton.addActionListener(e ->
-            SwingUtilities.invokeLater(() ->
-                mainWindow.showScreen(MainWindow.SCREEN_REGISTER)
-            )
+            SwingUtilities.invokeLater(mainWindow::showRegister)
         );
 
         // Ensamblar

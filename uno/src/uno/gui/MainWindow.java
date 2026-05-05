@@ -138,6 +138,9 @@ public class MainWindow extends JFrame {
         if (networkLayer != null) {
             networkLayer.shutdown();
         }
+        // Limpiar todos los listeners del EventBus para que la nueva partida
+        // empiece desde cero sin listeners duplicados de la partida anterior.
+        uno.events.bus.EventBus.getInstance().clearAll();
         this.session      = null;
         this.networkLayer = null;
         this.lobbyState   = null;
