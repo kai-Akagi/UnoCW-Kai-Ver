@@ -1,8 +1,5 @@
 package uno.events;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import uno.model.Card;
 import uno.model.Player;
 
@@ -29,21 +26,19 @@ public class TurnChangedEvent extends GameEvent {
      */
     private final Card topCard;
 
-    
-    private final Map<String,Integer> handSizes;
-    
+    /** Dirección del juego al momento del cambio de turno. */
+    private final boolean clockwise;
+
     /**
      * @param currentPlayer El jugador que ahora debe jugar.
      * @param topCard       La carta activa en la mesa.
-     * @param handSizes     Mapa nombre->cantidad de cartas de cada jugador
+     * @param clockwise     Dirección actual del juego.
      */
-    public TurnChangedEvent(Player currentPlayer, Card topCard, Map<String, Integer> handSizes) {
+    public TurnChangedEvent(Player currentPlayer, Card topCard, boolean clockwise) {
         super();
         this.currentPlayer = currentPlayer;
         this.topCard       = topCard;
-        this.handSizes     = Collections.unmodifiableMap(
-                new LinkedHashMap<>(handSizes));
-
+        this.clockwise     = clockwise;
     }
 
     /** @return El jugador que tiene el turno ahora. */
@@ -51,12 +46,7 @@ public class TurnChangedEvent extends GameEvent {
 
     /** @return La carta activa en la mesa. */
     public Card getTopCard() { return topCard; }
-    
-    
-        /**
-     * @return Mapa inmutable de nombre→cantidad de cartas de cada jugador.
-     *         Refleja el estado real del GameState del Host.
-     */
-    public Map<String, Integer> getHandSizes() { return handSizes; }
 
+    /** @return {@code true} si el juego va en sentido normal. */
+    public boolean isClockwise() { return clockwise; }
 }

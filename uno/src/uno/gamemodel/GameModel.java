@@ -96,7 +96,13 @@ public class GameModel {
                             + e.getPlayer().getName() + "' carta=" + e.getCard()
                             + " topCard=" + gameState.getTopCard()
                             + " turnoActual=" + gameState.getCurrentPlayer().getName());
-                            eventBus.publish(new InvalidPlayEvent());
+                        // Re-publicar el turno actual para que la GUI del Host
+                        // vuelva a habilitar la mano sin cambiar el estado del juego.
+                        eventBus.publish(GameEventFactory.turnChanged(
+                            gameState.getCurrentPlayer(),
+                            gameState.getTopCard(),
+                            gameState.isClockwise()
+                        ));
                     }
                 } finally {
                     processingPlay = false;
@@ -168,7 +174,7 @@ public class GameModel {
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
             gameState.getTopCard(),
-            gameState.getPlayers()
+            gameState.isClockwise()
         ));
     }
 
@@ -198,11 +204,6 @@ public class GameModel {
                 + " | turno actual: " + gameState.getCurrentPlayer().getName());
             return false;
         }
-        
-        System.out.println("[DEBUG] Mano de " + actualPlayer.getName() + ": " 
-            + actualPlayer.getHand());
-        System.out.println("[DEBUG] Buscando carta: color=" + card.getColor() 
-            + " value=" + card.getValue());
 
         // Buscamos la carta en la mano real del jugador por valor y color
         // para no depender de la identidad de objeto (que falla con JSON reconstruido)
@@ -269,8 +270,7 @@ public class GameModel {
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
             gameState.getTopCard(),
-            gameState.getPlayers()
-                
+            gameState.isClockwise()
         ));
 
         return true;
@@ -288,7 +288,7 @@ public class GameModel {
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
             gameState.getTopCard(),
-            gameState.getPlayers()
+            gameState.isClockwise()
         ));
     }
 
@@ -312,7 +312,7 @@ public class GameModel {
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
             gameState.getTopCard(),
-            gameState.getPlayers()
+            gameState.isClockwise()
         ));
     }
 
@@ -348,7 +348,7 @@ public class GameModel {
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
             gameState.getTopCard(),
-            gameState.getPlayers()
+            gameState.isClockwise()
         ));
 
         return drawn;
@@ -408,6 +408,11 @@ public class GameModel {
      */
     public GameState getGameState() { return gameState; }
 
+    /** Permite a NetworkLayer controlar la bandera processingPlay para evitar bucles. */
+    public void setProcessingPlay(boolean value) {
+        this.processingPlay = value;
+    }
+
     // ─────────────────────────────────────────────
     // Utilidades internas
     // ─────────────────────────────────────────────
@@ -428,12 +433,4 @@ public class GameModel {
         } while (card != null && card.getColor() == Card.Color.WILD);
         return card;
     }
-
-    public void setProcessingPlay(boolean value) {
-    this.processingPlay = value;
 }
-
-
-}
-
-

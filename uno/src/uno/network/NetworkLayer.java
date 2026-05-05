@@ -243,8 +243,31 @@ public class NetworkLayer {
  
         // Solo el Host hace broadcast o envíos privados de eventos del juego
         if (session.isHost()) {
-            eventBus.subscribe(TurnChangedEvent.class, event ->
+            // Broadcast de carta jugada para que el Peer confirmado elimine la carta de su mano
+            eventBus.subscribe(CardPlayedEvent.class, event ->
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
+
+            eventBus.subscribe(TurnChangedEvent.class, event -> {
+                String base = MessageSerializer.serialize((GameEvent) event).trim();
+                if (gameModel != null && gameModel.getGameState() != null) {
+                    uno.model.GameState gs = gameModel.getGameState();
+                    StringBuilder sizes = new StringBuilder();
+                    for (uno.model.Player p : gs.getPlayers()) {
+                        if (sizes.length() > 0) sizes.append(";");
+                        sizes.append(p.getName()).append(":").append(p.getHandSize());
+                    }
+                    // Incluir el color activo para que el Peer muestre el color
+                    // correcto cuando la carta activa es un comodín (WILD/WILD_DRAW_FOUR).
+                    String activeColorStr = gs.getActiveColor() != null
+                            ? gs.getActiveColor().name() : "";
+                    if (base.endsWith("}")) {
+                        base = base.substring(0, base.length() - 1)
+                               + ",\"sizes\":\"" + sizes + "\""
+                               + ",\"activeColor\":\"" + activeColorStr + "\"}\n";
+                    }
+                }
+                broadcast(base);
+            });
  
             eventBus.subscribe(GameOverEvent.class, event ->
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
@@ -391,26 +414,35 @@ public class NetworkLayer {
  
             case MessageSerializer.TYPE_CARD_PLAYED:
                 // Ejecutar la jugada directamente en el GameModel del Host.
-                // No publicamos en el bus porque causaría doble procesamiento:
-                // el listener del GameModel lo procesa Y el listener de NetworkLayer
-                // intentaría enviarlo de vuelta al Host en bucle.
+                // Si la jugada es inválida, notificar al Peer con CARD_REJECTED
+                // para que restaure la carta en su mano y vuelva a habilitar su turno.
                 if (gameModel != null) {
                     String cardStr  = fields.get("card");
                     Player cardPlyr = findPlayerByName(fields.get("player"));
                     if (cardPlyr != null && cardStr != null) {
+                        boolean valid = false;
                         int dashIdx = cardStr.indexOf('-');
-                        gameModel.setProcessingPlay(true);
                         if (dashIdx > 0) {
                             uno.model.Card.Color col = parseCardColor(cardStr.substring(0, dashIdx));
                             String val = cardStr.substring(dashIdx + 1);
                             if (col != null) {
-                                gameModel.playCard(cardPlyr, new uno.model.Card(col, val, null));
+                                valid = gameModel.playCard(cardPlyr, new uno.model.Card(col, val, null));
                             }
                         } else {
-                            gameModel.playCard(cardPlyr,
+                            valid = gameModel.playCard(cardPlyr,
                                 new uno.model.Card(uno.model.Card.Color.WILD, cardStr, null));
                         }
-                        gameModel.setProcessingPlay(false);
+                        if (!valid && gameModel.getGameState() != null) {
+                            uno.model.GameState st = gameModel.getGameState();
+                            String topText = st.getTopCard() != null ? st.getTopCard().toString() : "?";
+                            String cw = String.valueOf(st.isClockwise());
+                            sendPrivate(senderName,
+                                "{\"type\":\"" + MessageSerializer.TYPE_CARD_REJECTED + "\""
+                                + ",\"player\":\"" + fields.get("player") + "\""
+                                + ",\"card\":\"" + cardStr + "\""
+                                + ",\"topCard\":\"" + topText + "\""
+                                + ",\"clockwise\":\"" + cw + "\"}\n");
+                        }
                     }
                 }
                 break;
@@ -440,16 +472,13 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_UNO_CALLED:
-                
                 publishToLocalBus(type, fields);
-                // El jugador declaró UNO durante el periodo de gracia.
-                // Notificar al GameModel para que avance el turno sin penalización.
+                // El Peer declaró UNO: avanzar el turno en el GameModel del Host
                 if (gameModel != null) {
                     gameModel.onUnoDeclared();
                 }
                 break;
-                
-                
+
             case MessageSerializer.TYPE_START_REQUESTED:
                 publishToLocalBus(type, fields);
                 break;
@@ -514,27 +543,66 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_TURN_CHANGED:
-                
-                
-                // Deserializar handSizes desde "nombre1:cantidad1,nombre2:cantidad2"
-                java.util.Map<String, Integer> handSizes = new java.util.LinkedHashMap<>();
-                String handSizesStr = fields.get("handSizes");
-                if (handSizesStr != null && !handSizesStr.isBlank()) {
-                    for (String entry : handSizesStr.split(",")) {
-                        String[] parts = entry.split(":");
-                        if (parts.length == 2) {
+                java.util.Map<String, Integer> parsedSizes = null;
+                String sizesStr = fields.get("sizes");
+                if (sizesStr != null && !sizesStr.isEmpty()) {
+                    parsedSizes = new java.util.HashMap<>();
+                    for (String entry : sizesStr.split(";")) {
+                        int colon = entry.indexOf(':');
+                        if (colon > 0) {
                             try {
-                                handSizes.put(parts[0], Integer.parseInt(parts[1]));
+                                parsedSizes.put(entry.substring(0, colon),
+                                    Integer.parseInt(entry.substring(colon + 1)));
                             } catch (NumberFormatException ignored) {}
                         }
                     }
                 }
- 
+                uno.model.Card.Color parsedActiveColor = null;
+                String activeColorStr = fields.get("activeColor");
+                if (activeColorStr != null && !activeColorStr.isEmpty()) {
+                    parsedActiveColor = parseCardColor(activeColorStr);
+                }
                 eventBus.publish(GameEventFactory.networkTurnChanged(
                         fields.get("currentPlayer"),
                         fields.get("topCard"),
-                        handSizes));
-                        
+                        Boolean.parseBoolean(fields.getOrDefault("clockwise", "true")),
+                        parsedSizes,
+                        parsedActiveColor));
+                break;
+
+            case MessageSerializer.TYPE_CARD_PLAYED:
+                // El Host confirmó que esta carta fue jugada exitosamente.
+                // Solo el Peer (no el Host) elimina la carta: el Host ya la
+                // eliminó internamente en GameModel.playCard().
+                // Usamos removeCard() porque getHand() devuelve lista no modificable.
+                if (!session.isHost() && session.isLocalPlayer(fields.get("player"))) {
+                    String confirmedText = fields.get("card");
+                    uno.model.Card.Color confColor = uno.model.Card.Color.WILD;
+                    String confValue = confirmedText;
+                    int confDash = confirmedText != null ? confirmedText.indexOf('-') : -1;
+                    if (confDash > 0) {
+                        confColor = parseCardColor(confirmedText.substring(0, confDash));
+                        confValue = confirmedText.substring(confDash + 1);
+                    }
+                    uno.model.Card toRemove = null;
+                    for (uno.model.Card c : session.getLocalPlayer().getHand()) {
+                        if (c.getColor() == confColor && c.getValue().equals(confValue)) {
+                            toRemove = c;
+                            break;
+                        }
+                    }
+                    if (toRemove != null) session.getLocalPlayer().removeCard(toRemove);
+                }
+                break;
+
+            case MessageSerializer.TYPE_CARD_REJECTED:
+                // El Host rechazó la jugada. La carta ya está en la mano del Peer
+                // (no se elimina optimistamente), así que solo re-habilitamos la vista.
+                eventBus.publish(GameEventFactory.networkTurnChanged(
+                    fields.get("player"),
+                    fields.get("topCard"),
+                    Boolean.parseBoolean(fields.getOrDefault("clockwise", "true")),
+                    null, null));
                 break;
  
             case MessageSerializer.TYPE_CARD_DRAWN_PRIVATE:
