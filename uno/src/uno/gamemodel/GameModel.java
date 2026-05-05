@@ -408,6 +408,11 @@ public class GameModel {
      */
     public GameState getGameState() { return gameState; }
 
+    /** Permite a NetworkLayer controlar la bandera processingPlay para evitar bucles. */
+    public void setProcessingPlay(boolean value) {
+        this.processingPlay = value;
+    }
+
     // ─────────────────────────────────────────────
     // Utilidades internas
     // ─────────────────────────────────────────────
