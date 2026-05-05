@@ -86,7 +86,7 @@ public class ScoreboardView extends JPanel {
 
         backButton.addActionListener(e ->
             SwingUtilities.invokeLater(() ->
-                mainWindow.showScreen(MainWindow.SCREEN_REGISTER)
+                mainWindow.showRegister()
             )
         );
 

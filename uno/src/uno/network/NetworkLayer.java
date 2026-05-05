@@ -33,6 +33,11 @@ import javax.swing.SwingUtilities;
  *       de que la conexión está establecida.</li>
  *   <li>Logs de consola para diagnosticar el flujo de conexión.</li>
  * </ul>
+ * 
+ * 
+ * @Elite Héctor Alonso 252039
+ *        Alejandro Rodríguez 251622
+ * 
  */
 public class NetworkLayer {
  
@@ -172,6 +177,18 @@ public class NetworkLayer {
             PlayerReadyEvent e = (PlayerReadyEvent) event;
             if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
                 sendToHost(MessageSerializer.serialize(e));
+            }
+        });
+        
+        
+        // El jugador local salió del lobby → notificar al Host antes de cerrar la red.
+        // Esto garantiza que el Host elimine al Peer de su LobbyState limpiamente,
+        // en lugar de depender del cierre abrupto del socket.
+        eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
+            PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
+            if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
+                sendToHost(MessageSerializer.serialize(
+                GameEventFactory.playerDisconnected(e.getPlayerName())));
             }
         });
  
