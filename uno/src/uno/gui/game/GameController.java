@@ -244,6 +244,9 @@ public class GameController {
             gameModel.getGameState().getCurrentPlayer().getName()
                 .equals(session.getLocalPlayer().getName())) {
             onDrawClicked();
+        } else if (!session.isHost() && lastViewModel != null && lastViewModel.isMyTurn) {
+            // Peer: el timer expiró y es nuestro turno — forzar robo igual que el Host
+            onDrawClicked();
         }
     }
 
