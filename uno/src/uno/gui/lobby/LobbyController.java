@@ -94,11 +94,26 @@ public class LobbyController {
         view.updateReadyButton(localPlayerReady);
         eventBus.publish(GameEventFactory.playerReady(
                 session.getLocalPlayer().getName(), localPlayerReady));
- 
+
+        // Habilitar botón de solicitud solo cuando el Peer esté listo
+        if (!session.isHost()) {
+            view.setRequestStartEnabled(localPlayerReady);
+        }
+
         refreshPlayerList();
         checkStartCondition();
     }
- 
+
+    /**
+     * El Peer solicita al Host iniciar la partida antes de completar el cupo.
+     * Solo disponible cuando el Peer ya marcó "Listo".
+     */
+    public void onRequestStartClicked() {
+        if (session.isHost() || !localPlayerReady) return;
+        eventBus.publish(GameEventFactory.startRequested(
+                session.getLocalPlayer().getName()));
+    }
+
     /**
      * Inicia la partida. Solo el Host puede ejecutar esto.
      */
@@ -202,6 +217,18 @@ public class LobbyController {
             });
         });
  
+        // Un Peer solicitó iniciar antes de completar el cupo.
+        // Solo el Host muestra el diálogo y decide si acepta.
+        eventBus.subscribe(StartRequestedEvent.class, event -> {
+            if (!session.isHost()) return;
+            StartRequestedEvent e = (StartRequestedEvent) event;
+            SwingUtilities.invokeLater(() -> {
+                if (view.showStartRequestDialog(e.getRequesterName())) {
+                    onStartClicked();
+                }
+            });
+        });
+
         // La partida inició: navegar a la pantalla del juego.
         // NO llamamos clearAll() porque eso eliminaría los listeners de
         // NetworkLayer que son necesarios para recibir eventos del juego.

@@ -197,6 +197,17 @@ public class NetworkLayer {
             eventBus.subscribe(GameStartedEvent.class, event ->
                     broadcast(MessageSerializer.serialize((GameEvent) event)));
         }
+
+        // Un Peer solicita al Host iniciar la partida antes de completar el cupo.
+        // Solo los Peers envían esta solicitud; el Host la recibe y decide.
+        if (!session.isHost()) {
+            eventBus.subscribe(uno.events.StartRequestedEvent.class, event -> {
+                uno.events.StartRequestedEvent e = (uno.events.StartRequestedEvent) event;
+                if (session.isLocalPlayer(e.getRequesterName())) {
+                    sendToHost(MessageSerializer.serialize(e));
+                }
+            });
+        }
     }
  
     /**
@@ -664,6 +675,12 @@ public class NetworkLayer {
                 // Para el Peer que lo recibe por broadcast, no hay acción aquí.
                 break;
  
+            case MessageSerializer.TYPE_START_REQUESTED:
+                // Un Peer solicitó al Host iniciar antes de completar el cupo.
+                // Publicamos el evento en el bus del Host para que LobbyController lo maneje.
+                eventBus.publish(GameEventFactory.startRequested(fields.get("player")));
+                break;
+
             case "PLAYER_REJECTED":
                 // El Host rechazó la conexión por nombre o avatar duplicado.
                 // Mostramos un aviso al usuario y cerramos la red para que
