@@ -24,7 +24,8 @@ public class LobbyView extends JPanel {
     private final JLabel     playerCountLabel;
     private final JPanel     playerListPanel;
     private final JButton    readyButton;
-    private final JButton    startButton;   // solo visible para el Host
+    private final JButton    startButton;          // solo visible para el Host
+    private final JButton    requestStartButton;   // solo visible para los Peers
     private final JButton    leaveButton;
     private final JComboBox<Integer> capacitySelector; // solo para el Host
  
@@ -38,9 +39,10 @@ public class LobbyView extends JPanel {
         this.roomCodeLabel    = new JLabel("Código: ----");
         this.playerCountLabel = new JLabel("Jugadores: 0/?");
         this.playerListPanel  = new JPanel();
-        this.readyButton      = new JButton("✓ Estoy Listo");
-        this.startButton      = new JButton("▶ Iniciar Partida");
-        this.leaveButton      = new JButton("← Salir");
+        this.readyButton         = new JButton("✓ Estoy Listo");
+        this.startButton         = new JButton("▶ Iniciar Partida");
+        this.requestStartButton  = new JButton("▶ Solicitar Inicio");
+        this.leaveButton         = new JButton("← Salir");
         this.capacitySelector = new JComboBox<>(new Integer[]{2, 3, 4});
  
         buildUI();
@@ -124,15 +126,18 @@ public class LobbyView extends JPanel {
         controls.setBorder(new EmptyBorder(10, 0, 0, 0));
  
         // Estilizar botones
-        styleButton(readyButton,  new Color(34, 197, 94));  // verde
-        styleButton(startButton,  new Color(59, 130, 246)); // azul
-        styleButton(leaveButton,  new Color(71, 85, 105));  // gris
- 
-        startButton.setEnabled(false); // se habilita cuando todos están listos
- 
+        styleButton(readyButton,        new Color(34, 197, 94));  // verde
+        styleButton(startButton,        new Color(59, 130, 246)); // azul
+        styleButton(requestStartButton, new Color(234, 179, 8));  // amarillo
+        styleButton(leaveButton,        new Color(71, 85, 105));  // gris
+
+        startButton.setEnabled(false);        // se habilita cuando todos están listos
+        requestStartButton.setEnabled(false); // se habilita cuando el Peer está listo
+
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         rightButtons.setBackground(new Color(30, 30, 46));
         rightButtons.add(readyButton);
+        rightButtons.add(requestStartButton);
         rightButtons.add(startButton);
  
         controls.add(leaveButton,  BorderLayout.WEST);
@@ -249,11 +254,35 @@ public class LobbyView extends JPanel {
      */
     public void configureForRole(boolean isHost) {
         startButton.setVisible(isHost);
+        requestStartButton.setVisible(!isHost);
         capacitySelector.setEnabled(isHost);
-        // Los Peers no pueden cambiar el tamaño de la sala ni iniciar
-        if (!isHost) {
-            readyButton.setVisible(true);
-        }
+    }
+
+    /**
+     * Habilita o deshabilita el botón "Solicitar Inicio".
+     * Se habilita cuando el Peer ya marcó "Listo".
+     *
+     * @param enabled {@code true} para habilitar.
+     */
+    public void setRequestStartEnabled(boolean enabled) {
+        requestStartButton.setEnabled(enabled);
+    }
+
+    /**
+     * Muestra un diálogo al Host notificando que un Peer solicita iniciar.
+     *
+     * @param requesterName Nombre del Peer que hizo la solicitud.
+     * @return {@code true} si el Host acepta iniciar.
+     */
+    public boolean showStartRequestDialog(String requesterName) {
+        int result = JOptionPane.showConfirmDialog(
+            this,
+            requesterName + " solicita iniciar la partida ahora.\n¿Deseas iniciar con los jugadores actuales?",
+            "Solicitud de inicio",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+        return result == JOptionPane.YES_OPTION;
     }
  
     /**
@@ -282,6 +311,7 @@ public class LobbyView extends JPanel {
  
         readyButton.addActionListener(e -> controller.onReadyClicked());
         startButton.addActionListener(e -> controller.onStartClicked());
+        requestStartButton.addActionListener(e -> controller.onRequestStartClicked());
         leaveButton.addActionListener(e -> controller.onLeaveClicked());
         capacitySelector.addActionListener(e ->
             controller.onCapacityChanged((Integer) capacitySelector.getSelectedItem())

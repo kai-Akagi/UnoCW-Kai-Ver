@@ -96,6 +96,13 @@ public class GameModel {
                             + e.getPlayer().getName() + "' carta=" + e.getCard()
                             + " topCard=" + gameState.getTopCard()
                             + " turnoActual=" + gameState.getCurrentPlayer().getName());
+                        // Re-publicar el turno actual para que la GUI del Host
+                        // vuelva a habilitar la mano sin cambiar el estado del juego.
+                        eventBus.publish(GameEventFactory.turnChanged(
+                            gameState.getCurrentPlayer(),
+                            gameState.getTopCard(),
+                            gameState.isClockwise()
+                        ));
                     }
                 } finally {
                     processingPlay = false;
@@ -166,7 +173,8 @@ public class GameModel {
         // Publicar el primer turno. NetworkLayer hace broadcast a todos los peers.
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
     }
 
@@ -261,7 +269,8 @@ public class GameModel {
         // El turno pasa normalmente
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
 
         return true;
@@ -278,7 +287,8 @@ public class GameModel {
         unoCalled = true;
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
     }
 
@@ -301,7 +311,8 @@ public class GameModel {
         }
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
     }
 
@@ -336,7 +347,8 @@ public class GameModel {
         gameState.advanceTurn();
         eventBus.publish(GameEventFactory.turnChanged(
             gameState.getCurrentPlayer(),
-            gameState.getTopCard()
+            gameState.getTopCard(),
+            gameState.isClockwise()
         ));
 
         return drawn;
@@ -395,6 +407,11 @@ public class GameModel {
      * @return El GameState, o {@code null} si la partida no ha iniciado.
      */
     public GameState getGameState() { return gameState; }
+
+    /** Permite a NetworkLayer controlar la bandera processingPlay para evitar bucles. */
+    public void setProcessingPlay(boolean value) {
+        this.processingPlay = value;
+    }
 
     // ─────────────────────────────────────────────
     // Utilidades internas

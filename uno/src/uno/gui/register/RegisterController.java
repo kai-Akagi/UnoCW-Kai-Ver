@@ -68,6 +68,7 @@ public class RegisterController {
         }
  
         view.showError("");
+        name = name.trim().toLowerCase();
         askRoleAndProceed(name, avatarId);
     }
  
@@ -134,13 +135,70 @@ public class RegisterController {
      * que el código coincida antes de aceptar al Peer (fase futura).
      */
     private void proceedAsPeer(String name, String avatarId) {
-        JTextField ipField   = new JTextField("localhost", 15);
+       // IP: máximo 45 caracteres (suficiente para IPv6 completo)
+        JTextField ipField = new JTextField("localhost", 15);
+        ((javax.swing.text.AbstractDocument) ipField.getDocument())
+            .setDocumentFilter(new javax.swing.text.DocumentFilter() {
+                @Override
+                public void insertString(FilterBypass fb, int offset, String text,
+                        javax.swing.text.AttributeSet attr)
+                        throws javax.swing.text.BadLocationException {
+                    if (fb.getDocument().getLength() + text.length() <= 45)
+                        super.insertString(fb, offset, text, attr);
+                }
+                @Override
+                public void replace(FilterBypass fb, int offset, int length, String text,
+                        javax.swing.text.AttributeSet attr)
+                        throws javax.swing.text.BadLocationException {
+                    int current = fb.getDocument().getLength() - length;
+                    if (current + text.length() <= 45)
+                        super.replace(fb, offset, length, text, attr);
+                }
+            });
+ 
+        // Codigo de sala: formato XXXX-XXXX (9 caracteres con guion).
+        // - Solo letras y numeros (el guion se inserta automaticamente).
+        // - Mayusculas automaticas al escribir.
+        // - Al escribir el 5to caracter se agrega el guion automaticamente.
         JTextField codeField = new JTextField(10);
+        ((javax.swing.text.AbstractDocument) codeField.getDocument())
+            .setDocumentFilter(new javax.swing.text.DocumentFilter() {
+                private boolean updating = false;
+                @Override
+                public void insertString(FilterBypass fb, int offset, String text,
+                        javax.swing.text.AttributeSet attr)
+                        throws javax.swing.text.BadLocationException {
+                    replace(fb, offset, 0, text, attr);
+                }
+                @Override
+                public void replace(FilterBypass fb, int offset, int length, String text,
+                        javax.swing.text.AttributeSet attr)
+                        throws javax.swing.text.BadLocationException {
+                    if (updating) return;
+                    String filtered = text.toUpperCase().replaceAll("[^A-Z0-9]", "");
+                    if (filtered.isEmpty() && !text.isEmpty()) return;
+                    updating = true;
+                    try {
+                        super.replace(fb, offset, length, filtered, attr);
+                        String current = fb.getDocument()
+                                .getText(0, fb.getDocument().getLength());
+                        String base = current.replace("-", "");
+                        if (base.length() > 8) base = base.substring(0, 8);
+                        String formatted = base.length() > 4
+                                ? base.substring(0, 4) + "-" + base.substring(4)
+                                : base;
+                        super.replace(fb, 0, fb.getDocument().getLength(),
+                                formatted, attr);
+                    } finally {
+                        updating = false;
+                    }
+                }
+            });
  
         JPanel panel = new JPanel(new GridLayout(4, 1, 4, 4));
         panel.add(new JLabel("IP del Host:"));
         panel.add(ipField);
-        panel.add(new JLabel("Código de Sala:"));
+        panel.add(new JLabel("Codigo de Sala:"));
         panel.add(codeField);
  
         int result = JOptionPane.showConfirmDialog(
@@ -157,6 +215,7 @@ public class RegisterController {
             view.showError("Debes ingresar la IP y el código de sala.");
             return;
         }
+
  
         Player     localPlayer = new Player(name, avatarId, false);
         // El LobbyState del Peer comienza con el jugador local ya agregado.
@@ -171,7 +230,7 @@ public class RegisterController {
  
         new Thread(() -> {
             try {
-                network.connectToHost(hostIp, NetworkLayer.DEFAULT_PORT);
+                
  
                 // Listeners de confirmación/rechazo: solo activos hasta recibir respuesta.
                 // Usamos referencias a los listeners para poder desuscribirlos después
@@ -219,6 +278,9 @@ public class RegisterController {
  
                 EventBus.getInstance().subscribe(PlayerJoinedEvent.class,         joinListener[0]);
                 EventBus.getInstance().subscribe(NetworkPlayerRejectedEvent.class, rejectListener[0]);
+                
+                
+                network.connectToHost(hostIp, NetworkLayer.DEFAULT_PORT);
  
             } catch (Exception e) {
                 SwingUtilities.invokeLater(() ->
