@@ -5,12 +5,14 @@
 package Vistas;
 
 import java.awt.event.ActionListener;
+import uno.gui.lobby.LobbyController;
 
 /**
  *
  * @author HP
  */
 public class CrearSala extends javax.swing.JPanel {
+    
     private int tamanhoSala;
     
     /**
@@ -85,6 +87,9 @@ public class CrearSala extends javax.swing.JPanel {
         tamanho3.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         tamanho3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         tamanho3.setText("3");
+        tamanho3.setMaximumSize(new java.awt.Dimension(943, 680));
+        tamanho3.setMinimumSize(new java.awt.Dimension(943, 680));
+        tamanho3.setPreferredSize(new java.awt.Dimension(943, 680));
         tamanho3.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tamanho3MouseClicked(evt);
@@ -128,6 +133,11 @@ public class CrearSala extends javax.swing.JPanel {
     }
     public int getTamanhoSala(){
         return tamanhoSala;
+    }
+    public void setController(LobbyController controller){
+        BtnContinuar.addActionListener(
+            e -> controller.onContinueClicked()
+        );
     }
 
 }

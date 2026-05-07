@@ -1,5 +1,6 @@
 package uno.gui.register;
 
+import Vistas.MenuPrincipal;
 import uno.events.PlayerJoinedEvent;
 import uno.events.NetworkPlayerRejectedEvent;
 import uno.events.bus.EventBus;
@@ -27,10 +28,15 @@ import java.awt.*;
  */
 public class RegisterController {
  
-    private final RegisterView view;
+//    private final RegisterView view;
     private final MainWindow   mainWindow;
+    private final MenuPrincipal view;
  
-    public RegisterController(RegisterView view, MainWindow mainWindow) {
+//    public RegisterController(RegisterView view, MainWindow mainWindow) {
+//        this.view       = view;
+//        this.mainWindow = mainWindow;
+//    }
+        public RegisterController(MenuPrincipal view, MainWindow mainWindow) {
         this.view       = view;
         this.mainWindow = mainWindow;
     }
@@ -92,6 +98,7 @@ public class RegisterController {
         );
  
         if (choice == 0) {
+            
             proceedAsHost(name, avatarId);
         } else if (choice == 1) {
             proceedAsPeer(name, avatarId);
@@ -119,8 +126,11 @@ public class RegisterController {
         network.startAsHost(NetworkLayer.DEFAULT_PORT);
         network.registerLobbyListeners();
  
-        SwingUtilities.invokeLater(() ->
-                mainWindow.showLobby(session, lobbyState, network));
+//        SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala dejate mi intento abajo
+//                mainWindow.showLobby(session, lobbyState, network));
+        
+         SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala
+                mainWindow.showRoomConfiguration(session, lobbyState, network));
     }
  
     /**

@@ -4,7 +4,17 @@
  */
 package Vistas;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import uno.gui.register.RegisterController;
 
 /**
  *
@@ -12,11 +22,27 @@ import java.awt.event.ActionListener;
  */
 public class MenuPrincipal extends javax.swing.JPanel {
     private String avatarSeleccionado;
+    private static final String[] AVATAR_IDS = {
+        "avatar_pig", "avatar_bear", "avatar_panda", "avatar_bunny",
+        "avatar_fox",  "avatar_penguin", "avatar_chick", "avatar_wolf", "avatar_frog"
+    };
+
+    /** Emojis usados para representar los avatares en texto (mientras no hay imágenes). */
+    private static final String[] AVATAR_EMOJIS = {
+        "🐷", "🐻", "🐼", "🐰", "🦊", "🐧", "🐥", "🐺", "🐸"
+    };
+    private int selectedAvatarIndex = -1;
+    private final JButton[] avatarButtons;
+    private RegisterController controller;
+    
+    
     /**
      * Creates new form MenuPrincipal
      */
     public MenuPrincipal() {
+        this.avatarButtons = new JButton[AVATAR_IDS.length];
         initComponents();
+        PanelAvatars.add(buildAvatarPanel()); 
     }
 
     /**
@@ -32,11 +58,9 @@ public class MenuPrincipal extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        avatar4 = new javax.swing.JLabel();
-        avatar1 = new javax.swing.JLabel();
-        avatar2 = new javax.swing.JLabel();
-        avatar3 = new javax.swing.JLabel();
         BtnContinuar = new javax.swing.JButton();
+        errorLabel = new javax.swing.JLabel();
+        PanelAvatars = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(242, 239, 225));
         setMaximumSize(new java.awt.Dimension(943, 613));
@@ -56,50 +80,23 @@ public class MenuPrincipal extends javax.swing.JPanel {
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 20, 260, 220));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel2.setText("Selecciona tu avatar:");
+        jLabel2.setText("Selecciona tu avatar");
         add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 360, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel3.setText("Nombre de Jugador:");
+        jLabel3.setText("Nombre de Jugador");
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 270, -1, -1));
-
-        avatar4.setText("avatar 4");
-        avatar4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                avatar4MouseClicked(evt);
-            }
-        });
-        add(avatar4, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 430, 70, 50));
-
-        avatar1.setText("avatar 1");
-        avatar1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                avatar1MouseClicked(evt);
-            }
-        });
-        add(avatar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 430, 70, 50));
-
-        avatar2.setText("avatar 2");
-        avatar2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                avatar2MouseClicked(evt);
-            }
-        });
-        add(avatar2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 430, 70, 50));
-
-        avatar3.setText("Avatar 3");
-        avatar3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                avatar3MouseClicked(evt);
-            }
-        });
-        add(avatar3, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 430, 70, 50));
 
         BtnContinuar.setBackground(new java.awt.Color(255, 0, 0));
         BtnContinuar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         BtnContinuar.setForeground(new java.awt.Color(255, 255, 255));
         BtnContinuar.setText("Continuar");
         add(BtnContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 540, 170, 40));
+        add(errorLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 240, 410, 170));
+
+        PanelAvatars.setBackground(new java.awt.Color(242, 234, 218));
+        PanelAvatars.setLayout(new javax.swing.BoxLayout(PanelAvatars, javax.swing.BoxLayout.X_AXIS));
+        add(PanelAvatars, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 700, 60));
     }// </editor-fold>//GEN-END:initComponents
 
     private void campoUsuarioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_campoUsuarioMouseExited
@@ -108,34 +105,12 @@ public class MenuPrincipal extends javax.swing.JPanel {
 
     }//GEN-LAST:event_campoUsuarioMouseExited
 
-    private void avatar1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_avatar1MouseClicked
-        // TODO add your handling code here:
-        setAvatar(avatar1.getText());
-    }//GEN-LAST:event_avatar1MouseClicked
-
-    private void avatar2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_avatar2MouseClicked
-        // TODO add your handling code here:
-        setAvatar(avatar2.getText());
-    }//GEN-LAST:event_avatar2MouseClicked
-
-    private void avatar3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_avatar3MouseClicked
-        // TODO add your handling code here:
-        setAvatar(avatar3.getText());
-    }//GEN-LAST:event_avatar3MouseClicked
-
-    private void avatar4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_avatar4MouseClicked
-        // TODO add your handling code here:
-        setAvatar(avatar4.getText());
-    }//GEN-LAST:event_avatar4MouseClicked
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton BtnContinuar;
-    public javax.swing.JLabel avatar1;
-    public javax.swing.JLabel avatar2;
-    public javax.swing.JLabel avatar3;
-    public javax.swing.JLabel avatar4;
-    public javax.swing.JTextField campoUsuario;
+    private javax.swing.JPanel PanelAvatars;
+    private javax.swing.JTextField campoUsuario;
+    private javax.swing.JLabel errorLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -154,5 +129,129 @@ public class MenuPrincipal extends javax.swing.JPanel {
         return avatarSeleccionado;
     }
     
+       // ─────────────────────────────────────────────
+    // Métodos que el Controller llama para actualizar la View
+    // ─────────────────────────────────────────────
+
+    private JPanel buildAvatarPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
+        panel.setBackground(new Color(30, 30, 46));
+
+        for (int i = 0; i < AVATAR_EMOJIS.length; i++) {
+            final int index = i;
+            JButton btn = new JButton(AVATAR_EMOJIS[i]);
+            btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
+            btn.setPreferredSize(new Dimension(56, 56));
+            btn.setBackground(new Color(242, 234, 218));
+            btn.setBorderPainted(true);
+            btn.setFocusPainted(false);
+            btn.setToolTipText("Avatar " + (i + 1));
+
+            // Al hacer clic, seleccionar este avatar
+            btn.addActionListener(e -> {
+                if (controller != null) controller.onAvatarSelected(index);
+            });
+
+            avatarButtons[i] = btn;
+            panel.add(btn);
+        }
+
+        return panel;
+    }
+    /**
+     * Resalta el avatar seleccionado y quita el resaltado de los demás.
+     * El Controller llama a esto cuando el usuario hace clic en un avatar.
+     *
+     * @param index El índice del avatar seleccionado.
+     */
+    public void highlightAvatar(int index) {
+        selectedAvatarIndex = index;
+        for (int i = 0; i < avatarButtons.length; i++) {
+            if (i == index) {
+                // Borde dorado para el seleccionado
+                avatarButtons[i].setBackground(new Color(248, 216, 71));
+                avatarButtons[i].setBorder(
+                    BorderFactory.createLineBorder(new Color(248, 216, 71), 3));
+            } else {
+                avatarButtons[i].setBackground(new Color(51, 51, 72));
+                avatarButtons[i].setBorder(UIManager.getBorder("Button.border"));
+            }
+        }
+    }
+
+    /**
+     * Muestra un mensaje de error debajo del campo de nombre.
+     * Pasa cadena vacía o " " para limpiar el error.
+     *
+     * @param message El mensaje de error a mostrar.
+     */
+    public void showError(String message) {
+        errorLabel.setText(message == null || message.isBlank() ? " " : message);
+
+    }
+
+    /**
+     * Marca un avatar como "en uso" (ya elegido por otro jugador).
+     * Lo deshabilita visualmente para que el usuario no lo seleccione.
+     *
+     * @param avatarId El identificador del avatar a deshabilitar.
+     */
+    public void markAvatarTaken(String avatarId) {
+        for (int i = 0; i < AVATAR_IDS.length; i++) {
+            if (AVATAR_IDS[i].equals(avatarId)) {
+                avatarButtons[i].setEnabled(false);
+                avatarButtons[i].setToolTipText("En uso por otro jugador");
+                avatarButtons[i].setBackground(new Color(30, 30, 46));
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Datos que el Controller lee de la View
+    // ─────────────────────────────────────────────
+
+    /**
+     * Devuelve el texto ingresado en el campo de nombre.
+     * El Controller lo usa para validar antes de continuar.
+     *
+     * @return El nombre ingresado, sin espacios extremos.
+     */
+    public String getPlayerName() {
+        return campoUsuario.getText().trim();
+    }
+
+    /**
+     * Devuelve el identificador del avatar actualmente seleccionado.
+     *
+     * @return El ID del avatar, o {@code null} si no hay ninguno seleccionado.
+     */
+    public String getSelectedAvatarId() {
+        if (selectedAvatarIndex < 0) return null;
+        return AVATAR_IDS[selectedAvatarIndex];
+    }
+
+    // ─────────────────────────────────────────────
+    // Registro del Controller
+    // ─────────────────────────────────────────────
+
+    /**
+     * Asigna el Controller de esta pantalla.
+     * Conecta el botón "SIGUIENTE" al método del Controller.
+     *
+     * @param controller El controller que manejará las acciones de esta View.
+     */
+    public void setController(RegisterController controller) {
+        this.controller = controller;
+
+        // Conectar el botón continuar al controller
+        BtnContinuar.addActionListener(
+            e -> controller.onContinueClicked()
+        );
+
+        // También permitir presionar Enter en el campo de nombre
+        campoUsuario.addActionListener(
+            e -> controller.onContinueClicked()
+        );
+    }
    
 }

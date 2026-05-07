@@ -1,5 +1,7 @@
 package uno.gui;
 
+import Vistas.CrearSala;
+import Vistas.MenuPrincipal;
 import uno.gui.game.GameController;
 import uno.gui.game.GameView;
 import uno.gui.lobby.LobbyController;
@@ -30,6 +32,7 @@ public class MainWindow extends JFrame {
     public static final String SCREEN_REGISTER   = "register";
     public static final String SCREEN_LOBBY      = "lobby";
     public static final String SCREEN_GAME       = "game";
+    public static final String SCREEN_CONFIGURATION      = "configuracionLobby";
     public static final String SCREEN_SCOREBOARD = "scoreboard";
  
     private final CardLayout cardLayout; //java.awt
@@ -64,15 +67,39 @@ public class MainWindow extends JFrame {
  
     private void buildScreens() {
         RegisterView       registerView       = new RegisterView();
-        RegisterController registerController = new RegisterController(registerView, this);
-        registerView.setController(registerController);
-        screenContainer.add(registerView, SCREEN_REGISTER);
+//      RegisterController registerController = new RegisterController(registerView, this); pantallas de este repo
+//      registerView.setController(registerController); pantallas de este repo
+        
+        MenuPrincipal MenuView = new MenuPrincipal();
+        RegisterController registerController = new RegisterController(MenuView, this);
+
+        MenuView.setController(registerController); // pantallas del primer repo
+        
+//        screenContainer.add(registerView, SCREEN_REGISTER); pantallas de este repo
+
+        screenContainer.add(MenuView, SCREEN_REGISTER);
  
         screenContainer.add(new JPanel(), SCREEN_LOBBY);
         screenContainer.add(new JPanel(), SCREEN_GAME);
         screenContainer.add(new JPanel(), SCREEN_SCOREBOARD);
  
         cardLayout.show(screenContainer, SCREEN_REGISTER);
+    }
+    //pantalla donde selecciona el tamanho de sala
+    public void showRoomConfiguration(GameSession session, LobbyState lobbyState, NetworkLayer network){
+        this.session      = session;
+        this.networkLayer = network;
+        this.lobbyState   = lobbyState;
+        
+        CrearSala configurationView = new CrearSala();
+        LobbyController lobbyController = new LobbyController(
+                configurationView, this, session, lobbyState, network);
+        configurationView.setController(lobbyController);
+        
+        screenContainer.add(configurationView, SCREEN_CONFIGURATION);
+        cardLayout.show(screenContainer, SCREEN_CONFIGURATION);
+ 
+//        lobbyController.initialize();
     }
  
     /**

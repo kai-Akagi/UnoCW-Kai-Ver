@@ -1,5 +1,6 @@
 package uno.gui.lobby;
 
+import Vistas.CrearSala;
 import uno.events.*;
 import uno.events.bus.EventBus;
 import uno.gui.MainWindow;
@@ -26,6 +27,7 @@ import javax.swing.*;
 public class LobbyController {
  
     private final LobbyView    view;
+    private final CrearSala configurationView;
     private final MainWindow   mainWindow;
     private final GameSession  session;
     private final EventBus     eventBus;
@@ -54,7 +56,22 @@ public class LobbyController {
         this.networkLayer = networkLayer;
         this.eventBus     = EventBus.getInstance();
         this.localPlayerReady = session.isHost(); // Host siempre listo
+        this.configurationView = null;
     }
+    
+    //constructor con el Crear sala (PRUEBAAAS)
+    public LobbyController(CrearSala view, MainWindow mainWindow, GameSession session, LobbyState lobbyState, NetworkLayer networkLayer) {
+        this.configurationView         = view;
+        this.mainWindow   = mainWindow;
+        this.session      = session;
+        this.lobbyState   = lobbyState;
+        this.networkLayer = networkLayer;
+        this.eventBus     = EventBus.getInstance();
+        this.localPlayerReady = session.isHost(); // Host siempre listo
+        this.view = null;
+    }
+    
+    
  
     /**
      * Inicializa el lobby: configura la View según el rol y se suscribe
@@ -74,6 +91,16 @@ public class LobbyController {
     // Acciones del usuario → vienen de la View
     // ─────────────────────────────────────────────
  
+    //metodo para continuar desde la pantalla CrearSala
+    public void onContinueClicked(){
+        
+        lobbyState.setCapacity(configurationView.getTamanhoSala());
+        
+        SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala dejate mi intento abajo
+                mainWindow.showLobby(session, lobbyState, networkLayer));
+        
+        
+    }
     /**
      * Alterna el estado "Listo" del jugador local y lo publica en el bus.
      */
