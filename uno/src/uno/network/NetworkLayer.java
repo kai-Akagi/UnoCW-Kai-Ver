@@ -507,6 +507,13 @@ public class NetworkLayer {
                 }
                 break;
 
+            case MessageSerializer.TYPE_UNO_PENALTY:
+                // El Peer no declaró UNO a tiempo: aplicar penalización y avanzar turno
+                if (gameModel != null) {
+                    gameModel.onUnoTimerExpired();
+                }
+                break;
+
             case MessageSerializer.TYPE_START_REQUESTED:
                 publishToLocalBus(type, fields);
                 break;
