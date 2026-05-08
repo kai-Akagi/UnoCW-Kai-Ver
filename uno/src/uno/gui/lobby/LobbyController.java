@@ -141,7 +141,7 @@ public class LobbyController {
             SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala dejate mi intento abajo
                 mainWindow.showLobby(session, lobbyState, networkLayer));
         }else{
-            configurationView.showError("Elije el tamaño del lobby");
+            configurationView.showError("Debes seleccionar un tamaño válido.");
         }
         
         
