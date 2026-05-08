@@ -177,6 +177,9 @@ public class NetworkLayer {
             PlayerReadyEvent e = (PlayerReadyEvent) event;
             if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
                 sendToHost(MessageSerializer.serialize(e));
+            } else if (session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
+                // El Host cambió su estado listo → notificar a los Peers
+                broadcast(MessageSerializer.serialize(e));
             }
         });
         
