@@ -258,6 +258,13 @@ public class LobbyController {
         if (session.isHost()) {
             view.setStartEnabled(lobbyState.canStart());
         }
+        if (lobbyState.canStart()) {
+            view.setWaitingStatus("Todos los jugadores están listos.");
+        } else if (lobbyState.allPlayersReady()) {
+            view.setWaitingStatus("Esperando que se unan más jugadores...");
+        } else {
+            view.setWaitingStatus("Esperando jugadores...");
+        }
     }
  
     /** Verifica si el nombre dado corresponde al Host de la sala. */

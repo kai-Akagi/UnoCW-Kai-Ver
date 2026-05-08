@@ -22,6 +22,7 @@ public class LobbyView extends JPanel {
     // ─── Componentes principales ─────────────────────────────────────────────
     private final JLabel     roomCodeLabel;
     private final JLabel     playerCountLabel;
+    private final JLabel     waitingStatusLabel;
     private final JPanel     playerListPanel;
     private final JButton    readyButton;
     private final JButton    startButton;          // solo visible para el Host
@@ -36,9 +37,10 @@ public class LobbyView extends JPanel {
      * Construye la pantalla del lobby.
      */
     public LobbyView() {
-        this.roomCodeLabel    = new JLabel("Código: ----");
-        this.playerCountLabel = new JLabel("Jugadores: 0/?");
-        this.playerListPanel  = new JPanel();
+        this.roomCodeLabel      = new JLabel("Código: ----");
+        this.playerCountLabel   = new JLabel("Jugadores: 0/?");
+        this.waitingStatusLabel = new JLabel("Esperando jugadores...", SwingConstants.CENTER);
+        this.playerListPanel    = new JPanel();
         this.readyButton         = new JButton("✓ Estoy Listo");
         this.startButton         = new JButton("▶ Iniciar Partida");
         this.requestStartButton  = new JButton("▶ Solicitar Inicio");
@@ -59,21 +61,31 @@ public class LobbyView extends JPanel {
         // ── Encabezado ──
         JPanel header = buildHeader();
  
+        // ── Label de estado de espera ──
+        waitingStatusLabel.setFont(new Font("Arial", Font.ITALIC, 13));
+        waitingStatusLabel.setForeground(new Color(148, 163, 184));
+        waitingStatusLabel.setBorder(new EmptyBorder(6, 0, 6, 0));
+
         // ── Lista de jugadores ──
         playerListPanel.setLayout(new BoxLayout(playerListPanel, BoxLayout.Y_AXIS));
         playerListPanel.setBackground(new Color(22, 22, 35));
         playerListPanel.setBorder(BorderFactory.createLineBorder(new Color(51, 51, 72)));
- 
+
         JScrollPane scrollPane = new JScrollPane(playerListPanel);
         scrollPane.setBorder(null);
         scrollPane.getViewport().setBackground(new Color(22, 22, 35));
- 
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(30, 30, 46));
+        centerPanel.add(waitingStatusLabel, BorderLayout.NORTH);
+        centerPanel.add(scrollPane,         BorderLayout.CENTER);
+
         // ── Panel de controles (botones inferiores) ──
         JPanel controls = buildControls();
- 
-        add(header,     BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        add(controls,   BorderLayout.SOUTH);
+
+        add(header,      BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(controls,    BorderLayout.SOUTH);
     }
  
     /**
@@ -279,6 +291,15 @@ public class LobbyView extends JPanel {
      */
     public void setRequestStartEnabled(boolean enabled) {
         requestStartButton.setEnabled(enabled);
+    }
+
+    /**
+     * Actualiza el mensaje de estado de espera visible en la sala.
+     *
+     * @param text El texto a mostrar.
+     */
+    public void setWaitingStatus(String text) {
+        waitingStatusLabel.setText(text);
     }
 
     /**
