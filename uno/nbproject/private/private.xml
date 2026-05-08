@@ -3,10 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameController.java</file>
-            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameView.java</file>
-            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/gamemodel/GameModel.java</file>
-            <file>file:/S:/ProyectoUNOCW/UnoCW-Kai-Ver/uno/src/uno/network/NetworkLayer.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/model/GameState.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/gui/MainWindow.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameController.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/events/GameEventFactory.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameView.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/gui/game/GameViewModel.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/gui/register/RegisterController.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/gui/lobby/LobbyController.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/events/NetworkTurnChangedEvent.java</file>
+            <file>file:/C:/Users/HP/OneDrive/Documents/ITSON/Clases6toSemestre/Arquitectura%20de%20software/Uno%20hack/UnoCW-Kai-Ver/uno/src/uno/network/NetworkLayer.java</file>
         </group>
     </open-files>
 </project-private>
