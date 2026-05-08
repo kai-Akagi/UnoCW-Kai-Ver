@@ -5,6 +5,7 @@
 package Vistas;
 
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
 import uno.gui.lobby.LobbyController;
 
 /**
@@ -13,7 +14,7 @@ import uno.gui.lobby.LobbyController;
  */
 public class CrearSala extends javax.swing.JPanel {
     
-    private int tamanhoSala;
+    private int tamanhoSala = 0;
     
     /**
      * Creates new form CrearSala
@@ -36,13 +37,14 @@ public class CrearSala extends javax.swing.JPanel {
         BtnCancelar = new javax.swing.JButton();
         BtnContinuar = new javax.swing.JButton();
         tamanho4 = new javax.swing.JLabel();
-        tamanho2 = new javax.swing.JLabel();
         tamanho3 = new javax.swing.JLabel();
+        tamanho2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(242, 239, 225));
-        setMaximumSize(new java.awt.Dimension(943, 681));
-        setMinimumSize(new java.awt.Dimension(943, 681));
-        setPreferredSize(new java.awt.Dimension(943, 681));
+        setMaximumSize(new java.awt.Dimension(943, 640));
+        setMinimumSize(new java.awt.Dimension(943, 640));
+        setPreferredSize(new java.awt.Dimension(943, 640));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/UNO_Log_pequenho.png"))); // NOI18N
@@ -50,23 +52,23 @@ public class CrearSala extends javax.swing.JPanel {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         jLabel1.setText("Crear sala");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 60, -1, -1));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 20, -1, -1));
 
         BtnCancelar.setBackground(new java.awt.Color(0, 0, 0));
         BtnCancelar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         BtnCancelar.setForeground(new java.awt.Color(255, 255, 255));
         BtnCancelar.setText("Cancelar");
-        add(BtnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 630, 140, 40));
+        add(BtnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 590, 140, 40));
 
         BtnContinuar.setBackground(new java.awt.Color(51, 102, 255));
         BtnContinuar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         BtnContinuar.setForeground(new java.awt.Color(255, 255, 255));
         BtnContinuar.setText("Siguiente");
-        add(BtnContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 630, 180, 40));
+        add(BtnContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 590, 180, 40));
 
         tamanho4.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         tamanho4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        tamanho4.setText("4");
+        tamanho4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/tamanho4.png"))); // NOI18N
         tamanho4.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tamanho4MouseClicked(evt);
@@ -74,19 +76,9 @@ public class CrearSala extends javax.swing.JPanel {
         });
         add(tamanho4, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 160, 240, 360));
 
-        tamanho2.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
-        tamanho2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        tamanho2.setText("2");
-        tamanho2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tamanho2MouseClicked(evt);
-            }
-        });
-        add(tamanho2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 170, 240, 360));
-
         tamanho3.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         tamanho3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        tamanho3.setText("3");
+        tamanho3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/tamanho3.png"))); // NOI18N
         tamanho3.setMaximumSize(new java.awt.Dimension(943, 680));
         tamanho3.setMinimumSize(new java.awt.Dimension(943, 680));
         tamanho3.setPreferredSize(new java.awt.Dimension(943, 680));
@@ -95,7 +87,21 @@ public class CrearSala extends javax.swing.JPanel {
                 tamanho3MouseClicked(evt);
             }
         });
-        add(tamanho3, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 160, 240, 360));
+        add(tamanho3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 170, 240, 360));
+
+        tamanho2.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
+        tamanho2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        tamanho2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Tamanho2.png"))); // NOI18N
+        tamanho2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tamanho2MouseClicked(evt);
+            }
+        });
+        add(tamanho2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 270, 360));
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel4.setText("Selecciona el tamaño de la sala");
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 100, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void tamanho4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho4MouseClicked
@@ -120,6 +126,7 @@ public class CrearSala extends javax.swing.JPanel {
     private javax.swing.JButton BtnContinuar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel tamanho2;
     private javax.swing.JLabel tamanho3;
     private javax.swing.JLabel tamanho4;
@@ -138,6 +145,14 @@ public class CrearSala extends javax.swing.JPanel {
         BtnContinuar.addActionListener(
             e -> controller.onContinueClicked()
         );
+       BtnCancelar.addActionListener(
+         e -> controller.onLeaveClicked()
+       );
+    }
+    public void showError(String message) {
+//        errorLabel.setText(message == null || message.isBlank() ? " " : message);
+        JOptionPane.showMessageDialog(this, message);
+
     }
 
 }

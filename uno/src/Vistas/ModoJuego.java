@@ -5,6 +5,7 @@
 package Vistas;
 
 import java.awt.event.ActionListener;
+import uno.gui.lobby.LobbyController;
 
 /**
  *
@@ -12,6 +13,7 @@ import java.awt.event.ActionListener;
  */
 public class ModoJuego extends javax.swing.JPanel {
 
+    private GameModeController controller;
     /**
      * Creates new form ModoJuego
      */
@@ -93,5 +95,11 @@ public class ModoJuego extends javax.swing.JPanel {
         BtnCancelar.addActionListener(listener);
     }
     
+    public void setController(GameModeController controller){
+        this.controller = controller;
+        BtnCrearSala.addActionListener(
+            e -> controller.onContinueClicked()
+        );
+    }
 
 }

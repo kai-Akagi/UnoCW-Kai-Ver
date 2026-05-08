@@ -55,8 +55,8 @@ public class SalaEspera extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
         panelJugadores = new javax.swing.JPanel();
         BtnSalir = new javax.swing.JButton();
-        BtnListo = new javax.swing.JButton();
         BtnSolicitarIniciar = new javax.swing.JButton();
+        BtnListo = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(242, 239, 225));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -110,6 +110,7 @@ public class SalaEspera extends javax.swing.JPanel {
         jLabel6.setText("Codigo de Sala");
         add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 580, -1, -1));
 
+        panelJugadores.setBackground(new java.awt.Color(0, 87, 193));
         panelJugadores.setLayout(new javax.swing.BoxLayout(panelJugadores, javax.swing.BoxLayout.Y_AXIS));
         add(panelJugadores, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 180, 790, 390));
 
@@ -117,14 +118,14 @@ public class SalaEspera extends javax.swing.JPanel {
         BtnSalir.setText("Salir");
         add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 640, 110, 30));
 
-        BtnListo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        BtnListo.setText("Cancelar Listo");
-        add(BtnListo, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 640, 140, 30));
-
         BtnSolicitarIniciar.setBackground(new java.awt.Color(255, 255, 153));
         BtnSolicitarIniciar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         BtnSolicitarIniciar.setText("Solicitar Iniciar");
         add(BtnSolicitarIniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 640, 180, 30));
+
+        BtnListo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        BtnListo.setText("Cancelar Listo");
+        add(BtnListo, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 640, 160, 30));
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -234,7 +235,9 @@ public class SalaEspera extends javax.swing.JPanel {
      */
     public void setPlayerCount(int current, int capacity) {
         labelNumJugadores.setText( current + "/" + capacity);
+        labelTamanhoSala.setText(capacity+"");
     }
+    
  
     /**
      * Habilita o deshabilita el botón "Iniciar Partida".
@@ -253,8 +256,12 @@ public class SalaEspera extends javax.swing.JPanel {
      * @param isHost {@code true} si el jugador local es el Host.
      */
     public void configureForRole(boolean isHost) {
-        BtnListo.setVisible(isHost);
+        BtnIniciarPartida.setVisible(isHost);
+        BtnListo.setVisible(true);
         BtnSolicitarIniciar.setVisible(!isHost);
+        revalidate();
+        repaint();
+        
 //        capacitySelector.setEnabled(isHost); creo que este no lo ocuparemos si no 
                                             // traer la info desde la pantalla de crear sala
     }

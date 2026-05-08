@@ -52,7 +52,7 @@ public class RegisterController {
      */
     public void onAvatarSelected(int avatarIndex) {
         view.highlightAvatar(avatarIndex);
-        view.showError("");
+//        view.showError(""); al escojer avatar sale un Joptionpane en blanco (en el jPanel MenuPrincipal)
     }
  
     /**
@@ -73,10 +73,16 @@ public class RegisterController {
             return;
         }
  
-        view.showError("");
+//        view.showError("");  al escojer avatar sale un Joptionpane en blanco (en el jPanel MenuPrincipal)
         name = name.trim().toLowerCase();
+//        SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala
+//                mainWindow.showSelectGameMode(user, avatarId));
         askRoleAndProceed(name, avatarId);
+        
+        
     }
+    
+    
  
     // ─────────────────────────────────────────────
     // Flujo de rol

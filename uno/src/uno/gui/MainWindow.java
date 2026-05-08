@@ -1,11 +1,13 @@
 package uno.gui;
 
 import Vistas.CrearSala;
+import Vistas.GameModeController;
 import Vistas.MenuPrincipal;
+import Vistas.ModoJuego;
+import Vistas.SalaEspera;
 import uno.gui.game.GameController;
 import uno.gui.game.GameView;
 import uno.gui.lobby.LobbyController;
-import uno.gui.lobby.LobbyView;
 import uno.gui.register.RegisterController;
 import uno.gui.register.RegisterView;
 import uno.gui.scoreboard.ScoreboardView;
@@ -33,6 +35,7 @@ public class MainWindow extends JFrame {
     public static final String SCREEN_LOBBY      = "lobby";
     public static final String SCREEN_GAME       = "game";
     public static final String SCREEN_CONFIGURATION      = "configuracionLobby";
+    public static final String SCREEN_SELECTIONGAMEMODE      = "GameMode";
     public static final String SCREEN_SCOREBOARD = "scoreboard";
  
     private final CardLayout cardLayout; //java.awt
@@ -101,6 +104,20 @@ public class MainWindow extends JFrame {
  
 //        lobbyController.initialize();
     }
+    //quite los parametros para ver que pasa GameSession session, LobbyState lobbyState, NetworkLayer network
+    public void showSelectGameMode(String nombre, String avatar){
+//        this.session      = session;
+//        this.networkLayer = network;
+//        this.lobbyState   = lobbyState;
+        
+        ModoJuego gameMode = new ModoJuego();
+        GameModeController gameModeController = new GameModeController(gameMode, this, nombre, avatar);
+        gameMode.setController(gameModeController);
+        screenContainer.add(gameMode,SCREEN_SELECTIONGAMEMODE);
+        cardLayout.show(screenContainer, SCREEN_SELECTIONGAMEMODE);
+        
+    }
+                 
  
     /**
      * Navega al lobby con la sesión, el estado de sala y la red ya creados.
@@ -119,8 +136,9 @@ public class MainWindow extends JFrame {
         this.session      = session;
         this.networkLayer = network;
         this.lobbyState   = lobbyState;
- 
-        LobbyView       lobbyView       = new LobbyView();
+        SalaEspera lobbyView = new SalaEspera();
+        
+//        LobbyView       lobbyView       = new LobbyView();
         LobbyController lobbyController = new LobbyController(
                 lobbyView, this, session, lobbyState, network);
         lobbyView.setController(lobbyController);

@@ -49,6 +49,8 @@ public class GameSession {
      * El Host lo genera y lo comparte. Los Peers lo usan para conectarse.
      */
     private String roomCode;
+    
+    private int maxJugadores;
 
     /**
      * Crea una nueva sesión para el jugador local.
@@ -106,4 +108,13 @@ public class GameSession {
     public boolean isLocalPlayer(String playerName) {
         return localPlayer.getName().equals(playerName);
     }
+
+    public int getMaxJugadores() {
+        return maxJugadores;
+    }
+
+    public void setMaxJugadores(int maxJugadores) {
+        this.maxJugadores = maxJugadores;
+    }
+    
 }

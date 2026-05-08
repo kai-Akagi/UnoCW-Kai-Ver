@@ -54,12 +54,12 @@ public class MenuPrincipal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        errorLabel = new javax.swing.JLabel();
         campoUsuario = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         BtnContinuar = new javax.swing.JButton();
-        errorLabel = new javax.swing.JLabel();
         PanelAvatars = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(242, 239, 225));
@@ -67,6 +67,7 @@ public class MenuPrincipal extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(943, 613));
         setPreferredSize(new java.awt.Dimension(943, 613));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        add(errorLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 230, 410, 170));
 
         campoUsuario.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         campoUsuario.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -91,12 +92,11 @@ public class MenuPrincipal extends javax.swing.JPanel {
         BtnContinuar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         BtnContinuar.setForeground(new java.awt.Color(255, 255, 255));
         BtnContinuar.setText("Continuar");
-        add(BtnContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 540, 170, 40));
-        add(errorLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 240, 410, 170));
+        add(BtnContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 540, 170, 40));
 
-        PanelAvatars.setBackground(new java.awt.Color(242, 234, 218));
+        PanelAvatars.setBackground(new java.awt.Color(242, 218, 179));
         PanelAvatars.setLayout(new javax.swing.BoxLayout(PanelAvatars, javax.swing.BoxLayout.X_AXIS));
-        add(PanelAvatars, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 700, 60));
+        add(PanelAvatars, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 700, 80));
     }// </editor-fold>//GEN-END:initComponents
 
     private void campoUsuarioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_campoUsuarioMouseExited
@@ -135,13 +135,13 @@ public class MenuPrincipal extends javax.swing.JPanel {
 
     private JPanel buildAvatarPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
-        panel.setBackground(new Color(30, 30, 46));
+        panel.setBackground(new Color(242, 218, 179));
 
         for (int i = 0; i < AVATAR_EMOJIS.length; i++) {
             final int index = i;
             JButton btn = new JButton(AVATAR_EMOJIS[i]);
-            btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
-            btn.setPreferredSize(new Dimension(56, 56));
+            btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            btn.setPreferredSize(new Dimension(60, 60));
             btn.setBackground(new Color(242, 234, 218));
             btn.setBorderPainted(true);
             btn.setFocusPainted(false);
@@ -186,7 +186,8 @@ public class MenuPrincipal extends javax.swing.JPanel {
      * @param message El mensaje de error a mostrar.
      */
     public void showError(String message) {
-        errorLabel.setText(message == null || message.isBlank() ? " " : message);
+//        errorLabel.setText(message == null || message.isBlank() ? " " : message);
+        JOptionPane.showMessageDialog(this, message);
 
     }
 

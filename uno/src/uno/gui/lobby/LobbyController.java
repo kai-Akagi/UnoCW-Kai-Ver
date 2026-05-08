@@ -1,6 +1,8 @@
 package uno.gui.lobby;
 
 import Vistas.CrearSala;
+import Vistas.ModoJuego;
+import Vistas.SalaEspera;
 import uno.events.*;
 import uno.events.bus.EventBus;
 import uno.gui.MainWindow;
@@ -27,7 +29,9 @@ import javax.swing.*;
 public class LobbyController {
  
     private final LobbyView    view;
+    private final SalaEspera lobbyView;
     private final CrearSala configurationView;
+    private final ModoJuego gameModeView;
     private final MainWindow   mainWindow;
     private final GameSession  session;
     private final EventBus     eventBus;
@@ -57,6 +61,8 @@ public class LobbyController {
         this.eventBus     = EventBus.getInstance();
         this.localPlayerReady = session.isHost(); // Host siempre listo
         this.configurationView = null;
+        this.gameModeView = null;
+        this.lobbyView = null;
     }
     
     //constructor con el Crear sala (PRUEBAAAS)
@@ -69,6 +75,33 @@ public class LobbyController {
         this.eventBus     = EventBus.getInstance();
         this.localPlayerReady = session.isHost(); // Host siempre listo
         this.view = null;
+        this.gameModeView = null;
+        this.lobbyView = null;
+    }
+    //constructor con el ModoJuego (PRUEBAAAS)
+    public LobbyController(ModoJuego gameModeView, MainWindow mainWindow, GameSession session, LobbyState lobbyState, NetworkLayer networkLayer) {
+        this.gameModeView         = gameModeView;
+        this.mainWindow   = mainWindow;
+        this.session      = session;
+        this.lobbyState   = lobbyState;
+        this.networkLayer = networkLayer;
+        this.eventBus     = EventBus.getInstance();
+        this.localPlayerReady = session.isHost(); // Host siempre listo
+        this.view = null;
+        this.configurationView =null;
+        this.lobbyView = null;
+    }
+    public LobbyController(SalaEspera lobbyview, MainWindow mainWindow, GameSession session, LobbyState lobbyState, NetworkLayer networkLayer) {
+        this.gameModeView         = null;
+        this.mainWindow   = mainWindow;
+        this.session      = session;
+        this.lobbyState   = lobbyState;
+        this.networkLayer = networkLayer;
+        this.eventBus     = EventBus.getInstance();
+        this.localPlayerReady = session.isHost(); // Host siempre listo
+        this.view = null;
+        this.configurationView =null;
+        this.lobbyView = lobbyview;
     }
     
     
@@ -78,10 +111,10 @@ public class LobbyController {
      * a los eventos del bus.
      */
     public void initialize() {
-        view.configureForRole(session.isHost());
-        view.setRoomCode(session.getRoomCode());
-        view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
-        view.updateReadyButton(localPlayerReady);
+        lobbyView.configureForRole(session.isHost());
+        lobbyView.setRoomCode(session.getRoomCode());
+        lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+        lobbyView.updateReadyButton(localPlayerReady);
  
         refreshPlayerList();
         registerEventListeners();
@@ -93,13 +126,24 @@ public class LobbyController {
  
     //metodo para continuar desde la pantalla CrearSala
     public void onContinueClicked(){
+        if(configurationView.getTamanhoSala() > 0){
+            lobbyState.setCapacity(configurationView.getTamanhoSala());
+            System.out.println(configurationView.getTamanhoSala());
+            SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala dejate mi intento abajo
+                mainWindow.showLobby(session, lobbyState, networkLayer));
+        }else{
+            configurationView.showError("Elije el tamaño del lobby");
+        }
         
-        lobbyState.setCapacity(configurationView.getTamanhoSala());
         
+        
+    }
+    
+    //metodo para ir a Crear sala
+    
+    public void onConitueClickedModoJuego(){
         SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala dejate mi intento abajo
                 mainWindow.showLobby(session, lobbyState, networkLayer));
-        
-        
     }
     /**
      * Alterna el estado "Listo" del jugador local y lo publica en el bus.
@@ -118,14 +162,15 @@ public class LobbyController {
                 .findFirst()
                 .ifPresent(p -> p.setReady(localPlayerReady));
  
-        view.updateReadyButton(localPlayerReady);
+        lobbyView.updateReadyButton(localPlayerReady);
         eventBus.publish(GameEventFactory.playerReady(
                 session.getLocalPlayer().getName(), localPlayerReady));
 
         // Habilitar botón de solicitud solo cuando el Peer esté listo
         if (!session.isHost()) {
-            view.setRequestStartEnabled(localPlayerReady);
+            lobbyView.setRequestStartEnabled(localPlayerReady);
         }
+        
 
         refreshPlayerList();
         checkStartCondition();
@@ -187,7 +232,7 @@ public class LobbyController {
     public void onCapacityChanged(int newCapacity) {
         if (!session.isHost()) return;
         lobbyState.setCapacity(newCapacity);
-        view.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
+        lobbyView.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
         checkStartCondition();
     }
  
@@ -206,22 +251,28 @@ public class LobbyController {
         eventBus.subscribe(PlayerJoinedEvent.class, event -> {
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
-                view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
                 checkStartCondition();
             });
         });
  
         // Un jugador cambió su estado "Listo"
         eventBus.subscribe(PlayerReadyEvent.class, event -> {
-            PlayerReadyEvent e = (PlayerReadyEvent) event;
-            lobbyState.getConnectedPlayers().stream()
-                    .filter(p -> p.getName().equals(e.getPlayerName()))
-                    .findFirst()
-                    .ifPresent(p -> p.setReady(e.isReady()));
- 
-            SwingUtilities.invokeLater(() -> {
-                refreshPlayerList();
-                checkStartCondition();
+        PlayerReadyEvent e = (PlayerReadyEvent) event;
+        lobbyState.getConnectedPlayers().stream()
+                .filter(p -> p.getName().equals(e.getPlayerName()))
+                .findFirst()
+                .ifPresent(p -> p.setReady(e.isReady()));
+
+        SwingUtilities.invokeLater(() -> {
+            if (e.getPlayerName().equals(session.getLocalPlayer().getName())) {
+                localPlayerReady = e.isReady();
+                lobbyView.updateReadyButton(localPlayerReady);
+            }
+
+            refreshPlayerList();
+            lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+            checkStartCondition();
             });
         });
  
@@ -232,7 +283,7 @@ public class LobbyController {
  
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
-                view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
  
                 // Si el Host se fue, cerrar la sala y volver al registro
                 if (isHostName(e.getPlayerName()) && !session.isHost()) {
@@ -250,7 +301,7 @@ public class LobbyController {
             if (!session.isHost()) return;
             StartRequestedEvent e = (StartRequestedEvent) event;
             SwingUtilities.invokeLater(() -> {
-                if (view.showStartRequestDialog(e.getRequesterName())) {
+                if (lobbyView.showStartRequestDialog(e.getRequesterName())) {
                     onStartClicked();
                 }
             });
@@ -270,7 +321,7 @@ public class LobbyController {
  
     /** Redibuja la lista de jugadores en la View. */
     private void refreshPlayerList() {
-        view.updatePlayerList(
+        lobbyView.updatePlayerList(
                 lobbyState.getConnectedPlayers(),
                 session.getLocalPlayer().getName(),
                 session.isHost()
@@ -280,7 +331,7 @@ public class LobbyController {
     /** Habilita el botón Iniciar si se cumplen las condiciones. */
     private void checkStartCondition() {
         if (session.isHost()) {
-            view.setStartEnabled(lobbyState.canStart());
+            lobbyView.setStartEnabled(lobbyState.canStart());
         }
     }
  

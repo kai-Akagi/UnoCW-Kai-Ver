@@ -540,7 +540,6 @@ public class NetworkLayer {
      */
     private void publishToLocalBus(String type, Map<String, String> fields) {
         switch (type) {
- 
             case MessageSerializer.TYPE_PLAYER_JOINED:
                 // El Peer recibe notificación de que otro jugador se unió.
                 // También restauramos el estado "Listo" para que el Peer
