@@ -111,11 +111,20 @@ public class LobbyController {
      * a los eventos del bus.
      */
     public void initialize() {
+        // Sincronizar el objeto Player con el estado inicial del controller.
+        // El constructor de Player tiene ready=false por defecto, pero el Host
+        // comienza como listo — sin esto canStart() nunca retorna true.
+        session.getLocalPlayer().setReady(localPlayerReady);
+        lobbyState.getConnectedPlayers().stream()
+            .filter(p -> p.getName().equals(session.getLocalPlayer().getName()))
+            .findFirst()
+            .ifPresent(p -> p.setReady(localPlayerReady));
+
         lobbyView.configureForRole(session.isHost());
         lobbyView.setRoomCode(session.getRoomCode());
         lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
         lobbyView.updateReadyButton(localPlayerReady);
- 
+
         refreshPlayerList();
         registerEventListeners();
     }
