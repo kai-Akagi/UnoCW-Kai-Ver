@@ -161,6 +161,8 @@ public class LobbyController {
         if (!session.isHost()) return;
         lobbyState.setCapacity(newCapacity);
         view.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
+        // Notificar a los Peers del nuevo tamaño de sala
+        networkLayer.broadcast("{\"type\":\"LOBBY_STATE\",\"capacity\":\"" + newCapacity + "\"}\n");
         checkStartCondition();
     }
  

@@ -576,6 +576,20 @@ public class NetworkLayer {
                 eventBus.publish(GameEventFactory.playerDisconnected(fields.get("player")));
                 break;
  
+            case MessageSerializer.TYPE_LOBBY_STATE:
+                // El Host cambió el tamaño de sala → actualizar lobbyState y refrescar vista
+                String newCapStr = fields.get("capacity");
+                if (newCapStr != null) {
+                    try { lobbyState.setCapacity(Integer.parseInt(newCapStr)); }
+                    catch (NumberFormatException ignored) {}
+                }
+                // Reutilizar PlayerJoinedEvent para disparar el refresh del contador en LobbyController
+                if (!lobbyState.getConnectedPlayers().isEmpty()) {
+                    eventBus.publish(GameEventFactory.playerJoined(
+                        lobbyState.getConnectedPlayers().get(0)));
+                }
+                break;
+
             case MessageSerializer.TYPE_GAME_STARTED:
                 eventBus.publish(GameEventFactory.gameStarted());
                 break;
