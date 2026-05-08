@@ -56,6 +56,14 @@ public class LobbyState {
         this.connectedPlayers = new ArrayList<>();
         this.gameStarted      = false;
     }
+    
+    //contructor con el parametro del num max de jugadores
+    public LobbyState(int capacity) {
+        this.roomCode         = generateRoomCode();
+        this.capacity         = capacity;
+        this.connectedPlayers = new ArrayList<>();
+        this.gameStarted      = false;
+    }
 
     // ─────────────────────────────────────────────
     // Gestión de jugadores

@@ -113,8 +113,7 @@ public class LobbyController {
     public void initialize() {
         // Sincronizar el objeto Player con el estado inicial del controller.
         // El constructor de Player tiene ready=false por defecto, pero el Host
-        // comienza como listo — sin esta sincronización canStart() nunca retorna
-        // true aunque el Host crea que está listo.
+        // comienza como listo — sin esto canStart() nunca retorna true.
         session.getLocalPlayer().setReady(localPlayerReady);
         lobbyState.getConnectedPlayers().stream()
             .filter(p -> p.getName().equals(session.getLocalPlayer().getName()))
