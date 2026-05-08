@@ -192,6 +192,9 @@ public class NetworkLayer {
             if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
                 sendToHost(MessageSerializer.serialize(
                 GameEventFactory.playerDisconnected(e.getPlayerName())));
+            } else if (session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
+                broadcast(MessageSerializer.serialize(
+                GameEventFactory.playerDisconnected(e.getPlayerName())));
             }
         });
  
@@ -574,8 +577,15 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_PLAYER_LEFT:
-                lobbyState.removePlayer(fields.get("player"));
-                eventBus.publish(GameEventFactory.playerDisconnected(fields.get("player")));
+                String leftName = fields.get("player");
+                if ("HOST".equals(leftName)) {
+                    leftName = lobbyState.getConnectedPlayers().stream()
+                        .filter(uno.model.Player::isHost)
+                        .map(uno.model.Player::getName)
+                        .findFirst().orElse("HOST");
+                }
+                eventBus.publish(GameEventFactory.playerDisconnected(leftName));
+                lobbyState.removePlayer(leftName);
                 break;
  
             case MessageSerializer.TYPE_LOBBY_STATE:

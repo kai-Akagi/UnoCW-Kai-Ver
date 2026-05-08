@@ -294,14 +294,14 @@ public class LobbyController {
         // Un jugador se desconectó
         eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
+            final boolean hostLeft = isHostName(e.getPlayerName());
             lobbyState.removePlayer(e.getPlayerName());
- 
+
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
                 lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
- 
-                // Si el Host se fue, cerrar la sala y volver al registro
-                if (isHostName(e.getPlayerName()) && !session.isHost()) {
+
+                if (hostLeft && !session.isHost()) {
                     JOptionPane.showMessageDialog(mainWindow,
                             "El Host abandonó. La sala fue cerrada.",
                             "Sala cerrada", JOptionPane.WARNING_MESSAGE);
