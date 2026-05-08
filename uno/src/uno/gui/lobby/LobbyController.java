@@ -336,15 +336,19 @@ public class LobbyController {
  
     /** Habilita el botón Iniciar si se cumplen las condiciones. */
     private void checkStartCondition() {
+        boolean canStart = lobbyState.canStart();
         if (session.isHost()) {
-            lobbyView.setStartEnabled(lobbyState.canStart());
+            if (lobbyView != null) lobbyView.setStartEnabled(canStart);
+            if (view != null)      view.setStartEnabled(canStart);
         }
-        if (lobbyState.canStart()) {
-            view.setWaitingStatus("Todos los jugadores están listos.");
-        } else if (lobbyState.allPlayersReady()) {
-            view.setWaitingStatus("Esperando que se unan más jugadores...");
-        } else {
-            view.setWaitingStatus("Esperando jugadores...");
+        if (view != null) {
+            if (canStart) {
+                view.setWaitingStatus("Todos los jugadores están listos.");
+            } else if (lobbyState.allPlayersReady()) {
+                view.setWaitingStatus("Esperando que se unan más jugadores...");
+            } else {
+                view.setWaitingStatus("Esperando jugadores...");
+            }
         }
     }
  
