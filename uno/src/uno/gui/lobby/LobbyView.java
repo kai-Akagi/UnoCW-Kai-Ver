@@ -235,7 +235,20 @@ public class LobbyView extends JPanel {
     public void setPlayerCount(int current, int capacity) {
         playerCountLabel.setText("Jugadores: " + current + "/" + capacity);
     }
- 
+
+    /**
+     * Actualiza el selector de capacidad sin disparar el listener de cambio.
+     * Se usa para reflejar en los Peers el tamaño de sala elegido por el Host.
+     *
+     * @param capacity La nueva capacidad.
+     */
+    public void setCapacityDisplay(int capacity) {
+        java.awt.event.ActionListener[] listeners = capacitySelector.getActionListeners();
+        for (java.awt.event.ActionListener l : listeners) capacitySelector.removeActionListener(l);
+        capacitySelector.setSelectedItem(capacity);
+        for (java.awt.event.ActionListener l : listeners) capacitySelector.addActionListener(l);
+    }
+
     /**
      * Habilita o deshabilita el botón "Iniciar Partida".
      * Solo el Host puede verlo habilitado, y solo cuando todos están listos.

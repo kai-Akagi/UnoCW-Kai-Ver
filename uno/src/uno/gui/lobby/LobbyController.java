@@ -182,6 +182,7 @@ public class LobbyController {
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
                 view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                view.setCapacityDisplay(lobbyState.getCapacity());
                 checkStartCondition();
             });
         });
