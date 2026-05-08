@@ -434,6 +434,9 @@ public class NetworkLayer {
                 sendPrivate(senderName, MessageSerializer.serialize(
                         GameEventFactory.playerJoined(newPlayer)));
                 sendCurrentLobbyState(senderName);
+                // Enviar la capacidad configurada para que el peer muestre el tamaño correcto
+                sendPrivate(senderName, "{\"type\":\"LOBBY_STATE\",\"capacity\":\""
+                        + lobbyState.getCapacity() + "\"}\n");
                 break;
  
             case MessageSerializer.TYPE_PLAYER_READY:
