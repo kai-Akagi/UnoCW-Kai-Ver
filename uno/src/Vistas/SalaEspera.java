@@ -57,6 +57,7 @@ public class SalaEspera extends javax.swing.JPanel {
         BtnSalir = new javax.swing.JButton();
         BtnSolicitarIniciar = new javax.swing.JButton();
         BtnListo = new javax.swing.JButton();
+        waitingStatusLabel = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(242, 239, 225));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -125,8 +126,19 @@ public class SalaEspera extends javax.swing.JPanel {
 
         BtnListo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         BtnListo.setText("Cancelar Listo");
+        BtnListo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BtnListoMouseClicked(evt);
+            }
+        });
         add(BtnListo, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 640, 160, 30));
+        add(waitingStatusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 120, 140, 30));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void BtnListoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BtnListoMouseClicked
+        // TODO add your handling code here:
+//         BtnListo.addActionListener(e -> controller.onReadyClicked());
+    }//GEN-LAST:event_BtnListoMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -145,6 +157,7 @@ public class SalaEspera extends javax.swing.JPanel {
     public javax.swing.JLabel labelNumJugadores;
     public javax.swing.JLabel labelTamanhoSala;
     public javax.swing.JPanel panelJugadores;
+    private javax.swing.JLabel waitingStatusLabel;
     // End of variables declaration//GEN-END:variables
 
     // ─────────────────────────────────────────────
@@ -246,7 +259,7 @@ public class SalaEspera extends javax.swing.JPanel {
      * @param enabled {@code true} para habilitar.
      */
     public void setStartEnabled(boolean enabled) {
-        BtnListo.setEnabled(enabled);
+        BtnIniciarPartida.setEnabled(enabled);
     }
  
     /**
@@ -266,6 +279,11 @@ public class SalaEspera extends javax.swing.JPanel {
                                             // traer la info desde la pantalla de crear sala
     }
 
+    public void setWaitingStatus(String text) {
+        waitingStatusLabel.setText(text);
+    }
+
+    
     /**
      * Habilita o deshabilita el botón "Solicitar Inicio".
      * Se habilita cuando el Peer ya marcó "Listo".

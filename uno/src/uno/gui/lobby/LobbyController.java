@@ -348,15 +348,15 @@ public class LobbyController {
         boolean canStart = lobbyState.canStart();
         if (session.isHost()) {
             if (lobbyView != null) lobbyView.setStartEnabled(canStart);
-            if (view != null)      view.setStartEnabled(canStart);
+            if (lobbyView != null)      lobbyView.setStartEnabled(canStart);
         }
-        if (view != null) {
+        if (lobbyView != null) {
             if (canStart) {
-                view.setWaitingStatus("Todos los jugadores están listos.");
+                lobbyView.setWaitingStatus("Todos los jugadores están listos.");
             } else if (lobbyState.allPlayersReady()) {
-                view.setWaitingStatus("Esperando que se unan más jugadores...");
+                lobbyView.setWaitingStatus("Esperando que se unan más jugadores...");
             } else {
-                view.setWaitingStatus("Esperando jugadores...");
+                lobbyView.setWaitingStatus("Esperando jugadores...");
             }
         }
     }
