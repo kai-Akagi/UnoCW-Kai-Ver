@@ -106,18 +106,26 @@ public class CrearSala extends javax.swing.JPanel {
 
     private void tamanho4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho4MouseClicked
         // TODO add your handling code here:
-        tamanhoSala = 4;
+        
+        if(evt.getClickCount() <= 1){
+            tamanhoSala = 4;
+        }
         
     }//GEN-LAST:event_tamanho4MouseClicked
 
     private void tamanho3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho3MouseClicked
         // TODO add your handling code here:
-        tamanhoSala = 3;
+        if(evt.getClickCount() <= 1){
+            tamanhoSala = 3;
+        }
+        
     }//GEN-LAST:event_tamanho3MouseClicked
 
     private void tamanho2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho2MouseClicked
         // TODO add your handling code here:
-        tamanhoSala = 2;
+        if(evt.getClickCount() <= 1){
+            tamanhoSala = 2;
+        }
     }//GEN-LAST:event_tamanho2MouseClicked
 
 
