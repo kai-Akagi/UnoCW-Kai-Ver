@@ -23,7 +23,7 @@ import uno.model.Player;
  * principal para registrarse de nuevo.
  *
  * <p><b>¿Es un Singleton?</b><br>
- * No formalmente, pero en la práctica solo existe una instancia por ejecución.
+ * No literalmente, pero en la práctica solo existe una instancia cada ejecución.
  * Se crea en el punto de entrada (la pantalla de registro) y se pasa por
  * referencia a quien la necesite. Evitamos el Singleton aquí porque la sesión
  * sí puede "reiniciarse" si el jugador vuelve al menú principal, y un Singleton

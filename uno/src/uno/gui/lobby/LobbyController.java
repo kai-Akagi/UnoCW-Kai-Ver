@@ -22,6 +22,9 @@ import javax.swing.*;
  *   <li>El botón "Salir" ahora navega de vuelta al registro correctamente
  *       llamando a {@link MainWindow#showRegister()}.</li>
  * </ul>
+ * 
+ * @author Héctor Alonso 252039
+ * 
  */
 public class LobbyController {
  

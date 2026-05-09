@@ -16,6 +16,10 @@ import java.util.List;
  * <p><b>Rol en MVC: View</b><br>
  * Solo dibuja. No valida nada. El {@link LobbyController} decide qué mostrar
  * y cuándo habilitar o deshabilitar botones.
+ * 
+ * 
+ * @author Héctor Alonso 252039
+ * 
  */
 public class LobbyView extends JPanel {
  

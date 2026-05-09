@@ -18,6 +18,10 @@ import java.util.UUID;
  * desaparece y nace el GameState. Mezclarlos en una sola clase crearía
  * atributos que son null la mitad del tiempo, lo cual es confuso y propenso
  * a errores. Cada clase representa un momento claro.
+ * 
+ * 
+ * @author Héctor Alonso 252039
+ * 
  */
 public class LobbyState {
 
