@@ -202,13 +202,7 @@ public class LobbyController {
         eventBus.publish(GameEventFactory.gameStarted());
     }
  
-    /**
-     * Sale del lobby con confirmación.
-     *
-     * <p><b>Corrección del bug 2:</b> Antes solo mostraba un mensaje
-     * sin cambiar de pantalla. Ahora llama a {@link MainWindow#showRegister()}
-     * que cierra la red y navega al registro correctamente.
-     */
+    /** Sale del lobby tras confirmar con el jugador. */
     public void onLeaveClicked() {
         int confirm = JOptionPane.showConfirmDialog(
                 mainWindow,

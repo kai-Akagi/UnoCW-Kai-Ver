@@ -198,7 +198,7 @@ public class LobbyState {
      * Genera un código de sala único y legible.
      * Formato: "A3F2-9KX1" — dos grupos de 4 caracteres separados por guión.
      *
-     * <p>Usamos UUID como base para garantizar unicidad, luego tomamos
+     * Usamos UUID como base para garantizar unicidad, luego tomamos
      * solo los primeros 8 caracteres en mayúsculas para que sea fácil
      * de escribir y compartir entre jugadores.
      *
