@@ -104,9 +104,6 @@ public class NetworkLayer {
     /**
      * Conecta esta instancia al Host como Peer.
      *
-     * <p>Establece la conexión TCP, registra el canal y envía la
-     * presentación del jugador local al Host.
-     *
      * @param hostIp   IP del Host.
      * @param hostPort Puerto del Host.
      * @throws IOException Si no se puede conectar.
@@ -197,15 +194,7 @@ public class NetworkLayer {
         }
     }
  
-    /**
-     * Suscribe los listeners del juego: jugadas, robo, turno, cartas privadas.
-     * Se llama al iniciar la pantalla del juego, después de que el lobby cerró.
-     *
-     * <p><b>Por qué separado de registerLobbyListeners:</b><br>
-     * Los listeners del lobby y del juego son distintos. Si los registráramos
-     * todos juntos, los eventos del juego podrían llegar mientras aún estamos
-     * en el lobby. Separándolos, cada fase solo escucha lo que le corresponde.
-     */
+    /** Registra los listeners del juego. Se llama al iniciar la partida. */
     public void registerGameListeners() {
         // Protección contra doble registro: si ya se registraron los listeners
         // del juego, no los registramos de nuevo para evitar que cada evento
@@ -321,8 +310,7 @@ public class NetworkLayer {
     // ─────────────────────────────────────────────
  
     /**
-     * Punto central de entrada de mensajes recibidos por cualquier socket.
-     * Decide si procesarlos como Host (validar + reenviar) o como Peer (publicar en bus).
+     * Recibe un mensaje y lo enruta según el rol: Host valida y reenvía, Peer publica en bus.
      *
      * @param senderName Nombre del peer que envió el mensaje.
      * @param message    Texto JSON recibido.
@@ -344,11 +332,11 @@ public class NetworkLayer {
     /**
      * El Host procesa un mensaje entrante de un Peer.
      *
-     * <p>Para cada tipo de mensaje, el Host:
-     * <ol>
-     *   <li>Publica el evento en su bus local (para que GameModel lo procese).</li>
-     *   <li>Decide si reenviar el resultado a otros peers.</li>
-     * </ol>
+    	 * Para cada tipo de mensaje, el Host:
+    
+     * - Publica el evento en su bus local (para que GameModel lo procese).
+     * - Decide si reenviar el resultado a otros peers.
+    
      *
      * @param type       Tipo del mensaje.
      * @param fields     Campos del mensaje.
@@ -727,7 +715,7 @@ public class NetworkLayer {
      * Envía al peer recién unido la lista completa de jugadores que ya están
      * en el lobby, para que su pantalla quede sincronizada desde el primer momento.
      *
-     * <p>Sin esto, el Peer solo vería a los jugadores que se unan DESPUÉS de él,
+    	 * Sin esto, el Peer solo vería a los jugadores que se unan DESPUÉS de él,
      * nunca a los que ya estaban.
      *
      * @param targetPeerName El nombre del peer que acaba de unirse.
