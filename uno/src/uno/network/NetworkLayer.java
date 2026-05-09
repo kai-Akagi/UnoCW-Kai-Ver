@@ -268,6 +268,21 @@ public class NetworkLayer {
                 }
             });
         }
+        
+        
+        // El Peer abandona durante la partida → notificar al Host
+        if (!session.isHost()) {
+            eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
+                PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
+                if (session.isLocalPlayer(e.getPlayerName())) {
+                    sendToHost(MessageSerializer.serialize(
+                        GameEventFactory.playerDisconnected(e.getPlayerName())));
+                }
+            });
+        }
+        
+        
+        
  
         // Solo el Host hace broadcast o envíos privados de eventos del juego
         if (session.isHost()) {
@@ -519,17 +534,22 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_PLAYER_LEFT:
-                lobbyState.removePlayer(fields.get("player"));
-                eventBus.publish(GameEventFactory.playerDisconnected(fields.get("player")));
+                String leftName = fields.get("player");
+                lobbyState.removePlayer(leftName);
+                // Si hay partida activa, actualizar el GameModel también
+                if (gameModel != null && gameModel.getGameState() != null) {
+                    gameModel.removePlayer(leftName);
+                }
+                eventBus.publish(GameEventFactory.playerDisconnected(leftName));
                 broadcastExcept(senderName, MessageSerializer.serialize(
-                        GameEventFactory.playerDisconnected(fields.get("player"))));
+                        GameEventFactory.playerDisconnected(leftName)));
                 break;
- 
-            default:
-                System.out.println("[Host] Tipo de mensaje desconocido ignorado: " + type);
-                break;
+
+                default:
+                    System.out.println("[Host] Tipo de mensaje desconocido ignorado: " + type);
+                    break;
+            }
         }
-    }
  
     /**
      * Convierte los campos del mensaje en un evento y lo publica en el bus local.

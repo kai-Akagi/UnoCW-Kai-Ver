@@ -40,6 +40,7 @@ public class GameView extends JPanel {
     private final JButton unoButton;      // botón "¡UNO!"
     private final JLabel  turnLabel;      // "Tu turno" o nombre del jugador activo
     private final JLabel  directionLabel; // indicador de dirección
+    private final JButton leaveButton;  // botón para abandonar la partida
 
     /** Controller de esta pantalla. */
     private GameController controller;
@@ -65,6 +66,7 @@ public class GameView extends JPanel {
         this.unoButton       = new JButton("¡UNO!");
         this.turnLabel       = new JLabel("Esperando...", SwingConstants.CENTER);
         this.directionLabel  = new JLabel("→", SwingConstants.CENTER);
+        this.leaveButton = new JButton("✖ Salir");
 
         buildUI();
     }
@@ -78,9 +80,30 @@ public class GameView extends JPanel {
         setBorder(new EmptyBorder(12, 12, 12, 12));
 
         // ── Zona de oponentes (arriba) ──
-        opponentsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 14, 4));
+        // BorderLayout para colocar los oponentes al centro y el botón Salir a la derecha
+        opponentsPanel.setLayout(new BorderLayout(4, 0));
         opponentsPanel.setBackground(new Color(20, 83, 45));
         opponentsPanel.setPreferredSize(new Dimension(0, 80));
+
+        // Panel interno para los avatares de oponentes (centro)
+        JPanel opponentsInner = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 4));
+        opponentsInner.setBackground(new Color(20, 83, 45));
+        opponentsInner.setName("opponentsInner");
+        opponentsPanel.add(opponentsInner, BorderLayout.CENTER);
+
+        // Botón Salir — esquina superior derecha
+        leaveButton.setBackground(new Color(153, 27, 27));
+        leaveButton.setForeground(Color.WHITE);
+        leaveButton.setFont(new Font("Arial", Font.BOLD, 11));
+        leaveButton.setFocusPainted(false);
+        leaveButton.setBorderPainted(false);
+        leaveButton.setOpaque(true);
+        leaveButton.setPreferredSize(new Dimension(85, 36));
+        leaveButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        JPanel leaveWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 22));
+        leaveWrapper.setBackground(new Color(20, 83, 45));
+        leaveWrapper.add(leaveButton);
+        opponentsPanel.add(leaveWrapper, BorderLayout.EAST);
 
         // ── Zona central ──
         buildCenterPanel();
@@ -215,15 +238,23 @@ public class GameView extends JPanel {
      * @param handSizes Cantidad de cartas de cada oponente.
      */
     private void updateOpponents(List<String> names, List<Integer> handSizes) {
-        opponentsPanel.removeAll();
-        for (int i = 0; i < names.size(); i++) {
-            JPanel opPanel = buildOpponentPanel(names.get(i), handSizes.get(i));
-            opponentsPanel.add(opPanel);
+        // Buscar el panel interno por nombre para no afectar el botón Salir
+        JPanel inner = null;
+        for (java.awt.Component c : opponentsPanel.getComponents()) {
+            if (c instanceof JPanel && "opponentsInner".equals(((JPanel) c).getName())) {
+                inner = (JPanel) c;
+                break;
+            }
         }
-        opponentsPanel.revalidate();
-        opponentsPanel.repaint();
+        if (inner == null) return;
+        inner.removeAll();
+        for (int i = 0; i < names.size(); i++) {
+            inner.add(buildOpponentPanel(names.get(i), handSizes.get(i)));
+        }
+        inner.revalidate();
+        inner.repaint();
     }
-
+    
     /**
      * Construye el panel visual de un oponente (nombre + cantidad de cartas).
      *
@@ -460,6 +491,7 @@ public class GameView extends JPanel {
 
         drawButton.addActionListener(e -> controller.onDrawClicked());
         unoButton.addActionListener(e -> controller.onUnoClicked());
+        leaveButton.addActionListener(e -> controller.onLeaveClicked());
     }
 
     // ─────────────────────────────────────────────

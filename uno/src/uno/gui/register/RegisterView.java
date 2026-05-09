@@ -3,7 +3,7 @@ package uno.gui.register;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 /**
  * Pantalla de registro del jugador.
@@ -12,30 +12,30 @@ import java.awt.event.ActionListener;
  * un avatar antes de entrar al lobby.
  *
  * <p><b>Rol en MVC: View (Vista)</b><br>
- * Esta clase solo dibuja componentes Swing. No tiene lógica de negocio,
- * no valida datos y no conoce al EventBus. Solo:
- * <ul>
- *   <li>Muestra los campos al usuario.</li>
- *   <li>Llama al Controller cuando el usuario hace algo.</li>
- *   <li>Actualiza su apariencia cuando el Controller se lo pide.</li>
- * </ul>
- *
- * <p>La comunicación con el Controller ocurre a través de métodos simples
- * como {@link #getPlayerName()} y {@link #getSelectedAvatarId()}, y de
- * listeners que el Controller registra con {@link #setController}.
+ * Solo dibuja componentes Swing y delega acciones al Controller.
  */
 public class RegisterView extends JPanel {
 
     // ─── Avatares disponibles ────────────────────────────────────────────────
-    /** Identificadores de los avatares disponibles. */
     private static final String[] AVATAR_IDS = {
         "avatar_pig", "avatar_bear", "avatar_panda", "avatar_bunny",
-        "avatar_fox",  "avatar_penguin", "avatar_chick", "avatar_wolf", "avatar_frog"
+        "avatar_fox", "avatar_penguin", "avatar_chick", "avatar_wolf", "avatar_frog"
     };
 
-    /** Emojis usados para representar los avatares en texto (mientras no hay imágenes). */
     private static final String[] AVATAR_EMOJIS = {
         "🐷", "🐻", "🐼", "🐰", "🦊", "🐧", "🐥", "🐺", "🐸"
+    };
+
+    private static final Color[] AVATAR_COLORS = {
+        new Color(255, 182, 193), // rosa      - cerdo
+        new Color(210, 180, 140), // café      - oso
+        new Color(220, 220, 220), // gris      - panda
+        new Color(255, 209, 220), // rosa claro- conejo
+        new Color(255, 200, 150), // naranja   - zorro
+        new Color(173, 216, 230), // azul claro- pingüino
+        new Color(255, 230, 150), // amarillo  - pollito
+        new Color(200, 200, 200), // gris      - lobo
+        new Color(144, 238, 144)  // verde     - rana
     };
 
     // ─── Componentes Swing ───────────────────────────────────────────────────
@@ -44,129 +44,240 @@ public class RegisterView extends JPanel {
     private final JButton    continueButton;
     private final JButton[]  avatarButtons;
 
-    /** El índice del avatar actualmente seleccionado. -1 = ninguno. */
     private int selectedAvatarIndex = -1;
-
-    /** Referencia al controller. La View la usa para delegar acciones. */
     private RegisterController controller;
 
-    /**
-     * Construye la pantalla de registro con todos sus componentes.
-     */
     public RegisterView() {
-        this.avatarButtons = new JButton[AVATAR_IDS.length];
-        this.nameField     = new JTextField(20);
-        this.errorLabel    = new JLabel(" "); // espacio para que no cambie el tamaño
-        this.continueButton = new JButton("SIGUIENTE →");
-
+        this.avatarButtons  = new JButton[AVATAR_IDS.length];
+        this.nameField      = new JTextField();
+        this.errorLabel     = new JLabel(" ");
+        this.continueButton = new JButton("SIGUIENTE");
         buildUI();
     }
 
     /**
-     * Construye y organiza todos los componentes visuales.
+     * Construye la interfaz usando un panel central de ancho fijo dentro de
+     * un BorderLayout, lo que garantiza alineación consistente sin importar
+     * el tamaño de la ventana.
      */
     private void buildUI() {
-        setLayout(new BorderLayout());
-        setBackground(new Color(30, 30, 46));
-        setBorder(new EmptyBorder(30, 60, 30, 60));
+        setLayout(new GridBagLayout());
+        setBackground(Color.WHITE);
 
-        // ── Panel central ──
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBackground(new Color(30, 30, 46));
+        // Panel central de ancho proporcional — se adapta al tamaño de ventana.
+        // Usamos un porcentaje del ancho disponible para que en pantalla completa
+        // haya más separación entre componentes y se vea más espacioso.
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        // Ancho base 560px; en pantalla grande el GridBagLayout lo centrará
+        // con espacio generoso a los lados.
+        card.setPreferredSize(new Dimension(600, 520));
+        card.setMaximumSize(new Dimension(700, 620));
 
-        // Logo / título
-        JLabel title = new JLabel("🃏 UNO", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 48));
-        title.setForeground(new Color(248, 216, 71)); // amarillo UNO
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ── Logo ──
+        JLabel logoLabel = buildLogoLabel("src/assets/logo_uno.png");
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Subtítulo
-        JLabel subtitle = new JLabel("Registra tu jugador", SwingConstants.CENTER);
-        subtitle.setFont(new Font("Arial", Font.PLAIN, 16));
-        subtitle.setForeground(new Color(148, 163, 184));
-        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // ── Campo de nombre ──
+        // ── Etiqueta "Nombre de Jugador:" ──
         JLabel nameLabel = new JLabel("Nombre de Jugador:");
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        nameLabel.setForeground(Color.WHITE);
-        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        nameLabel.setForeground(new Color(40, 40, 40));
+        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        nameField.setFont(new Font("Arial", Font.PLAIN, 16));
-        nameField.setMaximumSize(new Dimension(300, 40));
-        nameField.setHorizontalAlignment(JTextField.CENTER);
+        // ── Campo de nombre con ícono lápiz ──
+        JPanel nameRow = buildNameRow();
+        nameRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // ── Mensaje de error ──
-        errorLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        errorLabel.setForeground(new Color(252, 100, 100));
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        errorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        errorLabel.setForeground(new Color(220, 38, 38));
+        errorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // ── Etiqueta "Selecciona tu avatar:" ──
+        JLabel avatarLabel = new JLabel("Selecciona tu avatar:");
+        avatarLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        avatarLabel.setForeground(new Color(40, 40, 40));
+        avatarLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // ── Galería de avatares ──
-        JLabel avatarLabel = new JLabel("Selecciona tu avatar:");
-        avatarLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        avatarLabel.setForeground(Color.WHITE);
-        avatarLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         JPanel avatarPanel = buildAvatarPanel();
-        avatarPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        avatarPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // ── Botón continuar ──
-        styleButton(continueButton, new Color(220, 38, 38)); // rojo UNO
-        continueButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        continueButton.setMaximumSize(new Dimension(200, 45));
+        // ── Botón SIGUIENTE alineado a la derecha ──
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        buttonRow.setBackground(Color.WHITE);
+        buttonRow.setMaximumSize(new Dimension(700, 48));
+        styleContinueButton();
+        buttonRow.add(continueButton);
+        buttonRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // ── Ensamblar ──
-        centerPanel.add(title);
-        centerPanel.add(Box.createVerticalStrut(8));
-        centerPanel.add(subtitle);
-        centerPanel.add(Box.createVerticalStrut(30));
-        centerPanel.add(nameLabel);
-        centerPanel.add(Box.createVerticalStrut(8));
-        centerPanel.add(nameField);
-        centerPanel.add(Box.createVerticalStrut(6));
-        centerPanel.add(errorLabel);
-        centerPanel.add(Box.createVerticalStrut(20));
-        centerPanel.add(avatarLabel);
-        centerPanel.add(Box.createVerticalStrut(10));
-        centerPanel.add(avatarPanel);
-        centerPanel.add(Box.createVerticalStrut(30));
-        centerPanel.add(continueButton);
+        // Los espacios verticales se amplían con el panel Glue en pantalla grande,
+        // ya que GridBagLayout centrará el card y dejará espacio libre alrededor.
+        card.add(Box.createVerticalStrut(8));
+        card.add(logoLabel);
+        card.add(Box.createVerticalStrut(32));
+        card.add(nameLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(nameRow);
+        card.add(Box.createVerticalStrut(4));
+        card.add(errorLabel);
+        card.add(Box.createVerticalStrut(28));
+        card.add(avatarLabel);
+        card.add(Box.createVerticalStrut(12));
+        card.add(avatarPanel);
+        card.add(Box.createVerticalStrut(28));
+        card.add(buttonRow);
 
-        add(centerPanel, BorderLayout.CENTER);
+        add(card);
     }
 
     /**
-     * Construye el panel de botones de avatar.
-     * Cada botón muestra un emoji y se resalta al seleccionarlo.
+     * Construye la etiqueta del logo UNO.
+     * Carga el asset de imagen si existe; si no, muestra texto de respaldo.
      *
-     * @return El panel con la galería de avatares.
+     * @param logoPath Ruta relativa al archivo de imagen del logo.
+     */
+    private JLabel buildLogoLabel(String logoPath) {
+        try {
+            ImageIcon raw = new ImageIcon(logoPath);
+            if (raw.getIconWidth() > 0) {
+                Image scaled = raw.getImage()
+                        .getScaledInstance(200, 110, Image.SCALE_SMOOTH);
+                JLabel lbl = new JLabel(new ImageIcon(scaled), SwingConstants.CENTER);
+                lbl.setMaximumSize(new Dimension(560, 120));
+                return lbl;
+            }
+        } catch (Exception ignored) {}
+        // Respaldo: texto "UNO" en rojo si no se encuentra el asset
+        JLabel fallback = new JLabel("UNO", SwingConstants.CENTER);
+        fallback.setFont(new Font("SansSerif", Font.BOLD, 64));
+        fallback.setForeground(new Color(220, 38, 38));
+        fallback.setMaximumSize(new Dimension(560, 100));
+        return fallback;
+    }
+
+    /**
+     * Construye el campo de nombre con el ícono de lápiz a la derecha.
+     * Usa un JPanel con BorderLayout para que el campo se estire al ancho
+     * disponible automáticamente, sin coordenadas absolutas.
+     */
+    private JPanel buildNameRow() {
+        JPanel row = new JPanel(new BorderLayout(0, 0));
+        row.setBackground(Color.WHITE);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+
+        nameField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            new EmptyBorder(6, 12, 6, 8)
+        ));
+        nameField.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        nameField.setBackground(new Color(248, 248, 250));
+        nameField.setForeground(new Color(30, 30, 30));
+
+       
+
+        // Panel que agrupa campo + lápiz con borde compartido
+        JPanel fieldWrapper = new JPanel(new BorderLayout());
+        fieldWrapper.setBackground(new Color(248, 248, 250));
+        fieldWrapper.setBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+        fieldWrapper.add(nameField, BorderLayout.CENTER);
+        
+
+        row.add(fieldWrapper, BorderLayout.CENTER);
+        return row;
+    }
+
+    /**
+     * Construye el panel de avatares usando GridLayout para garantizar que los 9
+     * avatares siempre aparezcan en una sola fila, sin importar el ancho de la ventana.
+     * GridLayout(1, N) distribuye el espacio equitativamente entre las N columnas.
      */
     private JPanel buildAvatarPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
-        panel.setBackground(new Color(30, 30, 46));
+        // GridLayout de 1 fila y 9 columnas — los 9 avatares siempre en una sola fila
+        JPanel panel = new JPanel(new GridLayout(1, AVATAR_EMOJIS.length, 6, 0));
+        panel.setBackground(Color.WHITE);
+        panel.setMaximumSize(new Dimension(700, 70));
 
         for (int i = 0; i < AVATAR_EMOJIS.length; i++) {
             final int index = i;
-            JButton btn = new JButton(AVATAR_EMOJIS[i]);
-            btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
-            btn.setPreferredSize(new Dimension(56, 56));
-            btn.setBackground(new Color(51, 51, 72));
-            btn.setBorderPainted(true);
-            btn.setFocusPainted(false);
-            btn.setToolTipText("Avatar " + (i + 1));
-
-            // Al hacer clic, seleccionar este avatar
+            JButton btn = createAvatarButton(AVATAR_EMOJIS[i], AVATAR_COLORS[i], false);
+            btn.putClientProperty("emoji", AVATAR_EMOJIS[i]);
+            btn.putClientProperty("color", AVATAR_COLORS[i]);
             btn.addActionListener(e -> {
                 if (controller != null) controller.onAvatarSelected(index);
             });
-
             avatarButtons[i] = btn;
             panel.add(btn);
         }
-
         return panel;
+    }
+
+    /**
+     * Crea un botón de avatar dibujando un círculo de color con el emoji centrado.
+     *
+     * @param emoji    El emoji a mostrar.
+     * @param bgColor  El color de fondo del círculo.
+     * @param selected Si debe mostrarse con borde dorado de selección.
+     */
+    private JButton createAvatarButton(String emoji, Color bgColor, boolean selected) {
+        // Tamaño reducido a 58px para que los 9 avatares quepan en una sola fila
+        // dentro de un panel de 600px: 9*58 + 8*6 = 522 + 48 = 570px < 600px
+        int totalSize = 58;
+        int circleSize = selected ? 50 : 54;
+        int offset = selected ? 4 : 2;
+
+        BufferedImage img = new BufferedImage(totalSize, totalSize,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Borde dorado si está seleccionado
+        if (selected) {
+            g2.setColor(new Color(248, 196, 50));
+            g2.fillOval(0, 0, totalSize, totalSize);
+        }
+
+        // Círculo de fondo del avatar
+        g2.setColor(bgColor);
+        g2.fillOval(offset, offset, circleSize, circleSize);
+
+        // Emoji centrado dentro del círculo
+        g2.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 26));
+        FontMetrics fm = g2.getFontMetrics();
+        int textX = offset + (circleSize - fm.stringWidth(emoji)) / 2;
+        int textY = offset + (circleSize - fm.getHeight()) / 2 + fm.getAscent();
+        g2.setColor(Color.BLACK);
+        g2.drawString(emoji, textX, textY);
+        g2.dispose();
+
+        JButton btn = new JButton(new ImageIcon(img));
+        btn.setPreferredSize(new Dimension(totalSize, totalSize));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText(emoji);
+        return btn;
+    }
+
+    /**
+     * Aplica los estilos visuales al botón SIGUIENTE.
+     */
+    private void styleContinueButton() {
+        continueButton.setBackground(new Color(220, 38, 38));
+        continueButton.setForeground(Color.WHITE);
+        continueButton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        continueButton.setFocusPainted(false);
+        continueButton.setBorderPainted(false);
+        continueButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        continueButton.setOpaque(true);
+        continueButton.setPreferredSize(new Dimension(120, 40));
     }
 
     // ─────────────────────────────────────────────
@@ -174,39 +285,39 @@ public class RegisterView extends JPanel {
     // ─────────────────────────────────────────────
 
     /**
-     * Resalta el avatar seleccionado y quita el resaltado de los demás.
-     * El Controller llama a esto cuando el usuario hace clic en un avatar.
+     * Resalta el avatar seleccionado con borde dorado y quita el de los demás.
      *
      * @param index El índice del avatar seleccionado.
      */
     public void highlightAvatar(int index) {
         selectedAvatarIndex = index;
         for (int i = 0; i < avatarButtons.length; i++) {
-            if (i == index) {
-                // Borde dorado para el seleccionado
-                avatarButtons[i].setBackground(new Color(248, 216, 71));
-                avatarButtons[i].setBorder(
-                    BorderFactory.createLineBorder(new Color(248, 216, 71), 3));
-            } else {
-                avatarButtons[i].setBackground(new Color(51, 51, 72));
-                avatarButtons[i].setBorder(UIManager.getBorder("Button.border"));
-            }
+            String emoji = (String) avatarButtons[i].getClientProperty("emoji");
+            Color  color = (Color)  avatarButtons[i].getClientProperty("color");
+            boolean selected = (i == index);
+            JButton newBtn = createAvatarButton(emoji, color, selected);
+            newBtn.putClientProperty("emoji", emoji);
+            newBtn.putClientProperty("color", color);
+            final int idx = i;
+            newBtn.addActionListener(e -> {
+                if (controller != null) controller.onAvatarSelected(idx);
+            });
+            // Reemplazar el ícono sin reconstruir el botón
+            avatarButtons[i].setIcon(newBtn.getIcon());
         }
     }
 
     /**
      * Muestra un mensaje de error debajo del campo de nombre.
-     * Pasa cadena vacía o " " para limpiar el error.
      *
-     * @param message El mensaje de error a mostrar.
+     * @param message El mensaje de error, o vacío para limpiar.
      */
     public void showError(String message) {
         errorLabel.setText(message == null || message.isBlank() ? " " : message);
     }
 
     /**
-     * Marca un avatar como "en uso" (ya elegido por otro jugador).
-     * Lo deshabilita visualmente para que el usuario no lo seleccione.
+     * Marca un avatar como "en uso": lo oscurece y deshabilita.
      *
      * @param avatarId El identificador del avatar a deshabilitar.
      */
@@ -215,7 +326,24 @@ public class RegisterView extends JPanel {
             if (AVATAR_IDS[i].equals(avatarId)) {
                 avatarButtons[i].setEnabled(false);
                 avatarButtons[i].setToolTipText("En uso por otro jugador");
-                avatarButtons[i].setBackground(new Color(30, 30, 46));
+                String emoji = (String) avatarButtons[i].getClientProperty("emoji");
+                // Redibujar con colores desaturados
+                int totalSize = 56;
+                BufferedImage img = new BufferedImage(totalSize, totalSize,
+                        BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2 = img.createGraphics();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(180, 180, 180));
+                g2.fillOval(2, 2, 54, 54);
+                g2.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 26));
+                FontMetrics fm = g2.getFontMetrics();
+                g2.setColor(new Color(120, 120, 120));
+                g2.drawString(emoji,
+                    2 + (54 - fm.stringWidth(emoji)) / 2,
+                    2 + (54 - fm.getHeight()) / 2 + fm.getAscent());
+                g2.dispose();
+                avatarButtons[i].setIcon(new ImageIcon(img));
             }
         }
     }
@@ -224,21 +352,12 @@ public class RegisterView extends JPanel {
     // Datos que el Controller lee de la View
     // ─────────────────────────────────────────────
 
-    /**
-     * Devuelve el texto ingresado en el campo de nombre.
-     * El Controller lo usa para validar antes de continuar.
-     *
-     * @return El nombre ingresado, sin espacios extremos.
-     */
+    /** @return El nombre ingresado sin espacios extremos. */
     public String getPlayerName() {
         return nameField.getText().trim();
     }
 
-    /**
-     * Devuelve el identificador del avatar actualmente seleccionado.
-     *
-     * @return El ID del avatar, o {@code null} si no hay ninguno seleccionado.
-     */
+    /** @return El ID del avatar seleccionado, o {@code null} si ninguno. */
     public String getSelectedAvatarId() {
         if (selectedAvatarIndex < 0) return null;
         return AVATAR_IDS[selectedAvatarIndex];
@@ -249,42 +368,13 @@ public class RegisterView extends JPanel {
     // ─────────────────────────────────────────────
 
     /**
-     * Asigna el Controller de esta pantalla.
-     * Conecta el botón "SIGUIENTE" al método del Controller.
+     * Asigna el Controller y conecta los listeners de los botones.
      *
-     * @param controller El controller que manejará las acciones de esta View.
+     * @param controller El controller de esta pantalla.
      */
     public void setController(RegisterController controller) {
         this.controller = controller;
-
-        // Conectar el botón continuar al controller
-        continueButton.addActionListener(
-            e -> controller.onContinueClicked()
-        );
-
-        // También permitir presionar Enter en el campo de nombre
-        nameField.addActionListener(
-            e -> controller.onContinueClicked()
-        );
-    }
-
-    // ─────────────────────────────────────────────
-    // Utilidades de estilo
-    // ─────────────────────────────────────────────
-
-    /**
-     * Aplica un estilo consistente a un botón de acción.
-     *
-     * @param button El botón a estilizar.
-     * @param color  El color de fondo del botón.
-     */
-    private void styleButton(JButton button, Color color) {
-        button.setBackground(color);
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font("Arial", Font.BOLD, 15));
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setOpaque(true);
+        continueButton.addActionListener(e -> controller.onContinueClicked());
+        nameField.addActionListener(e -> controller.onContinueClicked());
     }
 }

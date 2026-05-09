@@ -187,6 +187,41 @@ public class GameController {
             GameEventFactory.drawCardRequest(session.getLocalPlayer())
         );
     }
+    
+    /**
+    * Se llama cuando el jugador presiona el botón "Abandonar".
+    * Muestra confirmación. Si el Host abandona termina la partida para todos.
+    * Si un Peer abandona, notifica al Host y navega al registro.
+    */
+    public void onLeaveClicked() {
+        int choice = JOptionPane.showConfirmDialog(
+            mainWindow,
+            "¿Estás seguro de que deseas abandonar la partida?",
+            "Abandonar partida",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+        if (choice != JOptionPane.YES_OPTION) return;
+
+        view.stopTurnTimer();
+
+        if (session.isHost()) {
+            // Notificar a todos con nombre especial "HOST" para que sepan
+            // que la partida termina, no solo que un jugador salió
+            networkLayer.broadcast(
+                "{\"type\":\"PLAYER_LEFT\",\"player\":\"HOST\"}\n");
+            SwingUtilities.invokeLater(mainWindow::showRegister);
+        } else {
+            // El listener de NetworkLayer enviará PLAYER_LEFT al Host
+            eventBus.publish(GameEventFactory.playerDisconnected(
+                session.getLocalPlayer().getName()));
+            SwingUtilities.invokeLater(mainWindow::showRegister);
+        }
+    }
+    
+    
+    
+    
 
     /**
      * Indica si estamos en el periodo de gracia de UNO (5 segundos para declarar).
@@ -411,7 +446,60 @@ public class GameController {
                     "UNO", JOptionPane.INFORMATION_MESSAGE)
             );
         });
+    
+    
+        // Un jugador abandonó la partida en curso.
+        eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
+            PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
+            String leavingName = e.getPlayerName();
+
+            if ("HOST".equals(leavingName)) {
+                // El Host salió: todos los Peers regresan al registro
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(mainWindow,
+                        "El Host abandonó la partida.",
+                        "Partida terminada",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    mainWindow.showRegister();
+                });
+                return;
+            }
+
+            // Un Peer abandonó: el Host actualiza su GameModel
+            if (session.isHost() && gameModel.getGameState() != null) {
+                gameModel.removePlayer(leavingName);
+            }
+
+            // Todos eliminan al jugador del LobbyState
+            lobbyState.removePlayer(leavingName);
+
+            // El Peer limpia su mapa y re-renderiza sin ese jugador
+            if (!session.isHost()) {
+                peerOpponentHandSizes.remove(leavingName);
+                if (lastViewModel != null) {
+                    SwingUtilities.invokeLater(() -> {
+                        List<String> names  = new ArrayList<>(lastViewModel.opponentNames);
+                        List<Integer> sizes = new ArrayList<>(lastViewModel.opponentHandSizes);
+                        int idx = names.indexOf(leavingName);
+                        if (idx >= 0) { names.remove(idx); sizes.remove(idx); }
+                        GameViewModel updated = new GameViewModel(
+                            lastViewModel.currentPlayerName,
+                            lastViewModel.topCardValue,
+                            lastViewModel.topCardColor,
+                            new ArrayList<>(session.getLocalPlayer().getHand()),
+                            session.getLocalPlayer().getName(),
+                            names, sizes, lastViewModel.clockwise
+                        );
+                        lastViewModel = updated;
+                        view.render(updated);
+                    });
+                }
+            }
+        });
+    
+    
     }
+    
     // ─────────────────────────────────────────────
     // Utilidades de parseo de red
     // ─────────────────────────────────────────────

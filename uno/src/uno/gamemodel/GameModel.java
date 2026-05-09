@@ -396,6 +396,61 @@ public class GameModel {
         // en la lista de jugadores del gameState y actualizaríamos la carta activa.
         // El estado ya fue actualizado vía los eventos publicados en el bus local.
     }
+    
+    /**
+    * Elimina a un jugador de la partida porque abandonó voluntariamente.
+    *
+    * <p>Sus cartas se devuelven al Deck sin alterar la carta activa visible.
+    * Si era su turno, el índice queda apuntando al siguiente jugador.
+    * Si queda solo un jugador, ese jugador gana automáticamente.
+    *
+    * @param playerName El nombre del jugador que abandonó.
+    */
+    public void removePlayer(String playerName) {
+        if (gameState == null) return;
+
+        Player leaving = gameState.getPlayers().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElse(null);
+
+        if (leaving == null) return;
+
+        // Devolver las cartas al Deck sin afectar el topCard visible
+        for (Card card : new java.util.ArrayList<>(leaving.getHand())) {
+            leaving.removeCard(card);
+            Deck.getInstance().discard(card);
+        }
+
+        // Registrar si era su turno antes de removerlo
+        boolean wasCurrentPlayer = gameState.getCurrentPlayer().getName()
+                .equals(playerName);
+
+        // Remover al jugador de la lista
+        gameState.getPlayers().remove(leaving);
+
+        // Si solo queda un jugador, termina la partida
+        if (gameState.getPlayers().size() == 1) {
+            Player winner = gameState.getPlayers().get(0);
+            System.out.println("[GameModel] Solo queda 1 jugador. Ganador: "
+                    + winner.getName());
+            eventBus.publish(GameEventFactory.gameOver(winner));
+            return;
+        }
+
+        // Ajustar el índice para que no quede fuera de rango
+        gameState.clampCurrentIndex();
+
+        // Publicar el nuevo turno para actualizar todas las GUIs
+        eventBus.publish(GameEventFactory.turnChanged(
+            gameState.getCurrentPlayer(),
+            gameState.getTopCard(),
+            gameState.isClockwise()
+        ));
+    }
+    
+    
+    
 
     // ─────────────────────────────────────────────
     // Consultas
