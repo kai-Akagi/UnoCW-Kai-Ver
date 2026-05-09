@@ -14,30 +14,11 @@ import java.util.concurrent.*;
 import javax.swing.SwingUtilities;
  
 /**
- * Capa de red del juego. Maneja toda la comunicación por sockets.
- *
- * <p>Opera en dos modos según el rol del jugador:
- * <ul>
- *   <li><b>Host:</b> Abre un {@link ServerSocket}, acepta peers entrantes,
- *       valida su presentación, hace broadcast de los eventos relevantes.</li>
- *   <li><b>Peer:</b> Se conecta al ServerSocket del Host, se presenta
- *       enviando sus datos, y escucha los mensajes que el Host le envía.</li>
- * </ul>
- *
- * <p><b>Correcciones en esta versión:</b>
- * <ul>
- *   <li>El Host procesa correctamente {@code TYPE_PLAYER_JOINED}: publica
- *       el evento en su bus local Y hace broadcast a los peers conectados.</li>
- *   <li>El orden de llamadas en {@code RegisterController} se simplificó:
- *       {@code registerEventListeners()} se llama una sola vez, después
- *       de que la conexión está establecida.</li>
- *   <li>Logs de consola para diagnosticar el flujo de conexión.</li>
- * </ul>
- * 
- * 
- * @Elite Héctor Alonso 252039
- *        Alejandro Rodríguez 251622
- * 
+ * Maneja toda la comunicación por sockets entre Host y Peers.
+ * El Host abre el servidor y distribuye los mensajes; los Peers
+ * se conectan y envían sus acciones al Host para que las valide.
+ * Usa el EventBus para publicar los mensajes recibidos al resto
+ * de la aplicación sin acoplarse a ningún componente específico.
  */
 public class NetworkLayer {
  

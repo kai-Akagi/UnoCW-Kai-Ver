@@ -6,18 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Representa el estado de la sala de espera (lobby) antes de iniciar la partida.
- *
- * <p>Mientras {@link GameState} describe lo que pasa durante la partida,
- * {@code LobbyState} describe lo que pasa antes: quiénes están conectados,
- * cuántos jugadores se esperan y si todos están listos.
- *
- * <p><b>¿Por qué una clase separada y no meter esto en GameState?</b><br>
- * Porque son momentos distintos del ciclo de vida de la aplicación.
- * El lobby existe antes del juego. Cuando la partida inicia, el lobby
- * desaparece y nace el GameState. Mezclarlos en una sola clase crearía
- * atributos que son null la mitad del tiempo, lo cual es confuso y propenso
- * a errores. Cada clase representa un momento claro.
+ * Guarda el estado de la sala de espera: jugadores conectados,
+ * capacidad máxima, código de sala y si la partida ya inició.
+ * Se crea antes del juego y se descarta cuando la partida comienza.
  */
 public class LobbyState {
 

@@ -14,17 +14,11 @@ import uno.session.GameSession;
 import javax.swing.*;
  
 /**
- * Controller de la pantalla del lobby (sala de espera).
- *
- * <p><b>Correcciones respecto a la versión anterior:</b>
- * <ul>
- *   <li>Ya no crea su propio {@link LobbyState}: lo recibe del
- *       {@link uno.gui.register.RegisterController}, que es quien
- *       lo inicializó con el código de sala correcto.</li>
- *   <li>Recibe la {@link NetworkLayer} ya conectada en vez de crear una nueva.</li>
- *   <li>El botón "Salir" ahora navega de vuelta al registro correctamente
- *       llamando a {@link MainWindow#showRegister()}.</li>
- * </ul>
+ * Controlador de la sala de espera. Maneja las acciones del jugador
+ * durante el lobby: marcar listo, configurar el tamaño de sala,
+ * iniciar la partida y salir. Reacciona a eventos del bus para
+ * mantener la interfaz actualizada cuando otros jugadores se unen
+ * o se van.
  */
 public class LobbyController {
  
