@@ -410,7 +410,7 @@ public class GameController {
             );
         });
 
-        // Un jugador gritó UNO (feedback visual)
+        // Un jugador gritó UNO localmente (feedback visual para quien presionó)
         eventBus.subscribe(UnoCalledEvent.class, event -> {
             UnoCalledEvent e = (UnoCalledEvent) event;
             SwingUtilities.invokeLater(() ->
@@ -418,6 +418,18 @@ public class GameController {
                     "¡" + e.getPlayer().getName() + " gritó UNO!",
                     "UNO", JOptionPane.INFORMATION_MESSAGE)
             );
+        });
+
+        // Notificación de UNO recibida por la red (para los demás jugadores)
+        eventBus.subscribe(Eventos.NetworkUnoCalledEvent.class, event -> {
+            Eventos.NetworkUnoCalledEvent e = (Eventos.NetworkUnoCalledEvent) event;
+            if (!session.isLocalPlayer(e.getPlayerName())) {
+                SwingUtilities.invokeLater(() ->
+                    JOptionPane.showMessageDialog(mainWindow,
+                        "¡" + e.getPlayerName() + " gritó UNO!",
+                        "UNO", JOptionPane.INFORMATION_MESSAGE)
+                );
+            }
         });
     }
     // ─────────────────────────────────────────────

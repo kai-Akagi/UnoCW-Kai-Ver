@@ -489,6 +489,8 @@ public class NetworkLayer {
  
             case MessageSerializer.TYPE_UNO_CALLED:
                 publishToLocalBus(type, fields);
+                // Notificar a los demás peers que este jugador gritó UNO
+                broadcastExcept(senderName, MessageSerializer.serializeFields(type, fields));
                 // El Peer declaró UNO: avanzar el turno en el GameModel del Host
                 if (gameModel != null) {
                     gameModel.onUnoDeclared();
