@@ -1,9 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-package Vistas;
+package Controles;
 
 import javax.swing.SwingUtilities;
 import Main.MainWindow;
@@ -11,11 +6,8 @@ import Dominio.LobbyState;
 import Dominio.Player;
 import Red.NetworkLayer;
 import Controles.GameSession;
+import Vistas.ModoJuego;
 
-/**
- *
- * @author $Luis Carlos Manjarrez Gonzalez
- */
 public class GameModeController {
 
     private ModoJuego view;
@@ -28,27 +20,26 @@ public class GameModeController {
         this.avatarId = avatarid;
         this.name = name;
     }
-    
-    public void onContinueClicked(){
-        Player     localPlayer = new Player(name, avatarId, true);
+
+    public void onContinueClicked() {
+        Player localPlayer = new Player(name, avatarId, true);
         localPlayer.setReady(true); // el Host siempre está listo
- 
-        LobbyState  lobbyState = new LobbyState();
+
+        LobbyState lobbyState = new LobbyState();
         lobbyState.addPlayer(localPlayer);
- 
-        GameSession session    = new GameSession(localPlayer, true);
+
+        GameSession session = new GameSession(localPlayer, true);
         session.setRoomCode(lobbyState.getRoomCode());
- 
+
         NetworkLayer network = new NetworkLayer(session, lobbyState);
         network.startAsHost(NetworkLayer.DEFAULT_PORT);
         network.registerLobbyListeners();
- 
+
 //        SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala dejate mi intento abajo
 //                mainWindow.showLobby(session, lobbyState, network));
-        
-         SwingUtilities.invokeLater(() -> // aqui deberiamos de mostrar el configurar sala
+        SwingUtilities.invokeLater(()
+                -> // aqui deberiamos de mostrar el configurar sala
                 mainWindow.showRoomConfiguration(session, lobbyState, network));
     }
-    
-    
+
 }

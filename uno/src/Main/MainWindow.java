@@ -1,7 +1,7 @@
 package Main;
 
 import Vistas.CrearSala;
-import Vistas.GameModeController;
+import Controles.GameModeController;
 import Vistas.MenuPrincipal;
 import Vistas.ModoJuego;
 import Vistas.SalaEspera;

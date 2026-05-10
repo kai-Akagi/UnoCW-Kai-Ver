@@ -1,21 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package Vistas;
 
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 import Controles.LobbyController;
 
-/**
- *
- * @author HP
- */
 public class CrearSala extends javax.swing.JPanel {
-    
+
     private int tamanhoSala = 0;
-    
+
     /**
      * Creates new form CrearSala
      */
@@ -106,24 +98,24 @@ public class CrearSala extends javax.swing.JPanel {
 
     private void tamanho4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho4MouseClicked
         // TODO add your handling code here:
-        
-        if(evt.getClickCount() <= 1){
+
+        if (evt.getClickCount() <= 1) {
             tamanhoSala = 4;
         }
-        
+
     }//GEN-LAST:event_tamanho4MouseClicked
 
     private void tamanho3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho3MouseClicked
         // TODO add your handling code here:
-        if(evt.getClickCount() <= 1){
+        if (evt.getClickCount() <= 1) {
             tamanhoSala = 3;
         }
-        
+
     }//GEN-LAST:event_tamanho3MouseClicked
 
     private void tamanho2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tamanho2MouseClicked
         // TODO add your handling code here:
-        if(evt.getClickCount() <= 1){
+        if (evt.getClickCount() <= 1) {
             tamanhoSala = 2;
         }
     }//GEN-LAST:event_tamanho2MouseClicked
@@ -140,23 +132,27 @@ public class CrearSala extends javax.swing.JPanel {
     private javax.swing.JLabel tamanho4;
     // End of variables declaration//GEN-END:variables
 
-    public void ListenerBtnSiguiente(ActionListener listener){
+    public void ListenerBtnSiguiente(ActionListener listener) {
         BtnContinuar.addActionListener(listener);
     }
-    public void ListenerBtnCancelar(ActionListener listener){
+
+    public void ListenerBtnCancelar(ActionListener listener) {
         BtnCancelar.addActionListener(listener);
     }
-    public int getTamanhoSala(){
+
+    public int getTamanhoSala() {
         return tamanhoSala;
     }
-    public void setController(LobbyController controller){
+
+    public void setController(LobbyController controller) {
         BtnContinuar.addActionListener(
-            e -> controller.onContinueClicked()
+                e -> controller.onContinueClicked()
         );
-       BtnCancelar.addActionListener(
-         e -> controller.onLeaveClicked()
-       );
+        BtnCancelar.addActionListener(
+                e -> controller.onLeaveClicked()
+        );
     }
+
     public void showError(String message) {
 //        errorLabel.setText(message == null || message.isBlank() ? " " : message);
         JOptionPane.showMessageDialog(this, message);

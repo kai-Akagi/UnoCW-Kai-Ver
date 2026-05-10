@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package Vistas;
 
 import java.awt.BorderLayout;
@@ -18,17 +14,13 @@ import javax.swing.border.EmptyBorder;
 import Controles.LobbyController;
 import Dominio.Player;
 
-/**
- *
- * @author HP
- */
 public class SalaEspera extends javax.swing.JPanel {
 
     /**
      * Creates new form SalaEspera
      */
     private LobbyController controller;
-    
+
     public SalaEspera() {
         initComponents();
     }
@@ -163,74 +155,73 @@ public class SalaEspera extends javax.swing.JPanel {
     // ─────────────────────────────────────────────
     // Métodos que el Controller llama para actualizar la View
     // ─────────────────────────────────────────────
- 
     /**
-     * Actualiza la lista visual de jugadores conectados.
-     * Redibuja toda la lista cada vez que cambia.
+     * Actualiza la lista visual de jugadores conectados. Redibuja toda la lista
+     * cada vez que cambia.
      *
-     * @param players    Lista actual de jugadores.
-     * @param localName  Nombre del jugador local (para resaltarlo).
-     * @param isHost     Si el jugador local es Host.
+     * @param players Lista actual de jugadores.
+     * @param localName Nombre del jugador local (para resaltarlo).
+     * @param isHost Si el jugador local es Host.
      */
     public void updatePlayerList(List<Player> players, String localName, boolean isHost) {
         panelJugadores.removeAll();
- 
+
         for (Player p : players) {
             JPanel row = buildPlayerRow(p, localName.equals(p.getName()), isHost);
             panelJugadores.add(row);
             panelJugadores.add(Box.createVerticalStrut(2));
         }
- 
+
         panelJugadores.revalidate();
         panelJugadores.repaint();
     }
- 
+
     /**
      * Construye la fila visual de un jugador en la lista del lobby.
      *
-     * @param player   El jugador a mostrar.
-     * @param isLocal  Si es el jugador local (se resalta diferente).
+     * @param player El jugador a mostrar.
+     * @param isLocal Si es el jugador local (se resalta diferente).
      * @param hostView Si el que ve esto es el Host.
      * @return El panel de la fila.
      */
     private JPanel buildPlayerRow(Player player, boolean isLocal, boolean hostView) {
         JPanel row = new JPanel(new BorderLayout(10, 0));
         row.setBackground(isLocal
-            ? new Color(30, 58, 95)   // azul oscuro: soy yo
-            : new Color(30, 35, 50)); // gris oscuro: otro jugador
+                ? new Color(30, 58, 95) // azul oscuro: soy yo
+                : new Color(30, 35, 50)); // gris oscuro: otro jugador
         row.setBorder(new EmptyBorder(10, 14, 10, 14));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
- 
+
         // Ícono según rol: corona para Host, control para jugador normal
         String roleIcon = player.isHost() ? "👑" : "🎮";
         // Etiqueta de rol visible para todos
         String roleLabel = player.isHost() ? " [HOST]" : "";
-        String youLabel  = isLocal ? " (tú)" : "";
- 
+        String youLabel = isLocal ? " (tú)" : "";
+
         JLabel nameLabel = new JLabel(
-            roleIcon + " " + player.getName() + roleLabel + youLabel
+                roleIcon + " " + player.getName() + roleLabel + youLabel
         );
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         // El Host tiene color dorado para destacarlo
         nameLabel.setForeground(player.isHost()
-            ? new Color(248, 216, 71)
-            : Color.WHITE);
- 
+                ? new Color(248, 216, 71)
+                : Color.WHITE);
+
         // Estado "Listo": refleja el valor real de player.isReady()
         // El Host puede estar listo o no listo como cualquier otro jugador
         JLabel readyLabel = new JLabel(player.isReady() ? "✅ Listo" : "⏳ Esperando");
         readyLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         readyLabel.setForeground(player.isReady()
-            ? new Color(74, 222, 128)
-            : new Color(148, 163, 184));
+                ? new Color(74, 222, 128)
+                : new Color(148, 163, 184));
         readyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
- 
-        row.add(nameLabel,  BorderLayout.WEST);
+
+        row.add(nameLabel, BorderLayout.WEST);
         row.add(readyLabel, BorderLayout.EAST);
- 
+
         return row;
     }
- 
+
     /**
      * Actualiza el código de sala visible en el encabezado.
      *
@@ -239,29 +230,28 @@ public class SalaEspera extends javax.swing.JPanel {
     public void setRoomCode(String code) {
         labelCodigoSala.setText(code);
     }
- 
+
     /**
      * Actualiza el contador de jugadores conectados.
      *
-     * @param current  Cuántos hay ahora.
+     * @param current Cuántos hay ahora.
      * @param capacity Cuántos caben en total.
      */
     public void setPlayerCount(int current, int capacity) {
-        labelNumJugadores.setText( current + "/" + capacity);
-        labelTamanhoSala.setText(capacity+"");
+        labelNumJugadores.setText(current + "/" + capacity);
+        labelTamanhoSala.setText(capacity + "");
     }
-    
- 
+
     /**
-     * Habilita o deshabilita el botón "Iniciar Partida".
-     * Solo el Host puede verlo habilitado, y solo cuando todos están listos.
+     * Habilita o deshabilita el botón "Iniciar Partida". Solo el Host puede
+     * verlo habilitado, y solo cuando todos están listos.
      *
      * @param enabled {@code true} para habilitar.
      */
     public void setStartEnabled(boolean enabled) {
         BtnIniciarPartida.setEnabled(enabled);
     }
- 
+
     /**
      * Configura la visibilidad del botón de inicio y el selector de capacidad
      * según si el jugador local es Host o Peer.
@@ -274,19 +264,18 @@ public class SalaEspera extends javax.swing.JPanel {
         BtnSolicitarIniciar.setVisible(!isHost);
         revalidate();
         repaint();
-        
+
 //        capacitySelector.setEnabled(isHost); creo que este no lo ocuparemos si no 
-                                            // traer la info desde la pantalla de crear sala
+        // traer la info desde la pantalla de crear sala
     }
 
     public void setWaitingStatus(String text) {
         waitingStatusLabel.setText(text);
     }
 
-    
     /**
-     * Habilita o deshabilita el botón "Solicitar Inicio".
-     * Se habilita cuando el Peer ya marcó "Listo".
+     * Habilita o deshabilita el botón "Solicitar Inicio". Se habilita cuando el
+     * Peer ya marcó "Listo".
      *
      * @param enabled {@code true} para habilitar.
      */
@@ -302,15 +291,15 @@ public class SalaEspera extends javax.swing.JPanel {
      */
     public boolean showStartRequestDialog(String requesterName) {
         int result = JOptionPane.showConfirmDialog(
-            this,
-            requesterName + " solicita iniciar la partida ahora.\n¿Deseas iniciar con los jugadores actuales?",
-            "Solicitud de inicio",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+                this,
+                requesterName + " solicita iniciar la partida ahora.\n¿Deseas iniciar con los jugadores actuales?",
+                "Solicitud de inicio",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
         );
         return result == JOptionPane.YES_OPTION;
     }
- 
+
     /**
      * Cambia el texto del botón "Listo" según el estado actual.
      *
@@ -319,14 +308,13 @@ public class SalaEspera extends javax.swing.JPanel {
     public void updateReadyButton(boolean isReady) {
         BtnListo.setText(isReady ? "✗ Cancelar Listo" : "✓ Estoy Listo");
         BtnListo.setBackground(isReady
-            ? new Color(71, 85, 105)
-            : new Color(34, 197, 94));
+                ? new Color(71, 85, 105)
+                : new Color(34, 197, 94));
     }
- 
+
     // ─────────────────────────────────────────────
     // Registro del Controller
     // ─────────────────────────────────────────────
- 
     /**
      * Asigna el Controller y conecta los listeners de los botones.
      *
@@ -334,7 +322,7 @@ public class SalaEspera extends javax.swing.JPanel {
      */
     public void setController(LobbyController controller) {
         this.controller = controller;
- 
+
         BtnListo.addActionListener(e -> controller.onReadyClicked());
         BtnIniciarPartida.addActionListener(e -> controller.onStartClicked());
         BtnSolicitarIniciar.addActionListener(e -> controller.onRequestStartClicked());

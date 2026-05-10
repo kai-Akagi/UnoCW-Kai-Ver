@@ -1,19 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package Vistas;
 
+import Controles.GameModeController;
 import java.awt.event.ActionListener;
 import Controles.LobbyController;
 
-/**
- *
- * @author HP
- */
 public class ModoJuego extends javax.swing.JPanel {
 
     private GameModeController controller;
+
     /**
      * Creates new form ModoJuego
      */
@@ -88,17 +82,18 @@ public class ModoJuego extends javax.swing.JPanel {
     public javax.swing.JLabel labelNombreU;
     // End of variables declaration//GEN-END:variables
 
-    public void listenerCrearSala(ActionListener listener){
+    public void listenerCrearSala(ActionListener listener) {
         BtnCrearSala.addActionListener(listener);
     }
-    public void listenerBtnCancelar(ActionListener listener){
+
+    public void listenerBtnCancelar(ActionListener listener) {
         BtnCancelar.addActionListener(listener);
     }
-    
-    public void setController(GameModeController controller){
+
+    public void setController(GameModeController controller) {
         this.controller = controller;
         BtnCrearSala.addActionListener(
-            e -> controller.onContinueClicked()
+                e -> controller.onContinueClicked()
         );
     }
 

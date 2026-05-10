@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package Vistas;
 
 import java.awt.Color;
@@ -16,33 +12,32 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import Controles.RegisterController;
 
-/**
- *
- * @author HP
- */
 public class MenuPrincipal extends javax.swing.JPanel {
+
     private String avatarSeleccionado;
     private static final String[] AVATAR_IDS = {
         "avatar_pig", "avatar_bear", "avatar_panda", "avatar_bunny",
-        "avatar_fox",  "avatar_penguin", "avatar_chick", "avatar_wolf", "avatar_frog"
+        "avatar_fox", "avatar_penguin", "avatar_chick", "avatar_wolf", "avatar_frog"
     };
 
-    /** Emojis usados para representar los avatares en texto (mientras no hay imágenes). */
+    /**
+     * Emojis usados para representar los avatares en texto (mientras no hay
+     * imágenes).
+     */
     private static final String[] AVATAR_EMOJIS = {
         "🐷", "🐻", "🐼", "🐰", "🦊", "🐧", "🐥", "🐺", "🐸"
     };
     private int selectedAvatarIndex = -1;
     private final JButton[] avatarButtons;
     private RegisterController controller;
-    
-    
+
     /**
      * Creates new form MenuPrincipal
      */
     public MenuPrincipal() {
         this.avatarButtons = new JButton[AVATAR_IDS.length];
         initComponents();
-        PanelAvatars.add(buildAvatarPanel()); 
+        PanelAvatars.add(buildAvatarPanel());
     }
 
     /**
@@ -115,24 +110,23 @@ public class MenuPrincipal extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     // End of variables declaration//GEN-END:variables
-    
-    public void listenerBtnContinuar(ActionListener listener){
+
+    public void listenerBtnContinuar(ActionListener listener) {
         BtnContinuar.addActionListener(listener);
     }
-    
-    public void setAvatar(String a){
+
+    public void setAvatar(String a) {
         this.avatarSeleccionado = a;
-        
+
     }
 
     public String getAvatarSeleccionado() {
         return avatarSeleccionado;
     }
-    
-       // ─────────────────────────────────────────────
+
+    // ─────────────────────────────────────────────
     // Métodos que el Controller llama para actualizar la View
     // ─────────────────────────────────────────────
-
     private JPanel buildAvatarPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
         panel.setBackground(new Color(242, 218, 179));
@@ -149,7 +143,9 @@ public class MenuPrincipal extends javax.swing.JPanel {
 
             // Al hacer clic, seleccionar este avatar
             btn.addActionListener(e -> {
-                if (controller != null) controller.onAvatarSelected(index);
+                if (controller != null) {
+                    controller.onAvatarSelected(index);
+                }
             });
 
             avatarButtons[i] = btn;
@@ -158,9 +154,10 @@ public class MenuPrincipal extends javax.swing.JPanel {
 
         return panel;
     }
+
     /**
-     * Resalta el avatar seleccionado y quita el resaltado de los demás.
-     * El Controller llama a esto cuando el usuario hace clic en un avatar.
+     * Resalta el avatar seleccionado y quita el resaltado de los demás. El
+     * Controller llama a esto cuando el usuario hace clic en un avatar.
      *
      * @param index El índice del avatar seleccionado.
      */
@@ -171,7 +168,7 @@ public class MenuPrincipal extends javax.swing.JPanel {
                 // Borde dorado para el seleccionado
                 avatarButtons[i].setBackground(new Color(248, 216, 71));
                 avatarButtons[i].setBorder(
-                    BorderFactory.createLineBorder(new Color(248, 216, 71), 3));
+                        BorderFactory.createLineBorder(new Color(248, 216, 71), 3));
             } else {
                 avatarButtons[i].setBackground(new Color(51, 51, 72));
                 avatarButtons[i].setBorder(UIManager.getBorder("Button.border"));
@@ -180,8 +177,8 @@ public class MenuPrincipal extends javax.swing.JPanel {
     }
 
     /**
-     * Muestra un mensaje de error debajo del campo de nombre.
-     * Pasa cadena vacía o " " para limpiar el error.
+     * Muestra un mensaje de error debajo del campo de nombre. Pasa cadena vacía
+     * o " " para limpiar el error.
      *
      * @param message El mensaje de error a mostrar.
      */
@@ -192,8 +189,8 @@ public class MenuPrincipal extends javax.swing.JPanel {
     }
 
     /**
-     * Marca un avatar como "en uso" (ya elegido por otro jugador).
-     * Lo deshabilita visualmente para que el usuario no lo seleccione.
+     * Marca un avatar como "en uso" (ya elegido por otro jugador). Lo
+     * deshabilita visualmente para que el usuario no lo seleccione.
      *
      * @param avatarId El identificador del avatar a deshabilitar.
      */
@@ -210,10 +207,9 @@ public class MenuPrincipal extends javax.swing.JPanel {
     // ─────────────────────────────────────────────
     // Datos que el Controller lee de la View
     // ─────────────────────────────────────────────
-
     /**
-     * Devuelve el texto ingresado en el campo de nombre.
-     * El Controller lo usa para validar antes de continuar.
+     * Devuelve el texto ingresado en el campo de nombre. El Controller lo usa
+     * para validar antes de continuar.
      *
      * @return El nombre ingresado, sin espacios extremos.
      */
@@ -227,17 +223,18 @@ public class MenuPrincipal extends javax.swing.JPanel {
      * @return El ID del avatar, o {@code null} si no hay ninguno seleccionado.
      */
     public String getSelectedAvatarId() {
-        if (selectedAvatarIndex < 0) return null;
+        if (selectedAvatarIndex < 0) {
+            return null;
+        }
         return AVATAR_IDS[selectedAvatarIndex];
     }
 
     // ─────────────────────────────────────────────
     // Registro del Controller
     // ─────────────────────────────────────────────
-
     /**
-     * Asigna el Controller de esta pantalla.
-     * Conecta el botón "SIGUIENTE" al método del Controller.
+     * Asigna el Controller de esta pantalla. Conecta el botón "SIGUIENTE" al
+     * método del Controller.
      *
      * @param controller El controller que manejará las acciones de esta View.
      */
@@ -246,13 +243,13 @@ public class MenuPrincipal extends javax.swing.JPanel {
 
         // Conectar el botón continuar al controller
         BtnContinuar.addActionListener(
-            e -> controller.onContinueClicked()
+                e -> controller.onContinueClicked()
         );
 
         // También permitir presionar Enter en el campo de nombre
         campoUsuario.addActionListener(
-            e -> controller.onContinueClicked()
+                e -> controller.onContinueClicked()
         );
     }
-   
+
 }

@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package Vistas;
 
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-/**
- *
- * @author HP
- */
 public class FramePrincipal extends javax.swing.JFrame {
 
     /**
@@ -19,7 +11,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     public FramePrincipal() {
         valoresDefault();
         initComponents();
-        
+
     }
 
     /**
@@ -39,9 +31,8 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+    public void actualizarPantalla(JPanel panel) {
 
-      public void actualizarPantalla(JPanel panel){
-           
         this.getContentPane().removeAll();
         this.getContentPane().add(panel);
         this.pack();
@@ -49,10 +40,10 @@ public class FramePrincipal extends javax.swing.JFrame {
         this.repaint();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-    
+
     }
-    
-    public void valoresDefault(){
+
+    public void valoresDefault() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
