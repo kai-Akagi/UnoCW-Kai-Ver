@@ -6,7 +6,7 @@ package Vistas;
 
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
-import uno.gui.lobby.LobbyController;
+import Controles.LobbyController;
 
 /**
  *

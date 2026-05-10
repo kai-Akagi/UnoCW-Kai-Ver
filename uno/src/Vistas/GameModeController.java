@@ -6,11 +6,11 @@
 package Vistas;
 
 import javax.swing.SwingUtilities;
-import uno.gui.MainWindow;
-import uno.model.LobbyState;
-import uno.model.Player;
-import uno.network.NetworkLayer;
-import uno.session.GameSession;
+import Main.MainWindow;
+import Dominio.LobbyState;
+import Dominio.Player;
+import Red.NetworkLayer;
+import Controles.GameSession;
 
 /**
  *

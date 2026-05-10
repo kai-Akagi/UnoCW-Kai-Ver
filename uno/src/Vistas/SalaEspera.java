@@ -15,8 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import uno.gui.lobby.LobbyController;
-import uno.model.Player;
+import Controles.LobbyController;
+import Dominio.Player;
 
 /**
  *

@@ -5,7 +5,7 @@
 package Vistas;
 
 import java.awt.event.ActionListener;
-import uno.gui.lobby.LobbyController;
+import Controles.LobbyController;
 
 /**
  *

@@ -14,7 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import uno.gui.register.RegisterController;
+import Controles.RegisterController;
 
 /**
  *
