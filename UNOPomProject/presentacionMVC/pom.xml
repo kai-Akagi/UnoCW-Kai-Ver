@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.uno</groupId>
+        <artifactId>uno-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>presentacionMVC</artifactId>
+    <name>PresentacionMVC</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.uno</groupId>
+            <artifactId>networklayer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!--
+            AbsoluteLayout se instala en el repo local con:
+                mvn install:install-file ...
+            (el script install-deps.sh lo hace automáticamente)
+            scope=compile lo incluye en runtime y en el fat JAR.
+        -->
+        <dependency>
+            <groupId>org.netbeans.external</groupId>
+            <artifactId>AbsoluteLayout</artifactId>
+            <version>RELEASE180</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Fat JAR ejecutable: mvn package → target/presentacionMVC-...-jar-with-dependencies.jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>Main.MainWindow</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- mvn exec:java -pl presentacionMVC -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>Main.MainWindow</mainClass>
+                    <!--
+                        Garantiza que AbsoluteLayout esté en el classpath de runtime
+                        incluso si aún no se instaló con install-deps.sh.
+                        La ruta ${project.basedir}/../libs/AbsoluteLayout.jar apunta
+                        al JAR que ya viene incluido en el ZIP del proyecto.
+                    -->
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${project.basedir}/../libs/AbsoluteLayout.jar</additionalClasspathElement>
+                    </additionalClasspathElements>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+</project>
