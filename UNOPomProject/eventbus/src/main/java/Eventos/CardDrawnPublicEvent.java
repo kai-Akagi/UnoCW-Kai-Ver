@@ -1,6 +1,5 @@
 package Eventos;
 
-import Eventos.GameEvent;
 import Dominio.Player;
 
 /**

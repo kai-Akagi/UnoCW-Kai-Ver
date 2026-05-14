@@ -1,7 +1,5 @@
 package Eventos;
 
-import Eventos.GameEvent;
-
 /**
  * Evento: un jugador se desconectó.
  *

@@ -4,7 +4,6 @@
  */
 package Eventos;
 
-import Eventos.GameEvent;
 import Dominio.Card;
 import Dominio.Player;
 

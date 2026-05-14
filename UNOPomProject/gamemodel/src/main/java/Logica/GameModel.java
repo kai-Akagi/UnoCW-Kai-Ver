@@ -1,15 +1,8 @@
 package Logica;
 
-import Eventos.UnoGracePeriodEvent;
-import Eventos.GameEventFactory;
-import Eventos.DrawCardRequestEvent;
-import Eventos.ColorChosenEvent;
-import Eventos.CardPlayedEvent;
-import Dominio.Player;
-import Dominio.Deck;
-import Dominio.Card;
 import Dominio.GameState;
-import Logica.CardFactory;
+import Dominio.*;
+import Eventos.*;
 import Eventos.EventBus;
 
 import java.util.ArrayList;
@@ -342,13 +335,6 @@ public class GameModel {
             return null;
         }
 
-        // FIX: si hay un periodo de gracia UNO activo y el jugador roba en vez de declarar,
-        // cancelar el periodo de gracia para que el turno pueda avanzar normalmente.
-        if (pendingUnoPlayer != null &&
-                pendingUnoPlayer.getName().equals(actualPlayer.getName())) {
-            pendingUnoPlayer = null;
-        }
-
         Card drawn = Deck.getInstance().drawCard();
         if (drawn == null) return null;
 
@@ -410,6 +396,61 @@ public class GameModel {
         // en la lista de jugadores del gameState y actualizaríamos la carta activa.
         // El estado ya fue actualizado vía los eventos publicados en el bus local.
     }
+    
+    /**
+    * Elimina a un jugador de la partida porque abandonó voluntariamente.
+    *
+    * <p>Sus cartas se devuelven al Deck sin alterar la carta activa visible.
+    * Si era su turno, el índice queda apuntando al siguiente jugador.
+    * Si queda solo un jugador, ese jugador gana automáticamente.
+    *
+    * @param playerName El nombre del jugador que abandonó.
+    */
+    public void removePlayer(String playerName) {
+        if (gameState == null) return;
+
+        Player leaving = gameState.getPlayers().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElse(null);
+
+        if (leaving == null) return;
+
+        // Devolver las cartas al Deck sin afectar el topCard visible
+        for (Card card : new java.util.ArrayList<>(leaving.getHand())) {
+            leaving.removeCard(card);
+            Deck.getInstance().discard(card);
+        }
+
+        // Registrar si era su turno antes de removerlo
+        boolean wasCurrentPlayer = gameState.getCurrentPlayer().getName()
+                .equals(playerName);
+
+        // Remover al jugador de la lista
+        gameState.getPlayers().remove(leaving);
+
+        // Si solo queda un jugador, termina la partida
+        if (gameState.getPlayers().size() == 1) {
+            Player winner = gameState.getPlayers().get(0);
+            System.out.println("[GameModel] Solo queda 1 jugador. Ganador: "
+                    + winner.getName());
+            eventBus.publish(GameEventFactory.gameOver(winner));
+            return;
+        }
+
+        // Ajustar el índice para que no quede fuera de rango
+        gameState.clampCurrentIndex();
+
+        // Publicar el nuevo turno para actualizar todas las GUIs
+        eventBus.publish(GameEventFactory.turnChanged(
+            gameState.getCurrentPlayer(),
+            gameState.getTopCard(),
+            gameState.isClockwise()
+        ));
+    }
+    
+    
+    
 
     // ─────────────────────────────────────────────
     // Consultas
@@ -435,35 +476,16 @@ public class GameModel {
      * Saca cartas del mazo hasta encontrar una que no sea comodín.
      * La primera carta de la partida no puede ser WILD.
      */
-    /**
-     * Saca cartas del mazo hasta encontrar una que no sea comodín.
-     * La primera carta de la partida no puede ser WILD (regla oficial UNO).
-     *
-     * FIX: los comodines descartados se colocaban en la pila de descarte,
-     * lo que los convertía en la "carta activa" visible antes de empezar.
-     * Ahora se acumulan en una lista temporal y se reinsertan al fondo del
-     * mazo de robo para que puedan volver a aparecer durante el juego.
-     */
     private Card drawFirstNonWild(Deck deck) {
-        java.util.List<Card> skippedWilds = new java.util.ArrayList<>();
         Card card;
         do {
-            card = deck.drawCard();
-            if (card != null && card.getColor() == Card.Color.WILD) {
-                skippedWilds.add(card);
+             card = deck.drawCard();
+            
+             if(card != null && card.getColor() == Card.Color.WILD){
+                deck.discard(card);  
             }
+             
         } while (card != null && card.getColor() == Card.Color.WILD);
-
-        // Reinsertar los comodines al fondo del mazo (no en el descarte)
-        // para que puedan salir durante el juego normal.
-        for (Card wild : skippedWilds) {
-            deck.discard(wild); // los ponemos en descarte temporalmente...
-        }
-        // ...y recargamos el mazo mezclando el descarte (sin la carta activa)
-        // solo si es necesario. En la práctica, con 108 cartas y solo 4 wilds
-        // al inicio, el mazo raramente necesita recargarse aquí.
-        // Alternativa más simple: se quedan en el descarte y se mezclan en la
-        // primera recarga automática cuando el mazo de robo se vacía.
         return card;
     }
 }

@@ -1,13 +1,7 @@
 package Controles;
 
-import Eventos.UnoGracePeriodEvent;
-import Eventos.TurnChangedEvent;
-import Eventos.UnoCalledEvent;
-import Eventos.NetworkTurnChangedEvent;
-import Eventos.GameEventFactory;
-import Eventos.GameOverEvent;
-import Eventos.NetworkCardDrawnPrivateEvent;
 import Logica.GameModel;
+import Eventos.*;
 import Eventos.EventBus;
 import Main.MainWindow;
 import Dominio.Card;
@@ -15,12 +9,12 @@ import Dominio.GameState;
 import Dominio.LobbyState;
 import Red.NetworkLayer;
 import Controles.GameSession;
+import Vistas.GameView;
+import Vistas.GameViewModel;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import Vistas.GameView;
-import Vistas.GameViewModel;
 
 /**
  * Controller de la pantalla del juego.
@@ -195,6 +189,41 @@ public class GameController {
             GameEventFactory.drawCardRequest(session.getLocalPlayer())
         );
     }
+    
+    /**
+    * Se llama cuando el jugador presiona el botón "Abandonar".
+    * Muestra confirmación. Si el Host abandona termina la partida para todos.
+    * Si un Peer abandona, notifica al Host y navega al registro.
+    */
+    public void onLeaveClicked() {
+        int choice = JOptionPane.showConfirmDialog(
+            mainWindow,
+            "¿Estás seguro de que deseas abandonar la partida?",
+            "Abandonar partida",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+        if (choice != JOptionPane.YES_OPTION) return;
+
+        view.stopTurnTimer();
+
+        if (session.isHost()) {
+            // Notificar a todos con nombre especial "HOST" para que sepan
+            // que la partida termina, no solo que un jugador salió
+            networkLayer.broadcast(
+                "{\"type\":\"PLAYER_LEFT\",\"player\":\"HOST\"}\n");
+            SwingUtilities.invokeLater(mainWindow::showRegister);
+        } else {
+            // El listener de NetworkLayer enviará PLAYER_LEFT al Host
+            eventBus.publish(GameEventFactory.playerDisconnected(
+                session.getLocalPlayer().getName()));
+            SwingUtilities.invokeLater(mainWindow::showRegister);
+        }
+    }
+    
+    
+    
+    
 
     /**
      * Indica si estamos en el periodo de gracia de UNO (5 segundos para declarar).
@@ -410,7 +439,7 @@ public class GameController {
             );
         });
 
-        // Un jugador gritó UNO localmente (feedback visual para quien presionó)
+        // Un jugador gritó UNO (feedback visual)
         eventBus.subscribe(UnoCalledEvent.class, event -> {
             UnoCalledEvent e = (UnoCalledEvent) event;
             SwingUtilities.invokeLater(() ->
@@ -419,19 +448,60 @@ public class GameController {
                     "UNO", JOptionPane.INFORMATION_MESSAGE)
             );
         });
+    
+    
+        // Un jugador abandonó la partida en curso.
+        eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
+            PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
+            String leavingName = e.getPlayerName();
 
-        // Notificación de UNO recibida por la red (para los demás jugadores)
-        eventBus.subscribe(Eventos.NetworkUnoCalledEvent.class, event -> {
-            Eventos.NetworkUnoCalledEvent e = (Eventos.NetworkUnoCalledEvent) event;
-            if (!session.isLocalPlayer(e.getPlayerName())) {
-                SwingUtilities.invokeLater(() ->
+            if ("HOST".equals(leavingName)) {
+                // El Host salió: todos los Peers regresan al registro
+                SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(mainWindow,
-                        "¡" + e.getPlayerName() + " gritó UNO!",
-                        "UNO", JOptionPane.INFORMATION_MESSAGE)
-                );
+                        "El Host abandonó la partida.",
+                        "Partida terminada",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    mainWindow.showRegister();
+                });
+                return;
+            }
+
+            // Un Peer abandonó: el Host actualiza su GameModel
+            if (session.isHost() && gameModel.getGameState() != null) {
+                gameModel.removePlayer(leavingName);
+            }
+
+            // Todos eliminan al jugador del LobbyState
+            lobbyState.removePlayer(leavingName);
+
+            // El Peer limpia su mapa y re-renderiza sin ese jugador
+            if (!session.isHost()) {
+                peerOpponentHandSizes.remove(leavingName);
+                if (lastViewModel != null) {
+                    SwingUtilities.invokeLater(() -> {
+                        List<String> names  = new ArrayList<>(lastViewModel.opponentNames);
+                        List<Integer> sizes = new ArrayList<>(lastViewModel.opponentHandSizes);
+                        int idx = names.indexOf(leavingName);
+                        if (idx >= 0) { names.remove(idx); sizes.remove(idx); }
+                        GameViewModel updated = new GameViewModel(
+                            lastViewModel.currentPlayerName,
+                            lastViewModel.topCardValue,
+                            lastViewModel.topCardColor,
+                            new ArrayList<>(session.getLocalPlayer().getHand()),
+                            session.getLocalPlayer().getName(),
+                            names, sizes, lastViewModel.clockwise
+                        );
+                        lastViewModel = updated;
+                        view.render(updated);
+                    });
+                }
             }
         });
+    
+    
     }
+    
     // ─────────────────────────────────────────────
     // Utilidades de parseo de red
     // ─────────────────────────────────────────────

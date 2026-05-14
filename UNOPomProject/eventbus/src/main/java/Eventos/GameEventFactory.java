@@ -1,11 +1,5 @@
 package Eventos;
 
-import Eventos.CardPlayedEvent;
-import Eventos.CardDrawnPublicEvent;
-import Eventos.CardDrawnPrivateEvent;
-import Eventos.LobbyClosedEvent;
-import Eventos.NetworkCardDrawnPrivateEvent;
-import Eventos.GameStartedEvent;
 import Dominio.Card;
 import Dominio.Player;
  
@@ -66,7 +60,7 @@ public class GameEventFactory {
      * Crea el evento de cambio de turno.
      *
      * <p><b>Corrección respecto a Fase 2:</b> ahora incluye la carta activa
-     * para que {@link uno.network.MessageSerializer} pueda serializarla
+     * para que {@link Red.MessageSerializer} pueda serializarla
      * y los peers actualicen su vista sin pedir el estado completo al Host.
      *
      * @param currentPlayer El jugador que ahora tiene el turno.

@@ -6,9 +6,22 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Guarda el estado de la sala de espera: jugadores conectados,
- * capacidad máxima, código de sala y si la partida ya inició.
- * Se crea antes del juego y se descarta cuando la partida comienza.
+ * Representa el estado de la sala de espera (lobby) antes de iniciar la partida.
+ *
+ * <p>Mientras {@link GameState} describe lo que pasa durante la partida,
+ * {@code LobbyState} describe lo que pasa antes: quiénes están conectados,
+ * cuántos jugadores se esperan y si todos están listos.
+ *
+ * <p><b>¿Por qué una clase separada y no meter esto en GameState?</b><br>
+ * Porque son momentos distintos del ciclo de vida de la aplicación.
+ * El lobby existe antes del juego. Cuando la partida inicia, el lobby
+ * desaparece y nace el GameState. Mezclarlos en una sola clase crearía
+ * atributos que son null la mitad del tiempo, lo cual es confuso y propenso
+ * a errores. Cada clase representa un momento claro.
+ * 
+ * 
+ * @author Héctor Alonso 252039
+ * 
  */
 public class LobbyState {
 
@@ -44,14 +57,6 @@ public class LobbyState {
     public LobbyState() {
         this.roomCode         = generateRoomCode();
         this.capacity         = 4;
-        this.connectedPlayers = new ArrayList<>();
-        this.gameStarted      = false;
-    }
-    
-    //contructor con el parametro del num max de jugadores
-    public LobbyState(int capacity) {
-        this.roomCode         = generateRoomCode();
-        this.capacity         = capacity;
         this.connectedPlayers = new ArrayList<>();
         this.gameStarted      = false;
     }
@@ -198,7 +203,7 @@ public class LobbyState {
      * Genera un código de sala único y legible.
      * Formato: "A3F2-9KX1" — dos grupos de 4 caracteres separados por guión.
      *
-     * Usamos UUID como base para garantizar unicidad, luego tomamos
+     * <p>Usamos UUID como base para garantizar unicidad, luego tomamos
      * solo los primeros 8 caracteres en mayúsculas para que sea fácil
      * de escribir y compartir entre jugadores.
      *

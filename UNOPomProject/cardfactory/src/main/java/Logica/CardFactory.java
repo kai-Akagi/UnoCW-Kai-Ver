@@ -6,7 +6,6 @@ package Logica;
 
 import Dominio.Card;
 import Dominio.Card.Color;
-import Logica.CardEffectFactory;
  
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +51,7 @@ public class CardFactory {
     /**
      * Crea y devuelve el mazo completo de 108 cartas de UNO, ya mezclado.
      *
-     * <p>Mezclar el mazo aquí y no en el {@link uno.model.Deck} es una
+     * <p>Mezclar el mazo aquí y no en el {@link Dominio.Deck} es una
      * decisión consciente: la fábrica entrega el producto listo para usarse.
      *
      * @return Lista con las 108 cartas del juego en orden aleatorio.

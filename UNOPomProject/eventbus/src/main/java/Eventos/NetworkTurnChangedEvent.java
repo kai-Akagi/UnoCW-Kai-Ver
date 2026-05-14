@@ -1,7 +1,5 @@
 package Eventos;
 
-import Eventos.GameEvent;
-
 /**
  * Evento de red: cambio de turno recibido desde el Host.
  *

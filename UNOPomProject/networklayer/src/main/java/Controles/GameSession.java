@@ -3,10 +3,31 @@ package Controles;
 import Dominio.Player;
 
 /**
- * Guarda la información de la sesión del jugador local: su nombre,
- * avatar, rol (Host o Peer) y el código de sala al que pertenece.
- * Es el punto de referencia para que cualquier componente sepa
- * quién es el jugador local sin necesitar parámetros extra.
+ * Contexto de la sesión actual del jugador en esta instancia del programa.
+ *
+ * <p>Responde a las preguntas más básicas de cualquier componente:
+ * <ul>
+ *   <li>¿Quién soy yo en esta partida?</li>
+ *   <li>¿Soy el Host o un Peer?</li>
+ *   <li>¿A qué sala pertenezco?</li>
+ * </ul>
+ *
+ * <p><b>¿Por qué existe esta clase?</b><br>
+ * Sin ella, cada componente (Controller, NetworkLayer, GameModel) tendría que
+ * recibir el jugador local como parámetro en cada método, o peor, guardarlo
+ * como atributo propio. Con {@code GameSession} hay un solo lugar donde
+ * vive esa información y todos la consultan ahí.
+ *
+ * <p><b>Ciclo de vida:</b> Se crea cuando el jugador completa el registro
+ * (nombre + avatar) y vive hasta que cierra la aplicación o vuelve al menú
+ * principal para registrarse de nuevo.
+ *
+ * <p><b>¿Es un Singleton?</b><br>
+ * No literalmente, pero en la práctica solo existe una instancia cada ejecución.
+ * Se crea en el punto de entrada (la pantalla de registro) y se pasa por
+ * referencia a quien la necesite. Evitamos el Singleton aquí porque la sesión
+ * sí puede "reiniciarse" si el jugador vuelve al menú principal, y un Singleton
+ * complicaría ese reset.
  */
 public class GameSession {
 
@@ -28,8 +49,6 @@ public class GameSession {
      * El Host lo genera y lo comparte. Los Peers lo usan para conectarse.
      */
     private String roomCode;
-    
-    private int maxJugadores;
 
     /**
      * Crea una nueva sesión para el jugador local.
@@ -87,13 +106,4 @@ public class GameSession {
     public boolean isLocalPlayer(String playerName) {
         return localPlayer.getName().equals(playerName);
     }
-
-    public int getMaxJugadores() {
-        return maxJugadores;
-    }
-
-    public void setMaxJugadores(int maxJugadores) {
-        this.maxJugadores = maxJugadores;
-    }
-    
 }

@@ -4,8 +4,6 @@
  */
 package Eventos;
 
-import Eventos.GameEvent;
-
 /**
  * Evento publicado en el bus local cuando el Host rechaza la conexión del Peer.
  *

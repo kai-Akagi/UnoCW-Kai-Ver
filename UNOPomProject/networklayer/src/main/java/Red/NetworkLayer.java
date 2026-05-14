@@ -1,18 +1,7 @@
 package Red;
-import Eventos.TurnChangedEvent;
-import Eventos.UnoCalledEvent;
-import Eventos.PlayerReadyEvent;
-import Eventos.PlayerDisconnectedEvent;
-import Eventos.GameEventFactory;
-import Eventos.DrawCardRequestEvent;
-import Eventos.GameOverEvent;
-import Eventos.ColorChosenEvent;
-import Eventos.CardPlayedEvent;
-import Eventos.CardDrawnPrivateEvent;
-import Eventos.GameStartedEvent;
-import Eventos.GameEvent;
 import Logica.GameModel;
 
+import Eventos.*;
 import Eventos.EventBus;
 import Dominio.LobbyState;
 import Dominio.Player;
@@ -25,11 +14,30 @@ import java.util.concurrent.*;
 import javax.swing.SwingUtilities;
  
 /**
- * Maneja toda la comunicación por sockets entre Host y Peers.
- * El Host abre el servidor y distribuye los mensajes; los Peers
- * se conectan y envían sus acciones al Host para que las valide.
- * Usa el EventBus para publicar los mensajes recibidos al resto
- * de la aplicación sin acoplarse a ningún componente específico.
+ * Capa de red del juego. Maneja toda la comunicación por sockets.
+ *
+ * <p>Opera en dos modos según el rol del jugador:
+ * <ul>
+ *   <li><b>Host:</b> Abre un {@link ServerSocket}, acepta peers entrantes,
+ *       valida su presentación, hace broadcast de los eventos relevantes.</li>
+ *   <li><b>Peer:</b> Se conecta al ServerSocket del Host, se presenta
+ *       enviando sus datos, y escucha los mensajes que el Host le envía.</li>
+ * </ul>
+ *
+ * <p><b>Correcciones en esta versión:</b>
+ * <ul>
+ *   <li>El Host procesa correctamente {@code TYPE_PLAYER_JOINED}: publica
+ *       el evento en su bus local Y hace broadcast a los peers conectados.</li>
+ *   <li>El orden de llamadas en {@code RegisterController} se simplificó:
+ *       {@code registerEventListeners()} se llama una sola vez, después
+ *       de que la conexión está establecida.</li>
+ *   <li>Logs de consola para diagnosticar el flujo de conexión.</li>
+ * </ul>
+ * 
+ * 
+ * @Elite Héctor Alonso 252039
+ *        Alejandro Rodríguez 251622
+ * 
  */
 public class NetworkLayer {
  
@@ -115,6 +123,9 @@ public class NetworkLayer {
     /**
      * Conecta esta instancia al Host como Peer.
      *
+     * <p>Establece la conexión TCP, registra el canal y envía la
+     * presentación del jugador local al Host.
+     *
      * @param hostIp   IP del Host.
      * @param hostPort Puerto del Host.
      * @throws IOException Si no se puede conectar.
@@ -142,8 +153,11 @@ public class NetworkLayer {
      */
     private void presentToHost(PeerConnection hostConn) {
         Player local   = session.getLocalPlayer();
-        String message = MessageSerializer.serialize(
-                GameEventFactory.playerJoined(local));
+        // Incluir el código de sala que el Peer escribió al registrarse.
+        // El Host lo compara contra su propio código antes de aceptar la conexión.
+        String message = MessageSerializer.serializePlayerJoinedWithCode(
+                GameEventFactory.playerJoined(local),
+                session.getRoomCode());
         System.out.println("[Peer] Enviando presentación: " + message);
         hostConn.sendMessage(message);
     }
@@ -166,9 +180,6 @@ public class NetworkLayer {
             PlayerReadyEvent e = (PlayerReadyEvent) event;
             if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
                 sendToHost(MessageSerializer.serialize(e));
-            } else if (session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
-                // El Host cambió su estado listo → notificar a los Peers
-                broadcast(MessageSerializer.serialize(e));
             }
         });
         
@@ -180,9 +191,6 @@ public class NetworkLayer {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
             if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
                 sendToHost(MessageSerializer.serialize(
-                GameEventFactory.playerDisconnected(e.getPlayerName())));
-            } else if (session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
-                broadcast(MessageSerializer.serialize(
                 GameEventFactory.playerDisconnected(e.getPlayerName())));
             }
         });
@@ -205,7 +213,15 @@ public class NetworkLayer {
         }
     }
  
-    /** Registra los listeners del juego. Se llama al iniciar la partida. */
+    /**
+     * Suscribe los listeners del juego: jugadas, robo, turno, cartas privadas.
+     * Se llama al iniciar la pantalla del juego, después de que el lobby cerró.
+     *
+     * <p><b>Por qué separado de registerLobbyListeners:</b><br>
+     * Los listeners del lobby y del juego son distintos. Si los registráramos
+     * todos juntos, los eventos del juego podrían llegar mientras aún estamos
+     * en el lobby. Separándolos, cada fase solo escucha lo que le corresponde.
+     */
     public void registerGameListeners() {
         // Protección contra doble registro: si ya se registraron los listeners
         // del juego, no los registramos de nuevo para evitar que cada evento
@@ -255,6 +271,21 @@ public class NetworkLayer {
                 }
             });
         }
+        
+        
+        // El Peer abandona durante la partida → notificar al Host
+        if (!session.isHost()) {
+            eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
+                PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
+                if (session.isLocalPlayer(e.getPlayerName())) {
+                    sendToHost(MessageSerializer.serialize(
+                        GameEventFactory.playerDisconnected(e.getPlayerName())));
+                }
+            });
+        }
+        
+        
+        
  
         // Solo el Host hace broadcast o envíos privados de eventos del juego
         if (session.isHost()) {
@@ -290,7 +321,8 @@ public class NetworkLayer {
             // Periodo de gracia UNO: broadcast para que los demás jugadores vean
             // que un compañero está en el periodo de gracia.
             eventBus.subscribe(Eventos.UnoGracePeriodEvent.class, event ->
-                    broadcast(MessageSerializer.serializeUnoGrace((Eventos.UnoGracePeriodEvent) event)));
+                    broadcast(MessageSerializer.serializeUnoGrace(
+                        (Eventos.UnoGracePeriodEvent) event)));
  
             // Penalización UNO: el Peer le avisa al Host que su timer expiró.
             // El Host aplica la penalización y avanza el turno.
@@ -320,7 +352,8 @@ public class NetworkLayer {
     // ─────────────────────────────────────────────
  
     /**
-     * Recibe un mensaje y lo enruta según el rol: Host valida y reenvía, Peer publica en bus.
+     * Punto central de entrada de mensajes recibidos por cualquier socket.
+     * Decide si procesarlos como Host (validar + reenviar) o como Peer (publicar en bus).
      *
      * @param senderName Nombre del peer que envió el mensaje.
      * @param message    Texto JSON recibido.
@@ -342,11 +375,11 @@ public class NetworkLayer {
     /**
      * El Host procesa un mensaje entrante de un Peer.
      *
-    	 * Para cada tipo de mensaje, el Host:
-    
-     * - Publica el evento en su bus local (para que GameModel lo procese).
-     * - Decide si reenviar el resultado a otros peers.
-    
+     * <p>Para cada tipo de mensaje, el Host:
+     * <ol>
+     *   <li>Publica el evento en su bus local (para que GameModel lo procese).</li>
+     *   <li>Decide si reenviar el resultado a otros peers.</li>
+     * </ol>
      *
      * @param type       Tipo del mensaje.
      * @param fields     Campos del mensaje.
@@ -364,7 +397,30 @@ public class NetworkLayer {
                         fields.get("avatarId"),
                         false // los peers que se unen nunca son Host
                 );
- 
+
+                // ── Corrección: validar código de sala ──
+                // El Peer envía el código que escribió al registrarse.
+                // Si no coincide con el código real de la sala, el Host rechaza
+                // la conexión independientemente de si están en el mismo equipo
+                // (localhost) o en equipos distintos.
+                String peerRoomCode = fields.getOrDefault("roomCode", "");
+                String hostRoomCode = session.getRoomCode() != null ? session.getRoomCode() : "";
+                if (!hostRoomCode.equalsIgnoreCase(peerRoomCode)) {
+                    System.out.println("[Host] Codigo de sala incorrecto. Peer envió '"
+                            + peerRoomCode + "' esperado '" + hostRoomCode + "'");
+                    PeerConnection wrongConn = connections.get(senderName);
+                    if (wrongConn != null) {
+                        try {
+                            wrongConn.sendMessage("{\"type\":\"PLAYER_REJECTED\","
+                                + "\"reason\":\"Codigo de sala incorrecto\"}\n");
+                            Thread.sleep(100);
+                        } catch (Exception ex) { /* ignorar */ }
+                        connections.remove(senderName);
+                        wrongConn.close();
+                    }
+                    return;
+                }
+
                 // Validar que la sala no esté llena
                 if (!lobbyState.hasSpace()) {
                     System.out.println("[Host] Sala llena. Rechazando: " + newPlayer.getName());
@@ -379,7 +435,7 @@ public class NetworkLayer {
                     }
                     return;
                 }
- 
+
                 // Validar unicidad de nombre y avatar
                 if (lobbyState.isNameTaken(newPlayer.getName())
                         || lobbyState.isAvatarTaken(newPlayer.getAvatarId())) {
@@ -416,9 +472,6 @@ public class NetworkLayer {
                 sendPrivate(senderName, MessageSerializer.serialize(
                         GameEventFactory.playerJoined(newPlayer)));
                 sendCurrentLobbyState(senderName);
-                // Enviar la capacidad configurada para que el peer muestre el tamaño correcto
-                sendPrivate(senderName, "{\"type\":\"LOBBY_STATE\",\"capacity\":\""
-                        + lobbyState.getCapacity() + "\"}\n");
                 break;
  
             case MessageSerializer.TYPE_PLAYER_READY:
@@ -489,8 +542,6 @@ public class NetworkLayer {
  
             case MessageSerializer.TYPE_UNO_CALLED:
                 publishToLocalBus(type, fields);
-                // Notificar a los demás peers que este jugador gritó UNO
-                broadcastExcept(senderName, MessageSerializer.serializeFields(type, fields));
                 // El Peer declaró UNO: avanzar el turno en el GameModel del Host
                 if (gameModel != null) {
                     gameModel.onUnoDeclared();
@@ -509,17 +560,22 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_PLAYER_LEFT:
-                lobbyState.removePlayer(fields.get("player"));
-                eventBus.publish(GameEventFactory.playerDisconnected(fields.get("player")));
+                String leftName = fields.get("player");
+                lobbyState.removePlayer(leftName);
+                // Si hay partida activa, actualizar el GameModel también
+                if (gameModel != null && gameModel.getGameState() != null) {
+                    gameModel.removePlayer(leftName);
+                }
+                eventBus.publish(GameEventFactory.playerDisconnected(leftName));
                 broadcastExcept(senderName, MessageSerializer.serialize(
-                        GameEventFactory.playerDisconnected(fields.get("player"))));
+                        GameEventFactory.playerDisconnected(leftName)));
                 break;
- 
-            default:
-                System.out.println("[Host] Tipo de mensaje desconocido ignorado: " + type);
-                break;
+
+                default:
+                    System.out.println("[Host] Tipo de mensaje desconocido ignorado: " + type);
+                    break;
+            }
         }
-    }
  
     /**
      * Convierte los campos del mensaje en un evento y lo publica en el bus local.
@@ -530,6 +586,7 @@ public class NetworkLayer {
      */
     private void publishToLocalBus(String type, Map<String, String> fields) {
         switch (type) {
+ 
             case MessageSerializer.TYPE_PLAYER_JOINED:
                 // El Peer recibe notificación de que otro jugador se unió.
                 // También restauramos el estado "Listo" para que el Peer
@@ -558,31 +615,10 @@ public class NetworkLayer {
                 break;
  
             case MessageSerializer.TYPE_PLAYER_LEFT:
-                String leftName = fields.get("player");
-                if ("HOST".equals(leftName)) {
-                    leftName = lobbyState.getConnectedPlayers().stream()
-                        .filter(Dominio.Player::isHost)
-                        .map(Dominio.Player::getName)
-                        .findFirst().orElse("HOST");
-                }
-                eventBus.publish(GameEventFactory.playerDisconnected(leftName));
-                lobbyState.removePlayer(leftName);
+                lobbyState.removePlayer(fields.get("player"));
+                eventBus.publish(GameEventFactory.playerDisconnected(fields.get("player")));
                 break;
  
-            case MessageSerializer.TYPE_LOBBY_STATE:
-                // El Host cambió el tamaño de sala → actualizar lobbyState y refrescar vista
-                String newCapStr = fields.get("capacity");
-                if (newCapStr != null) {
-                    try { lobbyState.setCapacity(Integer.parseInt(newCapStr)); }
-                    catch (NumberFormatException ignored) {}
-                }
-                // Reutilizar PlayerJoinedEvent para disparar el refresh del contador en LobbyController
-                if (!lobbyState.getConnectedPlayers().isEmpty()) {
-                    eventBus.publish(GameEventFactory.playerJoined(
-                        lobbyState.getConnectedPlayers().get(0)));
-                }
-                break;
-
             case MessageSerializer.TYPE_GAME_STARTED:
                 eventBus.publish(GameEventFactory.gameStarted());
                 break;
@@ -671,7 +707,8 @@ public class NetworkLayer {
             case MessageSerializer.TYPE_GAME_OVER:
                 // El Host terminó el juego. Publicamos GameOverEvent localmente
                 // para que GameController muestre el scoreboard al Peer.
-                eventBus.publish(GameEventFactory.gameOver(new Dominio.Player(fields.get("winner"), "", false)));
+                eventBus.publish(GameEventFactory.gameOver(
+                    new Dominio.Player(fields.get("winner"), "", false)));
                 break;
  
             case MessageSerializer.TYPE_UNO_CALLED:
@@ -698,18 +735,12 @@ public class NetworkLayer {
                 break;
 
             case "PLAYER_REJECTED":
-                // El Host rechazó la conexión por nombre o avatar duplicado.
-                // Mostramos un aviso al usuario y cerramos la red para que
-                // el jugador pueda volver a intentarlo con datos diferentes.
+                // El Host rechazó la conexión (código incorrecto, sala llena, nombre/avatar duplicado).
+                // Publicamos el evento en el bus para que RegisterController lo capture,
+                // muestre el error en la View y limpie sus listeners temporales.
                 String rejReason = fields.getOrDefault("reason", "Nombre o avatar ya en uso");
                 System.out.println("[Peer] Conexion rechazada: " + rejReason);
-                SwingUtilities.invokeLater(() ->
-                    javax.swing.JOptionPane.showMessageDialog(null,
-                        rejReason + "\nPor favor elige un nombre y avatar diferentes.",
-                        "Registro rechazado",
-                        javax.swing.JOptionPane.WARNING_MESSAGE)
-                );
-                shutdown();
+                eventBus.publish(new Eventos.NetworkPlayerRejectedEvent(rejReason));
                 break;
  
             default:
@@ -726,7 +757,7 @@ public class NetworkLayer {
      * Envía al peer recién unido la lista completa de jugadores que ya están
      * en el lobby, para que su pantalla quede sincronizada desde el primer momento.
      *
-    	 * Sin esto, el Peer solo vería a los jugadores que se unan DESPUÉS de él,
+     * <p>Sin esto, el Peer solo vería a los jugadores que se unan DESPUÉS de él,
      * nunca a los que ya estaban.
      *
      * @param targetPeerName El nombre del peer que acaba de unirse.

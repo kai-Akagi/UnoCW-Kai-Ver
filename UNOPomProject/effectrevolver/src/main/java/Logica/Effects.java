@@ -1,6 +1,5 @@
 package Logica;
 
-import Logica.CardEffect;
 import Dominio.GameState;
 
 /**

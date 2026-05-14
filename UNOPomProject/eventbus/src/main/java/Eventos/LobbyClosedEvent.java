@@ -1,7 +1,5 @@
 package Eventos;
 
-import Eventos.GameEvent;
-
 /**
  * Evento: el lobby fue cerrado por el Host.
  *

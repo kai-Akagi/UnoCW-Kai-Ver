@@ -1,7 +1,5 @@
 package Dominio;
 
-import Dominio.Deck;
-import Dominio.Card;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -246,6 +244,17 @@ public class GameState {
     public Player getLastGivenPlayer() {
         return lastGivenPlayer;
     }
+    
+    
+    /**
+    * Ajusta el índice del jugador actual para que no quede fuera de rango.
+    * Se llama después de remover un jugador de la lista durante la partida.
+    */
+    public void clampCurrentIndex() {
+        if (players.isEmpty()) return;
+        currentPlayerIndex = currentPlayerIndex % players.size();
+    }
+    
 
     // ─────────────────────────────────────────────
     // Ayudas internas
@@ -269,4 +278,6 @@ public class GameState {
             return (currentPlayerIndex - steps + total) % total;
         }
     }
+    
+    
 }

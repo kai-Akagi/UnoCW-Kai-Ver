@@ -1,6 +1,5 @@
 package Eventos;
 
-import Eventos.GameEvent;
 import Dominio.Card;
 import Dominio.Player;
 
@@ -12,7 +11,7 @@ import Dominio.Player;
  * al jugador activo y actualizar la carta en la mesa.
  *
  * <p><b>Corrección respecto a la Fase 2:</b> Se agregó {@code topCard} porque
- * {@link uno.network.MessageSerializer} necesita serializar la carta activa
+ * {@link Red.MessageSerializer} necesita serializar la carta activa
  * junto con el cambio de turno para que los peers puedan actualizar su vista.
  */
 public class TurnChangedEvent extends GameEvent {

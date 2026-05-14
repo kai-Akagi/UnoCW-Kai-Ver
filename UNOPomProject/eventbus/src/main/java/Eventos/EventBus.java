@@ -1,56 +1,63 @@
 package Eventos;
 
+import Eventos.GameEvent;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Bus de eventos central del juego (patrón Observer / EDA).
+ * El bus de eventos del juego. Núcleo de la arquitectura EDA.
  *
- * <p>Funciona como tablero de anuncios: cualquier clase puede suscribirse
- * a un tipo de evento y cualquier clase puede publicarlo. El bus notifica
- * automáticamente a todos los suscriptores.
+ * <p>Funciona como un tablero de anuncios central:
+ * <ul>
+ *   <li>Cualquier clase puede <b>suscribirse</b> a un tipo de evento.</li>
+ *   <li>Cualquier clase puede <b>publicar</b> un evento.</li>
+ *   <li>El bus notifica automáticamente a todos los suscriptores.</li>
+ * </ul>
  *
- * <p><b>Patrones:</b> Singleton (instancia única compartida) + Observer
- * (suscriptores notificados sin que el publicador los conozca).
+ * <p><b>Patrones aplicados:</b>
+ * <ul>
+ *   <li><b>Observer:</b> los suscriptores son notificados sin que el
+ *       publicador los conozca directamente.</li>
+ *   <li><b>Singleton:</b> toda la aplicación comparte el mismo bus.
+ *       Si hubiera dos instancias, los suscriptores de una no recibirían
+ *       los eventos publicados en la otra.</li>
+ * </ul>
  *
- * <p><b>Thread-safety:</b> Usa {@link ConcurrentHashMap} y
- * {@link CopyOnWriteArrayList} para soportar acceso concurrente seguro
- * desde el EDT de Swing y los hilos de red, sin {@code synchronized}.
- * FIX: la instancia se crea con doble-checked locking para evitar
- * condiciones de carrera al inicializar el Singleton.
+ * <p><b>Cómo suscribirse:</b>
+ * <pre>
+ *   EventBus.getInstance().subscribe(CardPlayedEvent.class, event -> {
+ *       CardPlayedEvent e = (CardPlayedEvent) event;
+ *       // hacer algo con e.getCard()
+ *   });
+ * </pre>
  */
 public class EventBus {
 
-    /** Instancia única, volatile para visibilidad entre hilos. */
-    private static volatile EventBus instance;
+    /** La única instancia del bus en toda la aplicación. */
+    private static EventBus instance;
 
     /**
-     * Mapa suscriptores: clase del evento → lista de listeners.
-     * ConcurrentHashMap es thread-safe para lecturas/escrituras concurrentes.
+     * Mapa de suscriptores: clase del evento → lista de listeners.
+     * Usamos la clase como clave porque es inmutable y única por tipo.
      */
     private final Map<Class<? extends GameEvent>, List<GameEventListener>> listeners;
 
+    /** Constructor privado: solo {@link #getInstance()} puede crear el bus. */
     private EventBus() {
-        this.listeners = new ConcurrentHashMap<>();
+        this.listeners = new HashMap<>();
     }
 
     /**
-     * Devuelve la única instancia del bus.
-     * Usa doble-checked locking para thread-safety sin sincronizar siempre.
+     * Devuelve la única instancia del bus. La crea si aún no existe.
      *
      * @return La instancia única del EventBus.
      */
     public static EventBus getInstance() {
         if (instance == null) {
-            synchronized (EventBus.class) {
-                if (instance == null) {
-                    instance = new EventBus();
-                }
-            }
+            instance = new EventBus();
         }
         return instance;
     }
@@ -58,17 +65,22 @@ public class EventBus {
     /**
      * Suscribe un listener a un tipo de evento específico.
      *
-     * @param eventType La clase del evento (ej. {@code CardPlayedEvent.class}).
-     * @param listener  Función que se ejecutará cuando ocurra el evento.
+     * <p>A partir de este momento, cada vez que se publique un evento
+     * de ese tipo, el listener será llamado automáticamente.
+     *
+     * @param eventType La clase del evento al que suscribirse
+     *                  (ej. {@code CardPlayedEvent.class}).
+     * @param listener  La función que se ejecutará cuando ocurra el evento.
      */
     public void subscribe(Class<? extends GameEvent> eventType,
                           GameEventListener listener) {
-        listeners.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>())
+        listeners.computeIfAbsent(eventType, k -> new ArrayList<>())
                  .add(listener);
     }
 
     /**
      * Elimina un listener de un tipo de evento.
+     * Útil cuando una pantalla se cierra y ya no necesita recibir eventos.
      *
      * @param eventType La clase del evento del que desuscribirse.
      * @param listener  El listener a eliminar.
@@ -80,20 +92,26 @@ public class EventBus {
     }
 
     /**
-     * Publica un evento notificando a todos los suscriptores de su tipo.
-     * Itera sobre una snapshot de la lista para evitar CME si un listener
-     * se desuscribe durante la notificación.
+     * Publica un evento en el bus.
+     *
+     * <p>Todos los listeners suscritos al tipo de este evento son
+     * notificados inmediatamente. Se itera sobre una copia de la lista
+     * para evitar problemas si un listener se desuscribe durante la notificación.
      *
      * @param event El evento que ocurrió.
      */
     public void publish(GameEvent event) {
         List<GameEventListener> subs = listeners.get(event.getClass());
         if (subs == null || subs.isEmpty()) return;
-        // CopyOnWriteArrayList itera sobre snapshot → no necesita copia manual
-        subs.forEach(l -> l.onEvent(event));
+
+        // Copia para evitar ConcurrentModificationException
+        new ArrayList<>(subs).forEach(l -> l.onEvent(event));
     }
 
-    /** Elimina todos los suscriptores. Se llama al reiniciar una partida. */
+    /**
+     * Elimina todos los suscriptores.
+     * Se llama al reiniciar una partida para limpiar el estado anterior.
+     */
     public void clearAll() {
         listeners.clear();
     }

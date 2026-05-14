@@ -1,11 +1,9 @@
 package Eventos;
 
-import Eventos.GameEvent;
-
 /**
  * Evento de red: alguien gritó UNO (versión recibida por la red).
  *
- * <p>Solo contiene el nombre del jugador porque los objetos {@link uno.model.Player}
+ * <p>Solo contiene el nombre del jugador porque los objetos {@link Dominio.Player}
  * completos no viajan por la red. El Controller usa el nombre para
  * mostrar el feedback visual adecuado.
  */

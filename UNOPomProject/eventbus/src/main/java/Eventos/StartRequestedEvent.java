@@ -1,7 +1,5 @@
 package Eventos;
 
-import Eventos.GameEvent;
-
 /**
  * Evento: un Peer solicitó al Host iniciar la partida antes de completar el cupo.
  *

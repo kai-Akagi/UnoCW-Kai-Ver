@@ -1,18 +1,6 @@
 package Red;
 
-import Eventos.TurnChangedEvent;
-import Eventos.UnoCalledEvent;
-import Eventos.PlayerReadyEvent;
-import Eventos.PlayerDisconnectedEvent;
-import Eventos.PlayerJoinedEvent;
-import Eventos.DrawCardRequestEvent;
-import Eventos.GameOverEvent;
-import Eventos.ColorChosenEvent;
-import Eventos.CardPlayedEvent;
-import Eventos.CardDrawnPublicEvent;
-import Eventos.CardDrawnPrivateEvent;
-import Eventos.GameStartedEvent;
-import Eventos.GameEvent;
+import Eventos.*;
 import Dominio.Card;
 
 import java.util.ArrayList;
@@ -166,9 +154,25 @@ public class MessageSerializer {
         fields.put("player",   e.getPlayer().getName());
         fields.put("avatarId", e.getPlayer().getAvatarId());
         fields.put("isHost",   String.valueOf(e.getPlayer().isHost()));
-        // Incluir el estado "Listo" para que el Peer vea correctamente
-        // si el Host ya está listo cuando llega sendCurrentLobbyState()
         fields.put("ready",    String.valueOf(e.getPlayer().isReady()));
+        // roomCode se agrega desde presentToHost() via serializePlayerJoinedWithCode()
+        return json(TYPE_PLAYER_JOINED, fields) + "\n";
+    }
+
+    /**
+     * Serializa PLAYER_JOINED incluyendo el código de sala que el Peer envía.
+     * El Host usa este código para validar que el Peer conoce la sala correcta.
+     *
+     * @param e        El evento PlayerJoinedEvent del jugador local.
+     * @param roomCode El código de sala que el Peer escribió al registrarse.
+     */
+    public static String serializePlayerJoinedWithCode(PlayerJoinedEvent e, String roomCode) {
+        Map<String, String> fields = new HashMap<>();
+        fields.put("player",   e.getPlayer().getName());
+        fields.put("avatarId", e.getPlayer().getAvatarId());
+        fields.put("isHost",   String.valueOf(e.getPlayer().isHost()));
+        fields.put("ready",    String.valueOf(e.getPlayer().isReady()));
+        fields.put("roomCode", roomCode != null ? roomCode : "");
         return json(TYPE_PLAYER_JOINED, fields) + "\n";
     }
 

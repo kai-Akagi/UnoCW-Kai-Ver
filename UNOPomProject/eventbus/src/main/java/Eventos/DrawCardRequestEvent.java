@@ -4,7 +4,6 @@
  */
 package Eventos;
 
-import Eventos.GameEvent;
 import Dominio.Player;
  
 /**
@@ -12,8 +11,8 @@ import Dominio.Player;
  *
  * <p>Este evento representa la <b>intención</b> del jugador, no el resultado.
  * Lo publica el Peer en su EventBus local cuando presiona el botón "Robar".
- * La {@link uno.network.NetworkLayer} lo lleva al Host, quien ejecuta el robo
- * real en su {@link uno.model.GameModel} y devuelve el resultado en dos eventos:
+ * La {@link Red.NetworkLayer} lo lleva al Host, quien ejecuta el robo
+ * real en su {@link Dominio.GameModel} y devuelve el resultado en dos eventos:
  * <ul>
  *   <li>{@link CardDrawnPrivateEvent} → solo al jugador que robó (con la carta real).</li>
  *   <li>{@link CardDrawnPublicEvent}  → a todos los demás (sin revelar la carta).</li>

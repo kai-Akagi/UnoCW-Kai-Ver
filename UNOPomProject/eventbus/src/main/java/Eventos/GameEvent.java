@@ -5,7 +5,7 @@ package Eventos;
  *
  * <p>En la arquitectura EDA, cada cosa que "pasa" se representa como
  * un objeto que extiende esta clase. Los eventos fluyen por el
- * {@link uno.events.bus.EventBus}, que notifica a todos los suscriptores.
+ * {@link Eventos.EventBus}, que notifica a todos los suscriptores.
  *
  * <p><b>Por qué es pública y abstracta:</b><br>
  * Pública: cualquier paquete del proyecto necesita referenciarla con

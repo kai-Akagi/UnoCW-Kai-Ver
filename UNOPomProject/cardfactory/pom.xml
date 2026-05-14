@@ -18,7 +18,7 @@
     </description>
     <dependencies>
         <dependency>
-            <groupId>com.uno</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>effectrevolver</artifactId>
             <version>${project.version}</version>
         </dependency>

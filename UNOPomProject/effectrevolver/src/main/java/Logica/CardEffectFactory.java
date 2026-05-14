@@ -1,7 +1,5 @@
 package Logica;
 
-import Logica.CardEffect;
-
 /**
  * Fábrica de efectos de cartas.
  *

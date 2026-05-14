@@ -1,5 +1,6 @@
 package Dominio;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,9 +26,8 @@ import java.util.List;
  * </ul>
  *
  * <p><b>Nota importante:</b> En una partida nueva, hay que llamar a
- * {@link #reset(List)} pasando el mazo generado por {@code CardFactory.createFullDeck()}.
- * Esto permite reutilizar el Singleton entre partidas sin reiniciar el programa,
- * y desacopla el Deck de la CardFactory para evitar dependencias circulares entre módulos.
+ * {@link #reset()} para reinicializar el mazo con las 108 cartas frescas.
+ * Esto permite reutilizar el Singleton entre partidas sin reiniciar el programa.
  */
 public class Deck {
 
@@ -35,7 +35,7 @@ public class Deck {
      * La única instancia del mazo que existirá en toda la aplicación.
      * Se crea la primera vez que alguien llama a {@link #getInstance()}.
      */
-    private static volatile Deck instance;
+    private static Deck instance;
 
     /**
      * La pila de robo: las cartas que los jugadores pueden tomar.
@@ -62,39 +62,30 @@ public class Deck {
      * Devuelve la única instancia del mazo.
      *
      * <p>Si el mazo aún no existe, lo crea. Si ya existe, devuelve el mismo.
+     * Esto es la esencia del patrón Singleton.
+     *
+     * <p><b>Thread-safety:</b> En este proyecto simplificado no necesitamos
+     * sincronización aquí, ya que el mazo solo se accede desde el hilo del juego.
      *
      * @return La instancia única del mazo.
      */
-    /**
-     * Devuelve la única instancia del mazo (Singleton con doble-checked locking).
-     * FIX: volatile + synchronized para evitar condición de carrera entre hilos
-     * de red y el EDT de Swing.
-     */
     public static Deck getInstance() {
         if (instance == null) {
-            synchronized (Deck.class) {
-                if (instance == null) {
-                    instance = new Deck();
-                }
-            }
+            instance = new Deck();
         }
         return instance;
     }
 
     /**
-     * Reinicia el mazo con las cartas proporcionadas (ya mezcladas).
+     * Reinicia el mazo con las 108 cartas completas de UNO.
      *
-     * <p>Se llama al inicio de cada partida nueva pasando el resultado de
-     * {@code CardFactory.createFullDeck()}. Al recibir las cartas como parámetro,
-     * el Deck no necesita importar CardFactory y se evita una dependencia circular
-     * entre los módulos {@code cardfactory} y {@code eventbus}.
-     *
-     * @param cards Lista de cartas con las que inicializar el mazo (108 en una
-     *              partida estándar, ya mezcladas por CardFactory).
-     */
-    public void reset(List<Card> cards) {
-        drawPile    = new ArrayList<>(cards);
-        discardPile = new ArrayList<>();
+     reset() recibe la lista de cartas desde fuera
+     * @param fullDeck
+     **/
+    
+    public void reset(List<Card> fullDeck) {
+    drawPile    = new ArrayList<>(fullDeck);
+    discardPile = new ArrayList<>();
     }
 
     /**
@@ -110,13 +101,15 @@ public class Deck {
             reloadFromDiscard();
         }
         if (drawPile.isEmpty()) {
-            return null;
+            return null; // Caso extremo: no hay cartas en ninguna pila
         }
+        // Quitamos y devolvemos la última carta (es como tomar de arriba de la pila)
         return drawPile.remove(drawPile.size() - 1);
     }
 
     /**
      * Agrega una carta a la pila de descarte.
+     * Se usa cuando un jugador juega una carta.
      *
      * @param card La carta que se jugó.
      */
@@ -146,19 +139,24 @@ public class Deck {
     /**
      * Recarga la pila de robo usando las cartas del descarte.
      *
-     * <p>Toma todas las cartas del descarte EXCEPTO la que está en la cima
-     * (que es la carta activa de la mesa), las mezcla y las convierte en
-     * la nueva pila de robo.
+     * <p>Tomamos todas las cartas del descarte <em>excepto</em> la que está
+     * en la cima (que debe quedarse como la carta activa de la mesa),
+     * las mezclamos y las convertimos en la nueva pila de robo.
+     *
+     * <p>Esta operación se llama automáticamente cuando la pila de robo se vacía.
      */
     private void reloadFromDiscard() {
-        if (discardPile.size() <= 1) return;
+        if (discardPile.size() <= 1) return; // No hay suficientes para recargar
 
+        // Guardamos la carta de la cima (la carta activa)
         Card topCard = discardPile.remove(discardPile.size() - 1);
 
+        // El resto del descarte pasa a ser la nueva pila de robo, mezclada
         drawPile = new ArrayList<>(discardPile);
         Collections.shuffle(drawPile);
         discardPile.clear();
 
+        // Volvemos a poner la carta activa en el descarte
         discardPile.add(topCard);
     }
 }
