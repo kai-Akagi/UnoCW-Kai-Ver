@@ -31,6 +31,11 @@ import javax.swing.SwingUtilities;
  * acciones al Host para que las valide. Usa el EventBus para publicar los
  * mensajes recibidos al resto de la aplicación sin acoplarse a ningún
  * componente específico.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class NetworkLayer {
 

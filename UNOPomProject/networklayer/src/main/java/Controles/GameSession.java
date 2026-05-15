@@ -7,6 +7,11 @@ import Dominio.Player;
  * (Host o Peer) y el código de sala al que pertenece. Es el punto de referencia
  * para que cualquier componente sepa quién es el jugador local sin necesitar
  * parámetros extra.
+ * 
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class GameSession {
 

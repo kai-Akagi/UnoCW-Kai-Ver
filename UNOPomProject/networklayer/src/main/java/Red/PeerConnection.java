@@ -26,6 +26,11 @@ import java.util.function.BiConsumer;
  * <p>
  * <b>Protocolo:</b> Un mensaje por línea. El emisor termina cada mensaje con
  * {@code \n}. El receptor lee línea por línea con {@link BufferedReader}.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class PeerConnection {
 

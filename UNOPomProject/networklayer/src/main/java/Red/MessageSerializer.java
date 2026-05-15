@@ -49,6 +49,11 @@ import java.util.Map;
  * <pre>
  *   {"type":"CARD_PLAYED","player":"Kai","card":"RED-7"}
  * </pre>
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class MessageSerializer {
 
