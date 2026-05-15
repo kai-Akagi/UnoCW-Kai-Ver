@@ -1,6 +1,5 @@
 package Eventos;
 
-import Dominio.Card;
 import Dominio.Player;
 
 /**
@@ -9,6 +8,11 @@ import Dominio.Player;
  * <p>Se publica cuando el jugador presiona el botón UNO al quedarse
  * con una carta. Si no lo presiona a tiempo, el GameModel le aplica
  * la penalización de 2 cartas.
+ * 
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class UnoCalledEvent extends GameEvent {
 

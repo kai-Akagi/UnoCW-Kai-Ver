@@ -7,18 +7,27 @@ package Eventos;
 import Dominio.Player;
 
 /**
- * Evento publicado por el Peer cuando el timer del periodo de gracia UNO
- * expira sin que el jugador haya declarado UNO.
+ * Evento publicado por el Peer cuando el timer del periodo de gracia UNO expira
+ * sin que el jugador haya declarado UNO.
  *
- * <p>El Peer lo envía al Host vía red. El Host aplica la penalización
- * de 2 cartas llamando a {@code GameModel.onUnoTimerExpired()}.
+ * <p>
+ * El Peer lo envía al Host vía red. El Host aplica la penalización de 2 cartas
+ * llamando a {@code GameModel.onUnoTimerExpired()}.
  *
- * <p>Extiende {@link GameEvent} (clase abstracta) para heredar el timestamp
+ * <p>
+ * Extiende {@link GameEvent} (clase abstracta) para heredar el timestamp
  * automático que registra cuándo ocurrió el evento.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class UnoPenaltyEvent extends GameEvent {
 
-    /** El jugador que no declaró UNO a tiempo. */
+    /**
+     * El jugador que no declaró UNO a tiempo.
+     */
     private final Player player;
 
     /**
@@ -29,7 +38,9 @@ public class UnoPenaltyEvent extends GameEvent {
         this.player = player;
     }
 
-    /** @return El jugador penalizado. */
+    /**
+     * @return El jugador penalizado.
+     */
     public Player getPlayer() {
         return player;
     }

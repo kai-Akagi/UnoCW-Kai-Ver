@@ -19,8 +19,8 @@ import java.util.List;
  * <b>objeto de contexto</b> y mantiene los métodos limpios.
  *
  * <p>
- * Esta clase también es usada por el {@link GameModel} para mantener y publicar
- * el estado actual a través del EventBus.
+ * Esta clase también es usada por el GameModel para mantener y publicar el
+ * estado actual a través del EventBus.
  *
  * @author Héctor Javier Alonso Zaragoza
  * @author Alejandro Rodríguez Lugo
