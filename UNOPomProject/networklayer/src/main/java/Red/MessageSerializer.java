@@ -45,23 +45,89 @@ import java.util.Map;
  */
 public class MessageSerializer {
 
-    // Tipos de mensaje del protocolo
+    /**
+     * Tipo de mensaje para una carta jugada.
+     */
     public static final String TYPE_CARD_PLAYED = "CARD_PLAYED";
+
+    /**
+     * Tipo de mensaje para solicitar robar una carta.
+     */
     public static final String TYPE_DRAW_REQUEST = "DRAW_REQUEST";
+
+    /**
+     * Tipo de mensaje para notificar públicamente un robo de carta.
+     */
     public static final String TYPE_CARD_DRAWN_PUBLIC = "CARD_DRAWN_PUBLIC";
+
+    /**
+     * Tipo de mensaje para notificar privadamente una carta robada.
+     */
     public static final String TYPE_CARD_DRAWN_PRIVATE = "CARD_DRAWN_PRIVATE";
+
+    /**
+     * Tipo de mensaje para cambio de turno.
+     */
     public static final String TYPE_TURN_CHANGED = "TURN_CHANGED";
+
+    /**
+     * Tipo de mensaje para un jugador conectado.
+     */
     public static final String TYPE_PLAYER_JOINED = "PLAYER_JOINED";
+
+    /**
+     * Tipo de mensaje para un jugador desconectado.
+     */
     public static final String TYPE_PLAYER_LEFT = "PLAYER_LEFT";
+
+    /**
+     * Tipo de mensaje para cambio de estado ready.
+     */
     public static final String TYPE_PLAYER_READY = "PLAYER_READY";
+
+    /**
+     * Tipo de mensaje para inicio de partida.
+     */
     public static final String TYPE_GAME_STARTED = "GAME_STARTED";
+
+    /**
+     * Tipo de mensaje para fin de partida.
+     */
     public static final String TYPE_GAME_OVER = "GAME_OVER";
+
+    /**
+     * Tipo de mensaje para declarar UNO.
+     */
     public static final String TYPE_UNO_CALLED = "UNO_CALLED";
+
+    /**
+     * Tipo de mensaje para penalización UNO.
+     */
     public static final String TYPE_UNO_PENALTY = "UNO_PENALTY";
+
+    /**
+     * Tipo de mensaje para inicio del periodo de gracia UNO.
+     */
     public static final String TYPE_UNO_GRACE = "UNO_GRACE";
+
+    /**
+     * Tipo de mensaje para selección de color.
+     */
     public static final String TYPE_COLOR_CHOSEN = "COLOR_CHOSEN";
+
+    /**
+     * Tipo de mensaje para sincronización del estado del lobby.
+     */
     public static final String TYPE_LOBBY_STATE = "LOBBY_STATE";
+
+    /**
+     * Tipo de mensaje para solicitud de inicio de partida.
+     */
     public static final String TYPE_START_REQUESTED = "START_REQUESTED";
+
+    /**
+     * Tipo de mensaje para rechazo de carta inválida.
+     */
     public static final String TYPE_CARD_REJECTED = "CARD_REJECTED";
 
     /**
@@ -70,9 +136,6 @@ public class MessageSerializer {
     private MessageSerializer() {
     }
 
-    // ─────────────────────────────────────────────
-    // Serialización (evento → texto)
-    // ─────────────────────────────────────────────
     /**
      * Convierte un evento Java en una cadena de texto JSON lista para enviar.
      *
@@ -126,12 +189,24 @@ public class MessageSerializer {
         return "";
     }
 
+    /**
+     * Serializa una solicitud de robo de carta.
+     *
+     * @param e Evento DrawCardRequestEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeDrawRequest(DrawCardRequestEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
         return json(TYPE_DRAW_REQUEST, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de carta jugada.
+     *
+     * @param e Evento CardPlayedEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeCardPlayed(CardPlayedEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
@@ -139,12 +214,24 @@ public class MessageSerializer {
         return json(TYPE_CARD_PLAYED, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento público de robo de carta.
+     *
+     * @param e Evento CardDrawnPublicEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeCardDrawnPublic(CardDrawnPublicEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
         return json(TYPE_CARD_DRAWN_PUBLIC, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento privado de robo de carta.
+     *
+     * @param e Evento CardDrawnPrivateEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeCardDrawnPrivate(CardDrawnPrivateEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
@@ -152,6 +239,12 @@ public class MessageSerializer {
         return json(TYPE_CARD_DRAWN_PRIVATE, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de cambio de turno.
+     *
+     * @param e Evento TurnChangedEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeTurnChanged(TurnChangedEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("currentPlayer", e.getCurrentPlayer().getName());
@@ -160,6 +253,12 @@ public class MessageSerializer {
         return json(TYPE_TURN_CHANGED, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de jugador conectado.
+     *
+     * @param e Evento PlayerJoinedEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializePlayerJoined(PlayerJoinedEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
@@ -176,6 +275,8 @@ public class MessageSerializer {
      *
      * @param e El evento PlayerJoinedEvent del jugador local.
      * @param roomCode El código de sala que el Peer escribió al registrarse.
+     *
+     * @return Cadena JSON del evento PLAYER_JOINED.
      */
     public static String serializePlayerJoinedWithCode(PlayerJoinedEvent e, String roomCode) {
         Map<String, String> fields = new HashMap<>();
@@ -187,6 +288,12 @@ public class MessageSerializer {
         return json(TYPE_PLAYER_JOINED, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de cambio de estado ready.
+     *
+     * @param e Evento PlayerReadyEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializePlayerReady(PlayerReadyEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayerName());
@@ -194,12 +301,24 @@ public class MessageSerializer {
         return json(TYPE_PLAYER_READY, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de desconexión de jugador.
+     *
+     * @param e Evento PlayerDisconnectedEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializePlayerLeft(PlayerDisconnectedEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayerName());
         return json(TYPE_PLAYER_LEFT, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de fin de partida.
+     *
+     * @param e Evento GameOverEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeGameOver(GameOverEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("winner", e.getWinner().getName());
@@ -208,6 +327,9 @@ public class MessageSerializer {
 
     /**
      * Serializa el evento de penalización UNO (el timer de gracia expiró).
+     *
+     * @param e Evento UnoPenaltyEvent a serializar.
+     * @return Cadena JSON del evento.
      */
     public static String serializeUnoPenalty(Eventos.UnoPenaltyEvent e) {
         java.util.Map<String, String> fields = new java.util.LinkedHashMap<>();
@@ -219,6 +341,9 @@ public class MessageSerializer {
      * Serializa el evento de inicio del periodo de gracia UNO para broadcast.
      * Así los demás jugadores pueden ver visualmente que alguien está en
      * gracia.
+     *
+     * @param e Evento UnoGracePeriodEvent a serializar.
+     * @return Cadena JSON del evento.
      */
     public static String serializeUnoGrace(Eventos.UnoGracePeriodEvent e) {
         java.util.Map<String, String> fields = new java.util.LinkedHashMap<>();
@@ -226,12 +351,24 @@ public class MessageSerializer {
         return json(TYPE_UNO_GRACE, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento UNO_CALLED.
+     *
+     * @param e Evento UnoCalledEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeUnoCalled(UnoCalledEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
         return json(TYPE_UNO_CALLED, fields) + "\n";
     }
 
+    /**
+     * Serializa un evento de selección de color.
+     *
+     * @param e Evento ColorChosenEvent a serializar.
+     * @return Cadena JSON del evento.
+     */
     private static String serializeColorChosen(ColorChosenEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
@@ -239,9 +376,6 @@ public class MessageSerializer {
         return json(TYPE_COLOR_CHOSEN, fields) + "\n";
     }
 
-    // ─────────────────────────────────────────────
-    // Deserialización (texto → mapa de campos)
-    // ─────────────────────────────────────────────
     /**
      * Convierte una línea de texto JSON en un mapa de campos clave-valor.
      *

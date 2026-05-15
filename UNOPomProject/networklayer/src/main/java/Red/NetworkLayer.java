@@ -7,12 +7,10 @@ import Eventos.EventBus;
 import Dominio.LobbyState;
 import Dominio.Player;
 import Controles.GameSession;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
-import javax.swing.SwingUtilities;
 
 /**
  * Capa de red del juego. Maneja toda la comunicación por sockets.
@@ -92,9 +90,6 @@ public class NetworkLayer {
         this.running = false;
     }
 
-    // ─────────────────────────────────────────────
-    // Arranque según rol
-    // ─────────────────────────────────────────────
     /**
      * Inicia esta instancia como Host. Abre el ServerSocket y espera conexiones
      * en un hilo separado.
@@ -168,38 +163,35 @@ public class NetworkLayer {
         hostConn.sendMessage(message);
     }
 
-    // ─────────────────────────────────────────────
-    // Suscripciones al EventBus local
-    // ─────────────────────────────────────────────
     /**
      * Suscribe los listeners del lobby: cambios de estado "Listo" y eventos de
      * conexión. Se llama una vez al conectarse, antes de navegar al lobby.
      */
     public void registerLobbyListeners() {
-        // El jugador local cambió estado "Listo" → enviar al Host
+        // El jugador local cambió estado "Listo": enviar al Host
         eventBus.subscribe(PlayerReadyEvent.class, event -> {
             PlayerReadyEvent e = (PlayerReadyEvent) event;
             if (session.isLocalPlayer(e.getPlayerName())) {
                 if (!session.isHost()) {
-                    // Peer → envía su cambio de estado al Host por socket
+                    // Peer: envía su cambio de estado al Host por socket
                     sendToHost(MessageSerializer.serialize(e));
                 } else {
-                    // Host → hace broadcast de su propio cambio de estado a todos los Peers
+                    // Host: hace broadcast de su propio cambio de estado a todos los Peers
                     broadcast(MessageSerializer.serialize(e));
                 }
             }
         });
 
-        // El jugador local salió del lobby → notificar al Host antes de cerrar la red.
+        // El jugador local salió del lobby: notificar al Host antes de cerrar la red.
         eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
             if (session.isLocalPlayer(e.getPlayerName())) {
                 if (!session.isHost()) {
-                    // Peer → notifica al Host de su salida por socket
+                    // Peer: notifica al Host de su salida por socket
                     sendToHost(MessageSerializer.serialize(
                             GameEventFactory.playerDisconnected(e.getPlayerName())));
                 } else {
-                    // Host → avisa a todos los Peers que la sala fue cerrada
+                    // Host: avisa a todos los Peers que la sala fue cerrada
                     broadcast(MessageSerializer.serialize(
                             GameEventFactory.playerDisconnected(e.getPlayerName())));
                 }
@@ -923,9 +915,7 @@ public class NetworkLayer {
         System.out.println("[NetworkLayer] Cerrada.");
     }
 
-    // ─────────────────────────────────────────────
     // Utilidades
-    // ─────────────────────────────────────────────
     /**
      * Busca un jugador en el LobbyState por su nombre.
      *
@@ -947,6 +937,12 @@ public class NetworkLayer {
         }
     }
 
+    /**
+     * Busca un jugador conectado por su nombre.
+     *
+     * @param name Nombre del jugador a buscar.
+     * @return El jugador encontrado o null si no existe.
+     */
     private Player findPlayerByName(String name) {
         if (name == null) {
             return null;
@@ -958,6 +954,8 @@ public class NetworkLayer {
     }
 
     /**
+     * Regresa el número de peers conectados actualmente.
+     *
      * @return El número de peers conectados actualmente.
      */
     public int getConnectedPeerCount() {

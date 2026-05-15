@@ -75,7 +75,6 @@ public class PeerConnection {
      * @param name El nombre del jugador en el otro extremo.
      * @param socket El socket de la conexión.
      * @param onMessageReceived Callback que se invoca cuando llega un mensaje.
-     * @throws IOException Si no se pueden abrir los streams del socket.
      */
     public PeerConnection(String name, Socket socket,
             BiConsumer<String, String> onMessageReceived) {
@@ -160,6 +159,8 @@ public class PeerConnection {
     }
 
     /**
+     * Regresa el nombre del peer en el otro extremo.
+     *
      * @return El nombre del peer en el otro extremo.
      */
     public String getName() {
@@ -177,6 +178,8 @@ public class PeerConnection {
     }
 
     /**
+     * Regresa verdadero si la conexión está activa y escuchando.
+     *
      * @return {@code true} si la conexión está activa y escuchando.
      */
     public boolean isListening() {
