@@ -29,6 +29,8 @@ public class NetworkPlayerRejectedEvent extends GameEvent {
     private final String reason;
 
     /**
+     * Constructor para NetworkPlayerRejectedEvent.
+     *
      * @param reason Descripción del motivo del rechazo para mostrar al usuario.
      */
     public NetworkPlayerRejectedEvent(String reason) {

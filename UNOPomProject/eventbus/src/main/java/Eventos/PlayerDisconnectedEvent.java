@@ -21,6 +21,8 @@ public class PlayerDisconnectedEvent extends GameEvent {
     private final String playerName;
 
     /**
+     * Constructor para PlayerDisconnectedEvent.
+     *
      * @param playerName El nombre del jugador desconectado.
      */
     public PlayerDisconnectedEvent(String playerName) {
@@ -29,6 +31,8 @@ public class PlayerDisconnectedEvent extends GameEvent {
     }
 
     /**
+     * Regresa el nombre del jugador que se desconectó.
+     *
      * @return El nombre del jugador que se desconectó.
      */
     public String getPlayerName() {

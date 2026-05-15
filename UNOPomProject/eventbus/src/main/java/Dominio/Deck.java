@@ -93,7 +93,8 @@ public class Deck {
      *
      * reset() recibe la lista de cartas desde fuera
      *
-     * @param fullDeck
+     * @param fullDeck Lista completa de cartas que se usará para reconstruir el
+     * mazo.
      *
      */
     public void reset(List<Card> fullDeck) {

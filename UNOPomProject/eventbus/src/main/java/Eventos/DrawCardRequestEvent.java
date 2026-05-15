@@ -44,6 +44,8 @@ public class DrawCardRequestEvent extends GameEvent {
     private final Player player;
 
     /**
+     * Constructor para DrawCardRequestEvent
+     * 
      * @param player El jugador que presionó el botón de robar.
      */
     public DrawCardRequestEvent(Player player) {

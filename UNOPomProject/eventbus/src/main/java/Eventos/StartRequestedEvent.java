@@ -21,6 +21,8 @@ public class StartRequestedEvent extends GameEvent {
     private final String requesterName;
 
     /**
+     * Constructor para StartRequestedEvent.
+     * 
      * @param requesterName El nombre del peer que solicita iniciar.
      */
     public StartRequestedEvent(String requesterName) {
@@ -29,6 +31,8 @@ public class StartRequestedEvent extends GameEvent {
     }
 
     /**
+     * Regresa el nombre del jugador que hizo la solicitud.
+     * 
      * @return El nombre del jugador que hizo la solicitud.
      */
     public String getRequesterName() {

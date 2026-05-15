@@ -36,6 +36,8 @@ public abstract class GameEvent {
     }
 
     /**
+     * Regresa el timestamp de creacion del evento en milisegundos.
+     *
      * @return El timestamp de creación del evento en milisegundos.
      */
     public long getTimestamp() {

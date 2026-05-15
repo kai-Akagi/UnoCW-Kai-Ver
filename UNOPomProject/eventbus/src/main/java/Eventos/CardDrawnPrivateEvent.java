@@ -33,6 +33,8 @@ public class CardDrawnPrivateEvent extends GameEvent {
     private final Card card;
 
     /**
+     * Constructor de CardDrawnPrivateEvent
+     *
      * @param player El jugador que robó.
      * @param card La carta que tomó del mazo.
      */
@@ -43,6 +45,8 @@ public class CardDrawnPrivateEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador que robó.
+     *
      * @return El jugador que robó.
      */
     public Player getPlayer() {
@@ -50,6 +54,8 @@ public class CardDrawnPrivateEvent extends GameEvent {
     }
 
     /**
+     * Regresa la carta robada.
+     *
      * @return La carta robada.
      */
     public Card getCard() {

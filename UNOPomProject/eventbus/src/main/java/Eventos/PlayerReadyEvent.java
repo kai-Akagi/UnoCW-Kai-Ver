@@ -26,6 +26,8 @@ public class PlayerReadyEvent extends GameEvent {
     private final boolean ready;
 
     /**
+     * Constructor para PlayerReadyEvent.
+     *
      * @param playerName El nombre del jugador.
      * @param ready {@code true} si se marcó como listo.
      */
@@ -36,6 +38,8 @@ public class PlayerReadyEvent extends GameEvent {
     }
 
     /**
+     * Regresa el nombre del jugador que cambió su estado.
+     *
      * @return El nombre del jugador que cambió su estado.
      */
     public String getPlayerName() {
@@ -43,6 +47,8 @@ public class PlayerReadyEvent extends GameEvent {
     }
 
     /**
+     * Regresa verdadero si el jugador está listo.
+     *
      * @return {@code true} si el jugador está listo.
      */
     public boolean isReady() {

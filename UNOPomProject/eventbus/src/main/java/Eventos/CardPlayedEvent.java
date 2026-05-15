@@ -32,6 +32,8 @@ public class CardPlayedEvent extends GameEvent {
     private final Card card;
 
     /**
+     * Constructor para CardPlayedEvent
+     *
      * @param player El jugador que realizó la jugada.
      * @param card La carta que jugó.
      */
@@ -42,6 +44,8 @@ public class CardPlayedEvent extends GameEvent {
     }
 
     /**
+     * Regresar el jugador que jugó la carta.
+     *
      * @return El jugador que jugó la carta.
      */
     public Player getPlayer() {
@@ -49,6 +53,8 @@ public class CardPlayedEvent extends GameEvent {
     }
 
     /**
+     * Regresa la carta que fue jugada.
+     *
      * @return La carta que fue jugada.
      */
     public Card getCard() {

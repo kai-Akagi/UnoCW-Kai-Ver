@@ -74,10 +74,9 @@ public class Player {
         this.ready = false;
     }
 
-    // ─────────────────────────────────────────────
-    // Información del jugador
-    // ─────────────────────────────────────────────
     /**
+     * Regresa el nombre del jugador.
+     * 
      * @return El nombre del jugador.
      */
     public String getName() {
@@ -85,6 +84,8 @@ public class Player {
     }
 
     /**
+     * Regresa el identificador del avatar.
+     * 
      * @return El identificador del avatar.
      */
     public String getAvatarId() {
@@ -92,6 +93,8 @@ public class Player {
     }
 
     /**
+     * Regresa verdadero si este jugador es el Host.
+     * 
      * @return {@code true} si este jugador es el Host.
      */
     public boolean isHost() {
@@ -99,6 +102,8 @@ public class Player {
     }
 
     /**
+     * Regresa verdadero si el jugador marcó "Listo" en el lobby.
+     * 
      * @return {@code true} si el jugador marcó "Listo" en el lobby.
      */
     public boolean isReady() {
@@ -115,9 +120,6 @@ public class Player {
         this.ready = ready;
     }
 
-    // ─────────────────────────────────────────────
-    // Manejo de cartas en mano
-    // ─────────────────────────────────────────────
     /**
      * Agrega una carta a la mano del jugador. Se usa cuando el jugador roba una
      * carta del mazo.

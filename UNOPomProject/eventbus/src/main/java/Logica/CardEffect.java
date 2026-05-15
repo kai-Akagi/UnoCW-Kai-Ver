@@ -45,9 +45,9 @@ public interface CardEffect {
      * Aplica el efecto de esta carta al estado actual del juego.
      *
      * <p>
-     * Por ejemplo, un {@link SkipEffect} usará el {@code gameState} para saltar
-     * al siguiente jugador. Un {@link DrawTwoEffect} le asignará 2 cartas al
-     * siguiente jugador.
+     * Por ejemplo, un SkipEffect usará el {@code gameState} para saltar al
+     * siguiente jugador. Un DrawTwoEffect le asignará 2 cartas al siguiente
+     * jugador.
      *
      * @param gameState El estado actual del juego. Contiene información sobre
      * jugadores, turnos, mazo, etc.

@@ -39,6 +39,8 @@ public class GameEventFactory {
      *
      * @param player El jugador que jugó.
      * @param card La carta jugada.
+     *
+     * @return Una nueva instancia de CardPlayedEvent.
      */
     public static CardPlayedEvent cardPlayed(Player player, Card card) {
         return new CardPlayedEvent(player, card);
@@ -49,6 +51,8 @@ public class GameEventFactory {
      * llega a todos los peers (sin revelar la carta).
      *
      * @param player El jugador que robó.
+     *
+     * @return Una nueva instancia de CardDrawnPublicEvent.
      */
     public static CardDrawnPublicEvent cardDrawnPublic(Player player) {
         return new CardDrawnPublicEvent(player);
@@ -60,6 +64,8 @@ public class GameEventFactory {
      *
      * @param player El jugador que robó.
      * @param card La carta que tomó del mazo.
+     *
+     * @return Una nueva instancia de CardDrawnPrivateEvent.
      */
     public static CardDrawnPrivateEvent cardDrawnPrivate(Player player, Card card) {
         return new CardDrawnPrivateEvent(player, card);
@@ -70,11 +76,13 @@ public class GameEventFactory {
      *
      * <p>
      * <b>Corrección respecto a Fase 2:</b> ahora incluye la carta activa para
-     * que {@link Red.MessageSerializer} pueda serializarla y los peers
-     * actualicen su vista sin pedir el estado completo al Host.
+     * que MessageSerializer pueda serializarla y los peers actualicen su vista
+     * sin pedir el estado completo al Host.
      *
      * @param currentPlayer El jugador que ahora tiene el turno.
      * @param topCard La carta activa en la mesa.
+     * @param clockwise Indica si el turno avanza en sentido horario.
+     * @return Una nueva instancia de TurnChangedEvent.
      */
     public static TurnChangedEvent turnChanged(Player currentPlayer, Card topCard, boolean clockwise) {
         return new TurnChangedEvent(currentPlayer, topCard, clockwise);
@@ -84,6 +92,8 @@ public class GameEventFactory {
      * Crea el evento de que un nuevo jugador se unió al lobby.
      *
      * @param player El jugador que se unió.
+     *
+     * @return Una nueva instancia de PlayerJoinedEvent
      */
     public static PlayerJoinedEvent playerJoined(Player player) {
         return new PlayerJoinedEvent(player);
@@ -94,6 +104,8 @@ public class GameEventFactory {
      *
      * @param playerName El nombre del jugador.
      * @param ready {@code true} si se marcó como listo.
+     *
+     * @return Una nueva instancia de PlayerReadyEvent
      */
     public static PlayerReadyEvent playerReady(String playerName, boolean ready) {
         return new PlayerReadyEvent(playerName, ready);
@@ -103,6 +115,8 @@ public class GameEventFactory {
      * Crea el evento de que un jugador se desconectó.
      *
      * @param playerName El nombre del jugador que se fue.
+     *
+     * @return Una nueva instancia de PlayerDisconnectedEvent
      */
     public static PlayerDisconnectedEvent playerDisconnected(String playerName) {
         return new PlayerDisconnectedEvent(playerName);
@@ -112,6 +126,8 @@ public class GameEventFactory {
      * Crea el evento de que un jugador gritó UNO.
      *
      * @param player El jugador que gritó UNO.
+     *
+     * @return Una nueva instancia de UnoCalledEvent
      */
     public static UnoCalledEvent unoCalled(Player player) {
         return new UnoCalledEvent(player);
@@ -121,6 +137,8 @@ public class GameEventFactory {
      * Crea el evento de fin de partida.
      *
      * @param winner El jugador ganador.
+     *
+     * @return Una nueva instancia de GameOverEvent
      */
     public static GameOverEvent gameOver(Player winner) {
         return new GameOverEvent(winner);
@@ -128,6 +146,8 @@ public class GameEventFactory {
 
     /**
      * Crea el evento de inicio de partida.
+     *
+     * @return Una nueva instancia de GameStartedEvent
      */
     public static GameStartedEvent gameStarted() {
         return new GameStartedEvent();
@@ -138,6 +158,8 @@ public class GameEventFactory {
      *
      * @param player El jugador que eligió.
      * @param chosenColor El color elegido.
+     *
+     * @return Una nueva instancia de ColorChosenEvent
      */
     public static ColorChosenEvent colorChosen(Player player, Card.Color chosenColor) {
         return new ColorChosenEvent(player, chosenColor);
@@ -152,6 +174,8 @@ public class GameEventFactory {
      * lo comunica de vuelta al Peer.
      *
      * @param player El jugador que quiere robar.
+     *
+     * @return Una nueva instancia de drawCardRequest
      */
     public static DrawCardRequestEvent drawCardRequest(Player player) {
         return new DrawCardRequestEvent(player);
@@ -161,6 +185,8 @@ public class GameEventFactory {
      * Crea el evento de solicitud de inicio por parte de un Peer.
      *
      * @param requesterName El nombre del peer que solicita iniciar.
+     *
+     * @return Una nueva instancia de StartRequestedEvent
      */
     public static StartRequestedEvent startRequested(String requesterName) {
         return new StartRequestedEvent(requesterName);
@@ -170,6 +196,8 @@ public class GameEventFactory {
      * Crea el evento de cierre del lobby.
      *
      * @param reason La razón del cierre.
+     *
+     * @return Una nueva instancia de LobbyClosedEvent
      */
     public static LobbyClosedEvent lobbyClosed(String reason) {
         return new LobbyClosedEvent(reason);
@@ -184,6 +212,11 @@ public class GameEventFactory {
      *
      * @param currentPlayerName Nombre del jugador activo.
      * @param topCardText Carta activa como texto (ej. "RED-7").
+     * @param clockwise Indica si el turno avanza en sentido horario.
+     * @param handSizes Mapa con la cantidad de cartas de cada jugador.
+     * @param activeColor Color activo actual del juego.
+     *
+     * @return Una nueva instancia de NetworkTurnChangedEvent
      */
     public static NetworkTurnChangedEvent networkTurnChanged(
             String currentPlayerName, String topCardText, boolean clockwise,
@@ -197,6 +230,8 @@ public class GameEventFactory {
      *
      * @param playerName Nombre del jugador que robó.
      * @param cardText Carta robada como texto.
+     *
+     * @return Una nueva instancia de NetworkTurnChangedEvent
      */
     public static NetworkCardDrawnPrivateEvent networkCardDrawnPrivate(
             String playerName, String cardText) {
@@ -207,6 +242,8 @@ public class GameEventFactory {
      * Crea el evento de red de UNO gritado.
      *
      * @param playerName Nombre del jugador que gritó UNO.
+     *
+     * @return Una nueva instancia de NetworkUnoCalledEvent
      */
     public static NetworkUnoCalledEvent networkUnoCalled(String playerName) {
         return new NetworkUnoCalledEvent(playerName);

@@ -26,6 +26,8 @@ public class NetworkCardDrawnPrivateEvent extends GameEvent {
     private final String cardText;
 
     /**
+     * Constructor para NetworkCardDrawnPrivateEvent.
+     *
      * @param playerName El nombre del jugador que robó.
      * @param cardText La carta robada como texto.
      */
@@ -36,6 +38,8 @@ public class NetworkCardDrawnPrivateEvent extends GameEvent {
     }
 
     /**
+     * Regresa el nombre del jugador que robó.
+     *
      * @return El nombre del jugador que robó.
      */
     public String getPlayerName() {
@@ -43,6 +47,8 @@ public class NetworkCardDrawnPrivateEvent extends GameEvent {
     }
 
     /**
+     * Regresa la carta robada como texto.
+     *
      * @return La carta robada como texto.
      */
     public String getCardText() {

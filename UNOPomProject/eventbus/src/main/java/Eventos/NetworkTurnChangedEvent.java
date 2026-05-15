@@ -44,6 +44,15 @@ public class NetworkTurnChangedEvent extends GameEvent {
      */
     private final Dominio.Card.Color activeColor;
 
+    /**
+     * Constructor para NetworkTurnChangedEvent.
+     *
+     * @param currentPlayerName Nombre del jugador que tiene el turno actual.
+     * @param topCardText Carta activa representada como texto.
+     * @param clockwise Indica si la dirección del juego es horaria.
+     * @param handSizes Cantidad de cartas de cada jugador.
+     * @param activeColor Color activo actual del juego.
+     */
     public NetworkTurnChangedEvent(String currentPlayerName, String topCardText,
             boolean clockwise, java.util.Map<String, Integer> handSizes,
             Dominio.Card.Color activeColor) {
@@ -55,22 +64,47 @@ public class NetworkTurnChangedEvent extends GameEvent {
         this.activeColor = activeColor;
     }
 
+    /**
+     * Regresa el nombre del jugador actual.
+     *
+     * @return Nombre del jugador que tiene el turno.
+     */
     public String getCurrentPlayerName() {
         return currentPlayerName;
     }
 
+    /**
+     * Regresa la carta activa como texto.
+     *
+     * @return Representación textual de la carta activa.
+     */
     public String getTopCardText() {
         return topCardText;
     }
 
+    /**
+     * Indica si la dirección del juego es horaria.
+     *
+     * @return true si el juego avanza en sentido horario.
+     */
     public boolean isClockwise() {
         return clockwise;
     }
 
+    /**
+     * Regresa la cantidad de cartas de cada jugador.
+     *
+     * @return Mapa con los nombres de jugadores y sus cantidades de cartas.
+     */
     public java.util.Map<String, Integer> getHandSizes() {
         return handSizes;
     }
 
+    /**
+     * Regresa el color activo actual.
+     *
+     * @return Color activo del juego.
+     */
     public Dominio.Card.Color getActiveColor() {
         return activeColor;
     }

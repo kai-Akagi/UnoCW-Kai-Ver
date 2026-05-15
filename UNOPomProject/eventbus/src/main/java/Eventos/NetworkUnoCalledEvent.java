@@ -21,6 +21,8 @@ public class NetworkUnoCalledEvent extends GameEvent {
     private final String playerName;
 
     /**
+     * Constructor para NetworkUnoCalledEvent.
+     *
      * @param playerName El nombre del jugador que gritó UNO.
      */
     public NetworkUnoCalledEvent(String playerName) {
@@ -29,6 +31,8 @@ public class NetworkUnoCalledEvent extends GameEvent {
     }
 
     /**
+     * Regresa el nombre del jugador que gritó UNO.
+     *
      * @return El nombre del jugador que gritó UNO.
      */
     public String getPlayerName() {

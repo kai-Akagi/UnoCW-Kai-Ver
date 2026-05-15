@@ -36,7 +36,26 @@ public class Card {
      * que no tienen color fijo.
      */
     public enum Color {
-        RED, BLUE, GREEN, YELLOW, WILD
+        /**
+         * Rojo
+         */
+        RED,
+        /**
+         * Azul
+         */
+        BLUE,
+        /**
+         * Verde
+         */
+        GREEN,
+        /**
+         * Amarillo
+         */
+        YELLOW,
+        /**
+         * Comodín
+         */
+        WILD
     }
 
     /**
@@ -76,7 +95,7 @@ public class Card {
 
     /**
      * Regresa el color de la carta.
-     * 
+     *
      * @return El color de esta carta.
      */
     public Color getColor() {
@@ -85,7 +104,7 @@ public class Card {
 
     /**
      * Regresa el valor de la carta como texto.
-     * 
+     *
      * @return El valor de esta carta como texto.
      */
     public String getValue() {

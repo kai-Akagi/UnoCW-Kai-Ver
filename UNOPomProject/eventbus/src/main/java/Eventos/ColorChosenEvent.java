@@ -22,6 +22,8 @@ public class ColorChosenEvent extends GameEvent {
     private final Card.Color chosenColor;
 
     /**
+     * Constructor para ColorChosenEvent
+     *
      * @param player El jugador que eligió.
      * @param chosenColor El color elegido.
      */
@@ -32,6 +34,8 @@ public class ColorChosenEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador que eligió el color.
+     *
      * @return El jugador que eligió el color.
      */
     public Player getPlayer() {
@@ -39,6 +43,8 @@ public class ColorChosenEvent extends GameEvent {
     }
 
     /**
+     * Regresa el color elegido.
+     *
      * @return El color elegido.
      */
     public Card.Color getChosenColor() {

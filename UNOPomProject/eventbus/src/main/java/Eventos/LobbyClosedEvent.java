@@ -20,6 +20,8 @@ public class LobbyClosedEvent extends GameEvent {
     private final String reason;
 
     /**
+     * Constructor para LobbyClosedEvent.
+     *
      * @param reason La razón del cierre.
      */
     public LobbyClosedEvent(String reason) {
@@ -28,6 +30,8 @@ public class LobbyClosedEvent extends GameEvent {
     }
 
     /**
+     * Regresa la razón del cierre.
+     * 
      * @return La razón del cierre.
      */
     public String getReason() {

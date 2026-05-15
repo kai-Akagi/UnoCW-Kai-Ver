@@ -16,6 +16,9 @@ package Eventos;
  */
 public class InvalidPlayEvent extends GameEvent {
 
+    /**
+     * Constructor para InvalidPlayEvent.
+     */
     public InvalidPlayEvent() {
         super();
     }

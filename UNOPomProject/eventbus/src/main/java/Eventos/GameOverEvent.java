@@ -19,6 +19,8 @@ public class GameOverEvent extends GameEvent {
     private final Player winner;
 
     /**
+     * Constructor para GameOverEvent.
+     * 
      * @param winner El jugador que ganó.
      */
     public GameOverEvent(Player winner) {
@@ -27,6 +29,8 @@ public class GameOverEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador ganador.
+     * 
      * @return El jugador ganador.
      */
     public Player getWinner() {

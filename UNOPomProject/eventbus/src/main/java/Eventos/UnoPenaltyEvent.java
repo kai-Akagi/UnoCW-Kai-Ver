@@ -31,6 +31,8 @@ public class UnoPenaltyEvent extends GameEvent {
     private final Player player;
 
     /**
+     * Constructor para UnoPenaltyEvent.
+     *
      * @param player El jugador que recibirá la penalización de 2 cartas.
      */
     public UnoPenaltyEvent(Player player) {
@@ -39,6 +41,8 @@ public class UnoPenaltyEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador penalizado.
+     *
      * @return El jugador penalizado.
      */
     public Player getPlayer() {

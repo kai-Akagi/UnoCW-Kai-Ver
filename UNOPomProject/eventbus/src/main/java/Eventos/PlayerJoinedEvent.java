@@ -19,6 +19,8 @@ public class PlayerJoinedEvent extends GameEvent {
     private final Player player;
 
     /**
+     * Constructor para PlayerJoinedEvent.
+     *
      * @param player El jugador que se unió.
      */
     public PlayerJoinedEvent(Player player) {
@@ -27,6 +29,8 @@ public class PlayerJoinedEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador que se unió.
+     *
      * @return El jugador que se unió.
      */
     public Player getPlayer() {

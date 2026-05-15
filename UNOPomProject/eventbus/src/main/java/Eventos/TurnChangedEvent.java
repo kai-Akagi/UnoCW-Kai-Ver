@@ -41,6 +41,8 @@ public class TurnChangedEvent extends GameEvent {
     private final boolean clockwise;
 
     /**
+     * Constructor para TurnChangedEvent.
+     * 
      * @param currentPlayer El jugador que ahora debe jugar.
      * @param topCard La carta activa en la mesa.
      * @param clockwise Dirección actual del juego.
@@ -53,6 +55,8 @@ public class TurnChangedEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador que tiene el turno ahora.
+     * 
      * @return El jugador que tiene el turno ahora.
      */
     public Player getCurrentPlayer() {
@@ -60,6 +64,8 @@ public class TurnChangedEvent extends GameEvent {
     }
 
     /**
+     * Regresa la carta activa en la mesa.
+     * 
      * @return La carta activa en la mesa.
      */
     public Card getTopCard() {
@@ -67,6 +73,8 @@ public class TurnChangedEvent extends GameEvent {
     }
 
     /**
+     * Regresa verdadero si el juego va en sentido normal. 
+     * 
      * @return {@code true} si el juego va en sentido normal.
      */
     public boolean isClockwise() {

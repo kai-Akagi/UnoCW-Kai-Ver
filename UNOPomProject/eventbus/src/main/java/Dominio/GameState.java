@@ -205,6 +205,10 @@ public class GameState {
         clockwise = !clockwise;
     }
 
+    /**
+     * Cambia el sentido de juego entre horario y antihorario y actualiza el
+     * turno al siguiente jugador.
+     */
     public void reverseDirection() {
         flipDirection();
         advanceTurn();
@@ -243,6 +247,8 @@ public class GameState {
      * buffer. GameModel llama este método después de aplicar efectos para
      * publicar CardDrawnPrivateEvent por cada carta, notificando al Peer
      * correcto.
+     *
+     * @return Lista de cartas repartidas en la última llamada a giveCards().
      */
     public java.util.List<Card> drainLastGivenCards() {
         java.util.List<Card> result = new java.util.ArrayList<>(lastGivenCards);
@@ -251,7 +257,9 @@ public class GameState {
     }
 
     /**
-     * Devuelve el jugador que recibió las cartas en el último giveCards().
+     * Regresa el jugador que recibió las cartas en el último giveCards().
+     *
+     * @return El jugador que recibió las cartas en el último giveCards().
      */
     public Player getLastGivenPlayer() {
         return lastGivenPlayer;

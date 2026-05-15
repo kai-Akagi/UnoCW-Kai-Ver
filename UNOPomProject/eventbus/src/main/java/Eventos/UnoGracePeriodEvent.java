@@ -41,6 +41,8 @@ public class UnoGracePeriodEvent extends GameEvent {
     private final Player player;
 
     /**
+     * Constructor para UnoGracePeriodEvent.
+     * 
      * @param player El jugador que debe declarar UNO en los próximos 5
      * segundos.
      */
@@ -50,6 +52,8 @@ public class UnoGracePeriodEvent extends GameEvent {
     }
 
     /**
+     * Regresa el jugador que debe declarar UNO.
+     * 
      * @return El jugador que debe declarar UNO.
      */
     public Player getPlayer() {

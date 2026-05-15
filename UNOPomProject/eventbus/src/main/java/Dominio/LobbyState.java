@@ -27,7 +27,6 @@ import java.util.UUID;
  * @author Alejandro Rodríguez Lugo
  * @author Katia Ximena Navarez Espinoza
  * @author Luis Carlos Manjarrez Gonzalez
- *
  */
 public class LobbyState {
 
@@ -164,10 +163,9 @@ public class LobbyState {
         return !gameStarted && connectedPlayers.size() < capacity;
     }
 
-    // ─────────────────────────────────────────────
-    // Getters y setters
-    // ─────────────────────────────────────────────
     /**
+     * Regresa el código único de esta sala.
+     *
      * @return El código único de esta sala.
      */
     public String getRoomCode() {
@@ -175,6 +173,8 @@ public class LobbyState {
     }
 
     /**
+     * Regresa la capacidad máxima de jugadores.
+     *
      * @return La capacidad máxima de jugadores.
      */
     public int getCapacity() {
@@ -194,6 +194,8 @@ public class LobbyState {
     }
 
     /**
+     * Regresa una lista de jugadores conectados (solo lectura).
+     *
      * @return Lista de jugadores conectados (solo lectura).
      */
     public List<Player> getConnectedPlayers() {
@@ -201,6 +203,8 @@ public class LobbyState {
     }
 
     /**
+     * Regresa cuántos jugadores están conectados actualmente.
+     *
      * @return Cuántos jugadores están conectados actualmente.
      */
     public int getPlayerCount() {
@@ -208,6 +212,8 @@ public class LobbyState {
     }
 
     /**
+     * Regresa verdadero si la partida ya inició.
+     *
      * @return {@code true} si la partida ya inició.
      */
     public boolean isGameStarted() {

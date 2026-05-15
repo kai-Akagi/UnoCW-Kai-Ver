@@ -5,10 +5,11 @@ import Dominio.Player;
 /**
  * Evento: un jugador gritó "¡UNO!".
  *
- * <p>Se publica cuando el jugador presiona el botón UNO al quedarse
- * con una carta. Si no lo presiona a tiempo, el GameModel le aplica
- * la penalización de 2 cartas.
- * 
+ * <p>
+ * Se publica cuando el jugador presiona el botón UNO al quedarse con una carta.
+ * Si no lo presiona a tiempo, el GameModel le aplica la penalización de 2
+ * cartas.
+ *
  * @author Héctor Javier Alonso Zaragoza
  * @author Alejandro Rodríguez Lugo
  * @author Katia Ximena Navarez Espinoza
@@ -18,12 +19,22 @@ public class UnoCalledEvent extends GameEvent {
 
     private final Player player;
 
-    /** @param player El jugador que gritó UNO. */
+    /**
+     * Constructor para UnoCalledEvent.
+     *
+     * @param player El jugador que gritó UNO.
+     */
     public UnoCalledEvent(Player player) {
         super();
         this.player = player;
     }
 
-    /** @return El jugador que gritó UNO. */
-    public Player getPlayer() { return player; }
+    /**
+     * Regresa el jugador que gritó UNO.
+     *
+     * @return El jugador que gritó UNO.
+     */
+    public Player getPlayer() {
+        return player;
+    }
 }
