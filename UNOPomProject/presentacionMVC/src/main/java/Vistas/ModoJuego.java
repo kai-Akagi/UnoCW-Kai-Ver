@@ -4,6 +4,13 @@ import Controles.GameModeController;
 import java.awt.event.ActionListener;
 import Controles.LobbyController;
 
+/**
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ */
 public class ModoJuego extends javax.swing.JPanel {
 
     private GameModeController controller;
@@ -70,7 +77,6 @@ public class ModoJuego extends javax.swing.JPanel {
         BtnUnirsePartida.setText("Unirse a Partida");
         add(BtnUnirsePartida, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 210, 240, 220));
     }// </editor-fold>//GEN-END:initComponents
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton BtnCancelar;

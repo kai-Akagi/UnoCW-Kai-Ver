@@ -12,6 +12,13 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import Controles.RegisterController;
 
+/**
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ */
 public class MenuPrincipal extends javax.swing.JPanel {
 
     private String avatarSeleccionado;
@@ -99,7 +106,6 @@ public class MenuPrincipal extends javax.swing.JPanel {
         //agregar bordo gris
 
     }//GEN-LAST:event_campoUsuarioMouseExited
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton BtnContinuar;

@@ -24,6 +24,11 @@ import java.awt.event.ActionListener;
  * <p>La comunicación con el Controller ocurre a través de métodos simples
  * como {@link #getPlayerName()} y {@link #getSelectedAvatarId()}, y de
  * listeners que el Controller registra con {@link #setController}.
+ * 
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class RegisterView extends JPanel {
 

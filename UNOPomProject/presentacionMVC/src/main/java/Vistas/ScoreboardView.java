@@ -10,13 +10,20 @@ import java.awt.*;
 /**
  * Pantalla de resultados finales (Scoreboard).
  *
- * <p>Muestra al ganador de la partida y un botón para volver al menú principal.
- * Es la pantalla más simple del proyecto: solo presenta datos, no interactúa
- * con el bus ni con la red.
+ * <p>
+ * Muestra al ganador de la partida y un botón para volver al menú principal. Es
+ * la pantalla más simple del proyecto: solo presenta datos, no interactúa con
+ * el bus ni con la red.
  *
- * <p>En esta pantalla el patrón MVC se simplifica: View y Controller
- * están unidos porque la lógica es mínima (solo un botón). Para pantallas
- * tan simples, separar en dos clases sería sobreingeniería.
+ * <p>
+ * En esta pantalla el patrón MVC se simplifica: View y Controller están unidos
+ * porque la lógica es mínima (solo un botón). Para pantallas tan simples,
+ * separar en dos clases sería sobreingeniería.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez GonzalezF
  */
 public class ScoreboardView extends JPanel {
 
@@ -24,7 +31,7 @@ public class ScoreboardView extends JPanel {
      * Construye la pantalla del scoreboard.
      *
      * @param winnerName El nombre del jugador ganador.
-     * @param session    La sesión actual (para mostrar al jugador local).
+     * @param session La sesión actual (para mostrar al jugador local).
      * @param mainWindow La ventana principal para navegar de vuelta al inicio.
      */
     public ScoreboardView(String winnerName, GameSession session, MainWindow mainWindow) {
@@ -65,8 +72,8 @@ public class ScoreboardView extends JPanel {
         // Mensaje personalizado
         boolean localWon = session.getLocalPlayer().getName().equals(winnerName);
         JLabel personalMsg = new JLabel(
-            localWon ? "¡Felicidades, ganaste!" : "¡Mejor suerte la próxima vez!",
-            SwingConstants.CENTER
+                localWon ? "¡Felicidades, ganaste!" : "¡Mejor suerte la próxima vez!",
+                SwingConstants.CENTER
         );
         personalMsg.setFont(new Font("Arial", Font.ITALIC, 15));
         personalMsg.setForeground(new Color(80, 80, 80));
@@ -84,10 +91,10 @@ public class ScoreboardView extends JPanel {
         backButton.setMaximumSize(new Dimension(200, 45));
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        backButton.addActionListener(e ->
-            SwingUtilities.invokeLater(() ->
-                mainWindow.showRegister()
-            )
+        backButton.addActionListener(e
+                -> SwingUtilities.invokeLater(()
+                        -> mainWindow.showRegister()
+                )
         );
 
         // Ensamblar

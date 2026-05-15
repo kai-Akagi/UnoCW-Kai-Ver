@@ -14,6 +14,13 @@ import javax.swing.border.EmptyBorder;
 import Controles.LobbyController;
 import Dominio.Player;
 
+/**
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ */
 public class SalaEspera extends javax.swing.JPanel {
 
     /**
@@ -131,7 +138,6 @@ public class SalaEspera extends javax.swing.JPanel {
         // TODO add your handling code here:
 //         BtnListo.addActionListener(e -> controller.onReadyClicked());
     }//GEN-LAST:event_BtnListoMouseClicked
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnIniciarPartida;
