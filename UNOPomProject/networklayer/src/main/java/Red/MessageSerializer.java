@@ -11,57 +11,68 @@ import java.util.Map;
 /**
  * Convierte eventos del juego a texto (JSON simple) y viceversa.
  *
- * <p>Cuando dos jugadores se comunican por socket, no pueden enviarse
- * objetos Java directamente. Lo que viaja por la red es texto plano.
- * Esta clase hace la traducción en ambas direcciones:
+ * <p>
+ * Cuando dos jugadores se comunican por socket, no pueden enviarse objetos Java
+ * directamente. Lo que viaja por la red es texto plano. Esta clase hace la
+ * traducción en ambas direcciones:
  * <ul>
- *   <li><b>Serializar:</b> evento Java → texto JSON para enviar.</li>
- *   <li><b>Deserializar:</b> texto JSON recibido → evento Java.</li>
+ * <li><b>Serializar:</b> evento Java → texto JSON para enviar.</li>
+ * <li><b>Deserializar:</b> texto JSON recibido → evento Java.</li>
  * </ul>
  *
- * <p><b>¿Por qué JSON construido a mano y no una librería?</b><br>
- * El proyecto no admite frameworks ni librerías externas. Construimos
- * el JSON manualmente con {@link StringBuilder}. Para un protocolo
- * acotado como este (pocos tipos de mensajes con campos fijos),
- * esta solución es más que suficiente y evita dependencias innecesarias.
+ * <p>
+ * <b>¿Por qué JSON construido a mano y no una librería?</b><br>
+ * El proyecto no admite frameworks ni librerías externas. Construimos el JSON
+ * manualmente con {@link StringBuilder}. Para un protocolo acotado como este
+ * (pocos tipos de mensajes con campos fijos), esta solución es más que
+ * suficiente y evita dependencias innecesarias.
  *
- * <p><b>Formato del protocolo:</b> Cada mensaje es una línea de texto
- * que termina en {@code \n}. Esto permite al receptor leer línea por línea
- * y saber cuándo termina un mensaje completo.
+ * <p>
+ * <b>Formato del protocolo:</b> Cada mensaje es una línea de texto que termina
+ * en {@code \n}. Esto permite al receptor leer línea por línea y saber cuándo
+ * termina un mensaje completo.
  *
- * <p>Ejemplo de mensaje serializado:
+ * <p>
+ * Ejemplo de mensaje serializado:
  * <pre>
  *   {"type":"CARD_PLAYED","player":"Kai","card":"RED-7"}
  * </pre>
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class MessageSerializer {
 
     // Tipos de mensaje del protocolo
-    public static final String TYPE_CARD_PLAYED        = "CARD_PLAYED";
-    public static final String TYPE_DRAW_REQUEST       = "DRAW_REQUEST";
-    public static final String TYPE_CARD_DRAWN_PUBLIC  = "CARD_DRAWN_PUBLIC";
+    public static final String TYPE_CARD_PLAYED = "CARD_PLAYED";
+    public static final String TYPE_DRAW_REQUEST = "DRAW_REQUEST";
+    public static final String TYPE_CARD_DRAWN_PUBLIC = "CARD_DRAWN_PUBLIC";
     public static final String TYPE_CARD_DRAWN_PRIVATE = "CARD_DRAWN_PRIVATE";
-    public static final String TYPE_TURN_CHANGED       = "TURN_CHANGED";
-    public static final String TYPE_PLAYER_JOINED      = "PLAYER_JOINED";
-    public static final String TYPE_PLAYER_LEFT        = "PLAYER_LEFT";
-    public static final String TYPE_PLAYER_READY       = "PLAYER_READY";
-    public static final String TYPE_GAME_STARTED       = "GAME_STARTED";
-    public static final String TYPE_GAME_OVER          = "GAME_OVER";
-    public static final String TYPE_UNO_CALLED         = "UNO_CALLED";
-    public static final String TYPE_UNO_PENALTY        = "UNO_PENALTY";
-    public static final String TYPE_UNO_GRACE          = "UNO_GRACE";
-    public static final String TYPE_COLOR_CHOSEN       = "COLOR_CHOSEN";
-    public static final String TYPE_LOBBY_STATE        = "LOBBY_STATE";
-    public static final String TYPE_START_REQUESTED    = "START_REQUESTED";
-    public static final String TYPE_CARD_REJECTED      = "CARD_REJECTED";
+    public static final String TYPE_TURN_CHANGED = "TURN_CHANGED";
+    public static final String TYPE_PLAYER_JOINED = "PLAYER_JOINED";
+    public static final String TYPE_PLAYER_LEFT = "PLAYER_LEFT";
+    public static final String TYPE_PLAYER_READY = "PLAYER_READY";
+    public static final String TYPE_GAME_STARTED = "GAME_STARTED";
+    public static final String TYPE_GAME_OVER = "GAME_OVER";
+    public static final String TYPE_UNO_CALLED = "UNO_CALLED";
+    public static final String TYPE_UNO_PENALTY = "UNO_PENALTY";
+    public static final String TYPE_UNO_GRACE = "UNO_GRACE";
+    public static final String TYPE_COLOR_CHOSEN = "COLOR_CHOSEN";
+    public static final String TYPE_LOBBY_STATE = "LOBBY_STATE";
+    public static final String TYPE_START_REQUESTED = "START_REQUESTED";
+    public static final String TYPE_CARD_REJECTED = "CARD_REJECTED";
 
-    /** Constructor privado: clase de utilidad, no se instancia. */
-    private MessageSerializer() {}
+    /**
+     * Constructor privado: clase de utilidad, no se instancia.
+     */
+    private MessageSerializer() {
+    }
 
     // ─────────────────────────────────────────────
     // Serialización (evento → texto)
     // ─────────────────────────────────────────────
-
     /**
      * Convierte un evento Java en una cadena de texto JSON lista para enviar.
      *
@@ -124,7 +135,7 @@ public class MessageSerializer {
     private static String serializeCardPlayed(CardPlayedEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
-        fields.put("card",   e.getCard().toString());
+        fields.put("card", e.getCard().toString());
         return json(TYPE_CARD_PLAYED, fields) + "\n";
     }
 
@@ -137,24 +148,24 @@ public class MessageSerializer {
     private static String serializeCardDrawnPrivate(CardDrawnPrivateEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
-        fields.put("card",   e.getCard().toString());
+        fields.put("card", e.getCard().toString());
         return json(TYPE_CARD_DRAWN_PRIVATE, fields) + "\n";
     }
 
     private static String serializeTurnChanged(TurnChangedEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("currentPlayer", e.getCurrentPlayer().getName());
-        fields.put("topCard",       e.getTopCard().toString());
-        fields.put("clockwise",     String.valueOf(e.isClockwise()));
+        fields.put("topCard", e.getTopCard().toString());
+        fields.put("clockwise", String.valueOf(e.isClockwise()));
         return json(TYPE_TURN_CHANGED, fields) + "\n";
     }
 
     private static String serializePlayerJoined(PlayerJoinedEvent e) {
         Map<String, String> fields = new HashMap<>();
-        fields.put("player",   e.getPlayer().getName());
+        fields.put("player", e.getPlayer().getName());
         fields.put("avatarId", e.getPlayer().getAvatarId());
-        fields.put("isHost",   String.valueOf(e.getPlayer().isHost()));
-        fields.put("ready",    String.valueOf(e.getPlayer().isReady()));
+        fields.put("isHost", String.valueOf(e.getPlayer().isHost()));
+        fields.put("ready", String.valueOf(e.getPlayer().isReady()));
         // roomCode se agrega desde presentToHost() via serializePlayerJoinedWithCode()
         return json(TYPE_PLAYER_JOINED, fields) + "\n";
     }
@@ -163,15 +174,15 @@ public class MessageSerializer {
      * Serializa PLAYER_JOINED incluyendo el código de sala que el Peer envía.
      * El Host usa este código para validar que el Peer conoce la sala correcta.
      *
-     * @param e        El evento PlayerJoinedEvent del jugador local.
+     * @param e El evento PlayerJoinedEvent del jugador local.
      * @param roomCode El código de sala que el Peer escribió al registrarse.
      */
     public static String serializePlayerJoinedWithCode(PlayerJoinedEvent e, String roomCode) {
         Map<String, String> fields = new HashMap<>();
-        fields.put("player",   e.getPlayer().getName());
+        fields.put("player", e.getPlayer().getName());
         fields.put("avatarId", e.getPlayer().getAvatarId());
-        fields.put("isHost",   String.valueOf(e.getPlayer().isHost()));
-        fields.put("ready",    String.valueOf(e.getPlayer().isReady()));
+        fields.put("isHost", String.valueOf(e.getPlayer().isHost()));
+        fields.put("ready", String.valueOf(e.getPlayer().isReady()));
         fields.put("roomCode", roomCode != null ? roomCode : "");
         return json(TYPE_PLAYER_JOINED, fields) + "\n";
     }
@@ -179,7 +190,7 @@ public class MessageSerializer {
     private static String serializePlayerReady(PlayerReadyEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayerName());
-        fields.put("ready",  String.valueOf(e.isReady()));
+        fields.put("ready", String.valueOf(e.isReady()));
         return json(TYPE_PLAYER_READY, fields) + "\n";
     }
 
@@ -199,17 +210,18 @@ public class MessageSerializer {
      * Serializa el evento de penalización UNO (el timer de gracia expiró).
      */
     public static String serializeUnoPenalty(Eventos.UnoPenaltyEvent e) {
-        java.util.Map<String,String> fields = new java.util.LinkedHashMap<>();
+        java.util.Map<String, String> fields = new java.util.LinkedHashMap<>();
         fields.put("player", e.getPlayer().getName());
         return json(TYPE_UNO_PENALTY, fields) + "\n";
     }
 
     /**
      * Serializa el evento de inicio del periodo de gracia UNO para broadcast.
-     * Así los demás jugadores pueden ver visualmente que alguien está en gracia.
+     * Así los demás jugadores pueden ver visualmente que alguien está en
+     * gracia.
      */
     public static String serializeUnoGrace(Eventos.UnoGracePeriodEvent e) {
-        java.util.Map<String,String> fields = new java.util.LinkedHashMap<>();
+        java.util.Map<String, String> fields = new java.util.LinkedHashMap<>();
         fields.put("player", e.getPlayer().getName());
         return json(TYPE_UNO_GRACE, fields) + "\n";
     }
@@ -223,40 +235,48 @@ public class MessageSerializer {
     private static String serializeColorChosen(ColorChosenEvent e) {
         Map<String, String> fields = new HashMap<>();
         fields.put("player", e.getPlayer().getName());
-        fields.put("color",  e.getChosenColor().name());
+        fields.put("color", e.getChosenColor().name());
         return json(TYPE_COLOR_CHOSEN, fields) + "\n";
     }
 
     // ─────────────────────────────────────────────
     // Deserialización (texto → mapa de campos)
     // ─────────────────────────────────────────────
-
     /**
      * Convierte una línea de texto JSON en un mapa de campos clave-valor.
      *
-     * <p>El resultado es un mapa simple donde cada clave es el nombre
-     * del campo y el valor es su contenido como texto. El componente
-     * que recibe el mapa decide cómo interpretarlo según el campo "type".
+     * <p>
+     * El resultado es un mapa simple donde cada clave es el nombre del campo y
+     * el valor es su contenido como texto. El componente que recibe el mapa
+     * decide cómo interpretarlo según el campo "type".
      *
-     * <p>Ejemplo: {@code {"type":"TURN_CHANGED","currentPlayer":"Kai"}}
-     * produce: {@code {type=TURN_CHANGED, currentPlayer=Kai}}
+     * <p>
+     * Ejemplo: {@code {"type":"TURN_CHANGED","currentPlayer":"Kai"}} produce:
+     * {@code {type=TURN_CHANGED, currentPlayer=Kai}}
      *
      * @param message La línea de texto recibida por el socket.
-     * @return Mapa con los campos del mensaje, o mapa vacío si el formato es inválido.
+     * @return Mapa con los campos del mensaje, o mapa vacío si el formato es
+     * inválido.
      */
     public static Map<String, String> deserialize(String message) {
         Map<String, String> fields = new HashMap<>();
-        if (message == null || message.isBlank()) return fields;
+        if (message == null || message.isBlank()) {
+            return fields;
+        }
 
         // Eliminar llaves, saltos de linea y espacios extremos
         String content = message.trim();
-        if (content.startsWith("{")) content = content.substring(1);
-        if (content.endsWith("}"))  content = content.substring(0, content.length() - 1);
+        if (content.startsWith("{")) {
+            content = content.substring(1);
+        }
+        if (content.endsWith("}")) {
+            content = content.substring(0, content.length() - 1);
+        }
 
         // Parseamos el JSON manualmente caracter a caracter.
         // Evitamos regex de lookahead que causan StackOverflowError con cadenas largas.
-        boolean inQuotes   = false;
-        int     tokenStart = 0;
+        boolean inQuotes = false;
+        int tokenStart = 0;
         List<String> tokens = new ArrayList<>();
 
         for (int i = 0; i < content.length(); i++) {
@@ -274,8 +294,10 @@ public class MessageSerializer {
 
         for (String token : tokens) {
             int colonIdx = token.indexOf(':');
-            if (colonIdx < 0) continue;
-            String key   = stripQuotes(token.substring(0, colonIdx).trim());
+            if (colonIdx < 0) {
+                continue;
+            }
+            String key = stripQuotes(token.substring(0, colonIdx).trim());
             String value = stripQuotes(token.substring(colonIdx + 1).trim());
             fields.put(key, value);
         }
@@ -284,14 +306,16 @@ public class MessageSerializer {
     }
 
     /**
-     * Elimina las comillas que envuelven un valor JSON.
-     * Por ejemplo: '"hello"' se convierte en 'hello'.
+     * Elimina las comillas que envuelven un valor JSON. Por ejemplo: '"hello"'
+     * se convierte en 'hello'.
      *
      * @param s El texto posiblemente envuelto en comillas.
      * @return El texto sin comillas externas.
      */
     private static String stripQuotes(String s) {
-        if (s == null || s.isEmpty()) return s;
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
         if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
             return s.substring(1, s.length() - 1);
         }
@@ -302,7 +326,8 @@ public class MessageSerializer {
      * Extrae el tipo de mensaje de un mapa deserializado.
      *
      * @param fields El mapa producido por {@link #deserialize(String)}.
-     * @return El tipo de mensaje (ej. "CARD_PLAYED"), o cadena vacía si no existe.
+     * @return El tipo de mensaje (ej. "CARD_PLAYED"), o cadena vacía si no
+     * existe.
      */
     public static String getType(Map<String, String> fields) {
         return fields.getOrDefault("type", "");
@@ -311,12 +336,12 @@ public class MessageSerializer {
     // ─────────────────────────────────────────────
     // Utilidades para construir JSON
     // ─────────────────────────────────────────────
-
     /**
-     * Re-serializa un mensaje a partir de su tipo y mapa de campos ya deserializado.
-     * Útil cuando el Host necesita reenviar un mensaje recibido sin modificarlo.
+     * Re-serializa un mensaje a partir de su tipo y mapa de campos ya
+     * deserializado. Útil cuando el Host necesita reenviar un mensaje recibido
+     * sin modificarlo.
      *
-     * @param type   El tipo de mensaje (ej. "PLAYER_READY").
+     * @param type El tipo de mensaje (ej. "PLAYER_READY").
      * @param fields Los campos ya deserializados del mensaje original.
      * @return El texto JSON reconstruido, terminado en nueva línea.
      */
@@ -329,10 +354,11 @@ public class MessageSerializer {
     /**
      * Construye una cadena JSON simple con un tipo y campos adicionales.
      *
-     * <p>Ejemplo: json("CARD_PLAYED", {player: "Kai", card: "RED-7"})
-     * produce: {"type":"CARD_PLAYED","player":"Kai","card":"RED-7"}
+     * <p>
+     * Ejemplo: json("CARD_PLAYED", {player: "Kai", card: "RED-7"}) produce:
+     * {"type":"CARD_PLAYED","player":"Kai","card":"RED-7"}
      *
-     * @param type   El valor del campo "type".
+     * @param type El valor del campo "type".
      * @param fields Campos adicionales clave-valor.
      * @return La cadena JSON resultante.
      */
@@ -341,7 +367,7 @@ public class MessageSerializer {
         sb.append("\"type\":\"").append(type).append("\"");
         for (Map.Entry<String, String> entry : fields.entrySet()) {
             sb.append(",\"").append(entry.getKey())
-              .append("\":\"").append(entry.getValue()).append("\"");
+                    .append("\":\"").append(entry.getValue()).append("\"");
         }
         sb.append("}");
         return sb.toString();
