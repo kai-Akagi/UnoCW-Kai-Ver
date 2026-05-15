@@ -294,7 +294,7 @@ public class RegisterController {
                         NetworkPlayerRejectedEvent e = (NetworkPlayerRejectedEvent) rejEvent;
                         SwingUtilities.invokeLater(()
                                 -> view.showError(e.getReason()
-                                        + "Por favor elige otro nombre o avatar."));
+                                    +  "."  + " Por favor elige otro nombre o avatar."));
                     }
                 };
 
