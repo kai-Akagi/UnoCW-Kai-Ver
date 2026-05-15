@@ -4,6 +4,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 import Controles.LobbyController;
 
+/**
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ */
 public class CrearSala extends javax.swing.JPanel {
 
     private int tamanhoSala = 0;
@@ -119,7 +125,6 @@ public class CrearSala extends javax.swing.JPanel {
             tamanhoSala = 2;
         }
     }//GEN-LAST:event_tamanho2MouseClicked
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnCancelar;

@@ -8,6 +8,13 @@ import Red.NetworkLayer;
 import Controles.GameSession;
 import Vistas.ModoJuego;
 
+/**
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ */
 public class GameModeController {
 
     private ModoJuego view;
