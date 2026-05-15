@@ -27,7 +27,6 @@ public class LobbyController {
     private final EventBus   eventBus;
     private final LobbyState lobbyState;
     private final NetworkLayer networkLayer;
-    private String hostPlayerName;  // nombre del Host, guardado al inicializar //Para saber cuando sale
 
     private boolean localPlayerReady;
 
@@ -73,14 +72,6 @@ public class LobbyController {
         lobbyView.updateReadyButton(localPlayerReady);
         refreshPlayerList();
         registerEventListeners();
-        // Guardar el nombre del Host al entrar al lobby.
-        // Lo necesitamos en el listener de PlayerDisconnectedEvent para detectar
-        // si quien salió es el Host, incluso si lobbyState ya lo eliminó.
-        lobbyState.getConnectedPlayers().stream()
-                .filter(Player::isHost)
-                .map(Player::getName)
-                .findFirst()
-                .ifPresent(name -> this.hostPlayerName = name);
     }
 
     /**
@@ -169,19 +160,15 @@ public class LobbyController {
 
         eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
-            // Comparamos contra hostPlayerName (guardado al inicializar) en lugar de
-            // buscar en lobbyState, porque para cuando este listener se ejecuta
-            // el Host ya puede haber sido eliminado de lobbyState por publishToLocalBus.
-            final boolean hostLeft = e.getPlayerName().equals(hostPlayerName);
+            final boolean hostLeft = isHostName(e.getPlayerName());
             lobbyState.removePlayer(e.getPlayerName());
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
                 if (lobbyView != null) lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
                 if (view != null)      view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
                 if (hostLeft && !session.isHost()) {
-                    // El Host abandonó: mostrar aviso y regresar al registro
                     JOptionPane.showMessageDialog(mainWindow,
-                            "El Host abandonó la sala.",
+                            "El Host abandonó. La sala fue cerrada.",
                             "Sala cerrada", JOptionPane.WARNING_MESSAGE);
                     mainWindow.showRegister();
                 }
