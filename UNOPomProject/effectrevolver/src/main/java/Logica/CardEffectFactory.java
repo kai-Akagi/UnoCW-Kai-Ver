@@ -17,6 +17,11 @@ import Logica.CardEffect;
  *   <li>Tener un solo lugar donde se crean los efectos (control centralizado).</li>
  *   <li>Hacer el código más legible: {@code CardEffectFactory.createSkip()} es claro.</li>
  * </ul>
+ * 
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class CardEffectFactory {
 
