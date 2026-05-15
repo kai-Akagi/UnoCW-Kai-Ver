@@ -6,56 +6,63 @@ import java.util.List;
 /**
  * Contiene el estado completo del juego en un momento dado.
  *
- * <p>Esta clase es el "tablero de verdad": guarda todo lo que describe
- * la situación actual de la partida: quiénes juegan, de quién es el turno,
- * en qué dirección va el juego, y cuántas cartas tiene cada uno.
+ * <p>
+ * Esta clase es el "tablero de verdad": guarda todo lo que describe la
+ * situación actual de la partida: quiénes juegan, de quién es el turno, en qué
+ * dirección va el juego, y cuántas cartas tiene cada uno.
  *
- * <p><b>¿Por qué existe esta clase separada?</b><br>
- * Los efectos de las cartas (patrón Strategy) necesitan acceso al estado
- * del juego para funcionar. En vez de pasarles 5 parámetros distintos,
- * les pasamos un solo objeto {@code GameState} que lo contiene todo.
- * Esto se llama <b>objeto de contexto</b> y mantiene los métodos limpios.
+ * <p>
+ * <b>¿Por qué existe esta clase separada?</b><br>
+ * Los efectos de las cartas (patrón Strategy) necesitan acceso al estado del
+ * juego para funcionar. En vez de pasarles 5 parámetros distintos, les pasamos
+ * un solo objeto GameState que lo contiene todo. Esto se llama
+ * <b>objeto de contexto</b> y mantiene los métodos limpios.
  *
- * <p>Esta clase también es usada por el {@link GameModel} para mantener
- * y publicar el estado actual a través del EventBus.
+ * <p>
+ * Esta clase también es usada por el {@link GameModel} para mantener y publicar
+ * el estado actual a través del EventBus.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class GameState {
 
     /**
-     * La lista de jugadores en la partida, en el orden en que juegan.
-     * El índice 0 es quien empieza.
+     * La lista de jugadores en la partida, en el orden en que juegan. El índice
+     * 0 es quien empieza.
      */
     private final List<Player> players;
 
     /**
-     * El índice del jugador que tiene el turno actualmente.
-     * Se usa con la lista {@code players} para saber quién juega ahora.
+     * El índice del jugador que tiene el turno actualmente. Se usa con la lista
+     * {@code players} para saber quién juega ahora.
      */
     private int currentPlayerIndex;
 
     /**
-     * La dirección actual del juego.
-     * true = gira en sentido normal (0→1→2→3→0...).
-     * false = gira al revés (0→3→2→1→0...), efecto del REVERSE.
+     * La dirección actual del juego. true = gira en sentido normal
+     * (0→1→2→3→0...). false = gira al revés (0→3→2→1→0...), efecto del REVERSE.
      */
     private boolean clockwise;
 
     /**
-     * La carta que está encima de la pila de descarte (la carta "activa" de la mesa).
-     * Es la carta contra la que se compara para saber si puedes jugar.
+     * La carta que está encima de la pila de descarte (la carta "activa" de la
+     * mesa). Es la carta contra la que se compara para saber si puedes jugar.
      */
     private Card topCard;
 
     /**
-     * El color activo después de jugar un comodín.
-     * Cuando topCard es WILD, este campo indica el color que el jugador eligió.
-     * Es null cuando la carta activa tiene su propio color.
+     * El color activo después de jugar un comodín. Cuando topCard es WILD, este
+     * campo indica el color que el jugador eligió. Es null cuando la carta
+     * activa tiene su propio color.
      */
     private Card.Color activeColor;
 
     /**
-     * El mazo del juego. Lo necesitamos aquí para que los efectos
-     * como DrawTwo o WildDrawFour puedan robar cartas del mazo.
+     * El mazo del juego. Lo necesitamos aquí para que los efectos como DrawTwo
+     * o WildDrawFour puedan robar cartas del mazo.
      */
     private final Deck deck;
 
@@ -63,20 +70,19 @@ public class GameState {
      * Construye el estado inicial del juego.
      *
      * @param players La lista de jugadores que participarán.
-     * @param deck    El mazo de cartas ya inicializado.
+     * @param deck El mazo de cartas ya inicializado.
      */
     public GameState(List<Player> players, Deck deck) {
-        this.players            = new ArrayList<>(players);
-        this.deck               = deck;
+        this.players = new ArrayList<>(players);
+        this.deck = deck;
         this.currentPlayerIndex = 0;
-        this.clockwise          = true;
-        this.topCard            = null;
+        this.clockwise = true;
+        this.topCard = null;
     }
 
     // ─────────────────────────────────────────────
     // Consultas sobre el estado
     // ─────────────────────────────────────────────
-
     /**
      * Devuelve el jugador que tiene el turno en este momento.
      *
@@ -87,8 +93,8 @@ public class GameState {
     }
 
     /**
-     * Devuelve el jugador que jugará después del actual,
-     * respetando la dirección de juego.
+     * Devuelve el jugador que jugará después del actual, respetando la
+     * dirección de juego.
      *
      * @return El siguiente jugador.
      */
@@ -107,14 +113,16 @@ public class GameState {
     }
 
     /**
-     * Devuelve el color activo actualmente.
-     * Si la carta activa es un comodín, devuelve el color elegido por el jugador.
-     * Si no, devuelve el color de la carta activa.
+     * Devuelve el color activo actualmente. Si la carta activa es un comodín,
+     * devuelve el color elegido por el jugador. Si no, devuelve el color de la
+     * carta activa.
      *
      * @return El color que determina qué cartas se pueden jugar ahora.
      */
     public Card.Color getActiveColor() {
-        if (activeColor != null) return activeColor;
+        if (activeColor != null) {
+            return activeColor;
+        }
         return topCard != null ? topCard.getColor() : Card.Color.WILD;
     }
 
@@ -148,7 +156,8 @@ public class GameState {
     /**
      * Indica si el juego avanza en sentido normal (izquierda a derecha).
      *
-     * @return {@code true} si va en sentido normal, {@code false} si está invertido.
+     * @return {@code true} si va en sentido normal, {@code false} si está
+     * invertido.
      */
     public boolean isClockwise() {
         return clockwise;
@@ -157,11 +166,10 @@ public class GameState {
     // ─────────────────────────────────────────────
     // Modificaciones del estado
     // ─────────────────────────────────────────────
-
     /**
-     * Cambia la carta activa en la mesa (la que está encima del descarte).
-     * Si la nueva carta tiene su propio color (no es comodín), limpia el
-     * color activo especial para que no persista del turno anterior.
+     * Cambia la carta activa en la mesa (la que está encima del descarte). Si
+     * la nueva carta tiene su propio color (no es comodín), limpia el color
+     * activo especial para que no persista del turno anterior.
      *
      * @param card La nueva carta que queda en la cima.
      */
@@ -174,24 +182,24 @@ public class GameState {
 
     /**
      * Avanza el turno al siguiente jugador, respetando la dirección de juego.
-     * Después de llamar esto, {@link #getCurrentPlayer()} devolverá el siguiente.
+     * Después de llamar esto, {@link #getCurrentPlayer()} devolverá el
+     * siguiente.
      */
     public void advanceTurn() {
         currentPlayerIndex = nextIndex(1);
     }
 
     /**
-     * Salta al jugador siguiente (dos posiciones en vez de una).
-     * Esto lo usa el efecto SKIP.
+     * Salta al jugador siguiente (dos posiciones en vez de una). Esto lo usa el
+     * efecto SKIP.
      */
     public void skipNextPlayer() {
         currentPlayerIndex = nextIndex(2);
     }
 
     /**
-     * Invierte la dirección del juego.
-     * Si iba en sentido normal, pasa a ir al revés, y viceversa.
-     * Esto lo usa el efecto REVERSE.
+     * Invierte la dirección del juego. Si iba en sentido normal, pasa a ir al
+     * revés, y viceversa. Esto lo usa el efecto REVERSE.
      */
     public void flipDirection() {
         clockwise = !clockwise;
@@ -203,10 +211,10 @@ public class GameState {
     }
 
     /**
-     * Le da una cantidad de cartas del mazo a un jugador específico.
-     * Esto lo usan los efectos DRAW_TWO y WILD_DRAW_FOUR.
+     * Le da una cantidad de cartas del mazo a un jugador específico. Esto lo
+     * usan los efectos DRAW_TWO y WILD_DRAW_FOUR.
      *
-     * @param player   El jugador que debe robar cartas.
+     * @param player El jugador que debe robar cartas.
      * @param quantity Cuántas cartas debe robar.
      */
     public void giveCards(Player player, int quantity) {
@@ -223,14 +231,18 @@ public class GameState {
         lastGivenPlayer = player;
     }
 
-    /** Las cartas dadas en el último giveCards(), para publicar como eventos privados. */
+    /**
+     * Las cartas dadas en el último giveCards(), para publicar como eventos
+     * privados.
+     */
     private final java.util.List<Card> lastGivenCards = new java.util.ArrayList<>();
     private Player lastGivenPlayer = null;
 
     /**
-     * Devuelve las cartas repartidas por el último giveCards() y limpia el buffer.
-     * GameModel llama este método después de aplicar efectos para publicar
-     * CardDrawnPrivateEvent por cada carta, notificando al Peer correcto.
+     * Devuelve las cartas repartidas por el último giveCards() y limpia el
+     * buffer. GameModel llama este método después de aplicar efectos para
+     * publicar CardDrawnPrivateEvent por cada carta, notificando al Peer
+     * correcto.
      */
     public java.util.List<Card> drainLastGivenCards() {
         java.util.List<Card> result = new java.util.ArrayList<>(lastGivenCards);
@@ -244,27 +256,27 @@ public class GameState {
     public Player getLastGivenPlayer() {
         return lastGivenPlayer;
     }
-    
-    
+
     /**
-    * Ajusta el índice del jugador actual para que no quede fuera de rango.
-    * Se llama después de remover un jugador de la lista durante la partida.
-    */
+     * Ajusta el índice del jugador actual para que no quede fuera de rango. Se
+     * llama después de remover un jugador de la lista durante la partida.
+     */
     public void clampCurrentIndex() {
-        if (players.isEmpty()) return;
+        if (players.isEmpty()) {
+            return;
+        }
         currentPlayerIndex = currentPlayerIndex % players.size();
     }
-    
 
     // ─────────────────────────────────────────────
     // Ayudas internas
     // ─────────────────────────────────────────────
-
     /**
      * Calcula el índice del jugador que está {@code steps} posiciones adelante,
      * respetando la dirección actual y el total de jugadores (bucle circular).
      *
-     * <p>Ejemplo con 4 jugadores en sentido inverso, turno actual = 0, steps = 1:
+     * <p>
+     * Ejemplo con 4 jugadores en sentido inverso, turno actual = 0, steps = 1:
      * resultado = (0 - 1 + 4) % 4 = 3. Es decir, el jugador 3 va después.
      *
      * @param steps Cuántos pasos hacia adelante queremos contar.
@@ -278,6 +290,5 @@ public class GameState {
             return (currentPlayerIndex - steps + total) % total;
         }
     }
-    
-    
+
 }

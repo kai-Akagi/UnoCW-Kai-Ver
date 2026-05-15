@@ -6,71 +6,76 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Representa el estado de la sala de espera (lobby) antes de iniciar la partida.
+ * Representa el estado de la sala de espera (lobby) antes de iniciar la
+ * partida.
  *
- * <p>Mientras {@link GameState} describe lo que pasa durante la partida,
+ * <p>
+ * Mientras {@link GameState} describe lo que pasa durante la partida,
  * {@code LobbyState} describe lo que pasa antes: quiénes están conectados,
  * cuántos jugadores se esperan y si todos están listos.
  *
- * <p><b>¿Por qué una clase separada y no meter esto en GameState?</b><br>
- * Porque son momentos distintos del ciclo de vida de la aplicación.
- * El lobby existe antes del juego. Cuando la partida inicia, el lobby
- * desaparece y nace el GameState. Mezclarlos en una sola clase crearía
- * atributos que son null la mitad del tiempo, lo cual es confuso y propenso
- * a errores. Cada clase representa un momento claro.
- * 
- * 
- * @author Héctor Alonso 252039
- * 
+ * <p>
+ * <b>¿Por qué una clase separada y no meter esto en GameState?</b><br>
+ * Porque son momentos distintos del ciclo de vida de la aplicación. El lobby
+ * existe antes del juego. Cuando la partida inicia, el lobby desaparece y nace
+ * el GameState. Mezclarlos en una sola clase crearía atributos que son null la
+ * mitad del tiempo, lo cual es confuso y propenso a errores. Cada clase
+ * representa un momento claro.
+ *
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ *
  */
 public class LobbyState {
 
     /**
-     * Código único de la sala. El Host lo comparte con los demás jugadores
-     * para que puedan unirse. Se genera automáticamente al crear la sala.
-     * Formato: "XXXX-XXXX" con letras y números mayúsculas.
+     * Código único de la sala. El Host lo comparte con los demás jugadores para
+     * que puedan unirse. Se genera automáticamente al crear la sala. Formato:
+     * "XXXX-XXXX" con letras y números mayúsculas.
      */
     private final String roomCode;
 
     /**
-     * Número máximo de jugadores que puede tener esta sala.
-     * Solo el Host puede definirlo (2, 3 o 4).
+     * Número máximo de jugadores que puede tener esta sala. Solo el Host puede
+     * definirlo (2, 3 o 4).
      */
     private int capacity;
 
     /**
-     * Lista de jugadores actualmente conectados en el lobby.
-     * El primer jugador siempre es el Host.
+     * Lista de jugadores actualmente conectados en el lobby. El primer jugador
+     * siempre es el Host.
      */
     private final List<Player> connectedPlayers;
 
     /**
-     * Indica si la partida ya fue iniciada.
-     * Una vez que es true, no se permiten más conexiones a la sala.
+     * Indica si la partida ya fue iniciada. Una vez que es true, no se permiten
+     * más conexiones a la sala.
      */
     private boolean gameStarted;
 
     /**
-     * Crea un nuevo estado de lobby con capacidad inicial de 4 jugadores.
-     * El Host puede cambiar la capacidad antes de que otros se unan.
+     * Crea un nuevo estado de lobby con capacidad inicial de 4 jugadores. El
+     * Host puede cambiar la capacidad antes de que otros se unan.
      */
     public LobbyState() {
-        this.roomCode         = generateRoomCode();
-        this.capacity         = 4;
+        this.roomCode = generateRoomCode();
+        this.capacity = 4;
         this.connectedPlayers = new ArrayList<>();
-        this.gameStarted      = false;
+        this.gameStarted = false;
     }
 
     // ─────────────────────────────────────────────
     // Gestión de jugadores
     // ─────────────────────────────────────────────
-
     /**
      * Agrega un jugador a la sala si hay espacio y la partida no ha iniciado.
      *
      * @param player El jugador que quiere unirse.
      * @return {@code true} si se unió exitosamente, {@code false} si la sala
-     *         está llena o la partida ya comenzó.
+     * está llena o la partida ya comenzó.
      */
     public boolean addPlayer(Player player) {
         if (gameStarted || connectedPlayers.size() >= capacity) {
@@ -81,8 +86,8 @@ public class LobbyState {
     }
 
     /**
-     * Elimina un jugador de la sala.
-     * Se usa cuando un jugador abandona o se desconecta.
+     * Elimina un jugador de la sala. Se usa cuando un jugador abandona o se
+     * desconecta.
      *
      * @param playerName El nombre del jugador que se va.
      */
@@ -93,7 +98,6 @@ public class LobbyState {
     // ─────────────────────────────────────────────
     // Validaciones de unicidad
     // ─────────────────────────────────────────────
-
     /**
      * Verifica si un nombre ya está siendo usado por algún jugador conectado.
      *
@@ -119,20 +123,21 @@ public class LobbyState {
     // ─────────────────────────────────────────────
     // Condiciones para iniciar la partida
     // ─────────────────────────────────────────────
-
     /**
      * Verifica si todos los jugadores conectados marcaron "Listo".
      *
      * @return {@code true} si todos están listos.
      */
     public boolean allPlayersReady() {
-        if (connectedPlayers.size() < 2) return false;
+        if (connectedPlayers.size() < 2) {
+            return false;
+        }
         return connectedPlayers.stream().allMatch(Player::isReady);
     }
 
     /**
-     * Verifica si la sala tiene el mínimo de jugadores para iniciar.
-     * En UNO se necesitan al menos 2 jugadores.
+     * Verifica si la sala tiene el mínimo de jugadores para iniciar. En UNO se
+     * necesitan al menos 2 jugadores.
      *
      * @return {@code true} si hay 2 o más jugadores conectados.
      */
@@ -141,8 +146,8 @@ public class LobbyState {
     }
 
     /**
-     * Verifica si se puede iniciar la partida.
-     * Condiciones: mínimo 2 jugadores y todos en estado "Listo".
+     * Verifica si se puede iniciar la partida. Condiciones: mínimo 2 jugadores
+     * y todos en estado "Listo".
      *
      * @return {@code true} si se puede iniciar.
      */
@@ -162,16 +167,23 @@ public class LobbyState {
     // ─────────────────────────────────────────────
     // Getters y setters
     // ─────────────────────────────────────────────
-
-    /** @return El código único de esta sala. */
-    public String getRoomCode() { return roomCode; }
-
-    /** @return La capacidad máxima de jugadores. */
-    public int getCapacity() { return capacity; }
+    /**
+     * @return El código único de esta sala.
+     */
+    public String getRoomCode() {
+        return roomCode;
+    }
 
     /**
-     * Cambia la capacidad de la sala.
-     * Solo el Host puede hacer esto, y solo antes de que inicien.
+     * @return La capacidad máxima de jugadores.
+     */
+    public int getCapacity() {
+        return capacity;
+    }
+
+    /**
+     * Cambia la capacidad de la sala. Solo el Host puede hacer esto, y solo
+     * antes de que inicien.
      *
      * @param capacity El nuevo número máximo (2, 3 o 4).
      */
@@ -181,31 +193,45 @@ public class LobbyState {
         }
     }
 
-    /** @return Lista de jugadores conectados (solo lectura). */
+    /**
+     * @return Lista de jugadores conectados (solo lectura).
+     */
     public List<Player> getConnectedPlayers() {
         return Collections.unmodifiableList(connectedPlayers);
     }
 
-    /** @return Cuántos jugadores están conectados actualmente. */
-    public int getPlayerCount() { return connectedPlayers.size(); }
+    /**
+     * @return Cuántos jugadores están conectados actualmente.
+     */
+    public int getPlayerCount() {
+        return connectedPlayers.size();
+    }
 
-    /** @return {@code true} si la partida ya inició. */
-    public boolean isGameStarted() { return gameStarted; }
+    /**
+     * @return {@code true} si la partida ya inició.
+     */
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
 
-    /** Marca la partida como iniciada. No se pueden unir más jugadores. */
-    public void markGameStarted() { this.gameStarted = true; }
+    /**
+     * Marca la partida como iniciada. No se pueden unir más jugadores.
+     */
+    public void markGameStarted() {
+        this.gameStarted = true;
+    }
 
     // ─────────────────────────────────────────────
     // Utilidades
     // ─────────────────────────────────────────────
-
     /**
-     * Genera un código de sala único y legible.
-     * Formato: "A3F2-9KX1" — dos grupos de 4 caracteres separados por guión.
+     * Genera un código de sala único y legible. Formato: "A3F2-9KX1" — dos
+     * grupos de 4 caracteres separados por guión.
      *
-     * <p>Usamos UUID como base para garantizar unicidad, luego tomamos
-     * solo los primeros 8 caracteres en mayúsculas para que sea fácil
-     * de escribir y compartir entre jugadores.
+     * <p>
+     * Usamos UUID como base para garantizar unicidad, luego tomamos solo los
+     * primeros 8 caracteres en mayúsculas para que sea fácil de escribir y
+     * compartir entre jugadores.
      *
      * @return El código generado.
      */
