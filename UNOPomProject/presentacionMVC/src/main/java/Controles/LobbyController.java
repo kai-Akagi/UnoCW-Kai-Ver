@@ -27,6 +27,7 @@ public class LobbyController {
     private final EventBus   eventBus;
     private final LobbyState lobbyState;
     private final NetworkLayer networkLayer;
+    private String hostPlayerName;
 
     private boolean localPlayerReady;
 
@@ -72,6 +73,14 @@ public class LobbyController {
         lobbyView.updateReadyButton(localPlayerReady);
         refreshPlayerList();
         registerEventListeners();
+        
+        lobbyState.getConnectedPlayers().stream()
+        .filter(Player::isHost)
+        .map(Player::getName)
+        .findFirst()
+        .ifPresent(name -> this.hostPlayerName = name);
+        
+        
     }
 
     /**
@@ -160,7 +169,9 @@ public class LobbyController {
 
         eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
-            final boolean hostLeft = isHostName(e.getPlayerName());
+            // Usamos hostPlayerName en lugar de isHostName() porque para cuando
+            // este listener se ejecuta lobbyState ya puede haber removido al Host
+            final boolean hostLeft = e.getPlayerName().equals(hostPlayerName);
             lobbyState.removePlayer(e.getPlayerName());
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
@@ -168,7 +179,7 @@ public class LobbyController {
                 if (view != null)      view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
                 if (hostLeft && !session.isHost()) {
                     JOptionPane.showMessageDialog(mainWindow,
-                            "El Host abandonó. La sala fue cerrada.",
+                            "El Host abandonó la sala.",
                             "Sala cerrada", JOptionPane.WARNING_MESSAGE);
                     mainWindow.showRegister();
                 }
