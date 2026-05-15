@@ -35,10 +35,29 @@ import java.awt.*;
  */
 public class MainWindow extends JFrame {
 
+    /**
+     * Identificador de la pantalla de registro.
+     */
     public static final String SCREEN_REGISTER = "register";
+
+    /**
+     * Identificador de la pantalla de configuración de sala.
+     */
     public static final String SCREEN_ROOM_CONFIG = "roomConfig";
+
+    /**
+     * Identificador de la pantalla del lobby.
+     */
     public static final String SCREEN_LOBBY = "lobby";
+
+    /**
+     * Identificador de la pantalla principal del juego.
+     */
     public static final String SCREEN_GAME = "game";
+
+    /**
+     * Identificador de la pantalla de scoreboard.
+     */
     public static final String SCREEN_SCOREBOARD = "scoreboard";
 
     private final CardLayout cardLayout;
@@ -48,6 +67,9 @@ public class MainWindow extends JFrame {
     private NetworkLayer networkLayer;
     private LobbyState lobbyState;
 
+    /**
+     * Crea e inicializa la ventana principal de la aplicación.
+     */
     public MainWindow() {
         super("UNO");
         this.cardLayout = new CardLayout();
@@ -56,6 +78,9 @@ public class MainWindow extends JFrame {
         buildScreens();
     }
 
+    /**
+     * Configura las propiedades principales de la ventana.
+     */
     private void configureWindow() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 650);
@@ -65,6 +90,9 @@ public class MainWindow extends JFrame {
         add(screenContainer);
     }
 
+    /**
+     * Construye y registra las pantallas iniciales de la aplicación.
+     */
     private void buildScreens() {
         RegisterView registerView = new RegisterView();
         RegisterController registerController = new RegisterController(registerView, this);
@@ -143,6 +171,9 @@ public class MainWindow extends JFrame {
 
     /**
      * Navega al scoreboard al terminar la partida.
+     *
+     * @param winnerName Nombre del jugador ganador.
+     *
      */
     public void showScoreboard(String winnerName) {
         ScoreboardView scoreboardView = new ScoreboardView(winnerName, session, this);
@@ -164,18 +195,38 @@ public class MainWindow extends JFrame {
         cardLayout.show(screenContainer, SCREEN_REGISTER);
     }
 
+    /**
+     * Muestra una pantalla específica dentro de la ventana principal.
+     *
+     * @param screenName Nombre de la pantalla a mostrar.
+     */
     public void showScreen(String screenName) {
         cardLayout.show(screenContainer, screenName);
     }
 
+    /**
+     * Obtiene la sesión actual del juego.
+     *
+     * @return Sesión activa del jugador.
+     */
     public GameSession getSession() {
         return session;
     }
 
+    /**
+     * Obtiene la capa de comunicación en red.
+     *
+     * @return Instancia de NetworkLayer utilizada por la aplicación.
+     */
     public NetworkLayer getNetworkLayer() {
         return networkLayer;
     }
 
+    /**
+     * Entrada principal para el juego UNO.
+     *
+     * @param args Argumentos.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MainWindow window = new MainWindow();

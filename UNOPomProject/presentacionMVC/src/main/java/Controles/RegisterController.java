@@ -8,9 +8,7 @@ import Main.MainWindow;
 import Dominio.LobbyState;
 import Dominio.Player;
 import Red.NetworkLayer;
-import Controles.GameSession;
 import Vistas.RegisterView;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -38,14 +36,18 @@ public class RegisterController {
     private final RegisterView view;
     private final MainWindow mainWindow;
 
+    /**
+     * Crea el controlador encargado de la pantalla de registro.
+     *
+     * @param view Vista de registro utilizada por el usuario.
+     * @param mainWindow Ventana principal de la aplicación.
+     */
     public RegisterController(RegisterView view, MainWindow mainWindow) {
         this.view = view;
         this.mainWindow = mainWindow;
     }
 
-    // ─────────────────────────────────────────────
     // Acciones del usuario
-    // ─────────────────────────────────────────────
     /**
      * Llamado cuando el usuario selecciona un avatar.
      *
@@ -294,7 +296,7 @@ public class RegisterController {
                         NetworkPlayerRejectedEvent e = (NetworkPlayerRejectedEvent) rejEvent;
                         SwingUtilities.invokeLater(()
                                 -> view.showError(e.getReason()
-                                    +  "."  + " Por favor elige otro nombre o avatar."));
+                                        + "." + " Por favor elige otro nombre o avatar."));
                     }
                 };
 

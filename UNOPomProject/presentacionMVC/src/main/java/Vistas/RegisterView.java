@@ -55,6 +55,9 @@ public class RegisterView extends JPanel {
     private int selectedAvatarIndex = -1;
     private RegisterController controller;
 
+    /**
+     * Crea e inicializa la vista de registro de jugadores.
+     */
     public RegisterView() {
         this.avatarButtons = new JButton[AVATAR_IDS.length];
         this.nameField = new JTextField();
@@ -301,9 +304,7 @@ public class RegisterView extends JPanel {
         continueButton.setPreferredSize(new Dimension(120, 40));
     }
 
-    // ─────────────────────────────────────────────
     // Métodos que el Controller llama para actualizar la View
-    // ─────────────────────────────────────────────
     /**
      * Resalta el avatar seleccionado con borde dorado y quita el de los demás.
      *
@@ -370,10 +371,10 @@ public class RegisterView extends JPanel {
         }
     }
 
-    // ─────────────────────────────────────────────
     // Datos que el Controller lee de la View
-    // ─────────────────────────────────────────────
     /**
+     * Regresa el nombre ingresado sin espacios extremos.
+     * 
      * @return El nombre ingresado sin espacios extremos.
      */
     public String getPlayerName() {
@@ -381,6 +382,8 @@ public class RegisterView extends JPanel {
     }
 
     /**
+     * Regresa el ID del avatar seleccionado, o null si ninguno.
+     * 
      * @return El ID del avatar seleccionado, o {@code null} si ninguno.
      */
     public String getSelectedAvatarId() {
@@ -390,9 +393,7 @@ public class RegisterView extends JPanel {
         return AVATAR_IDS[selectedAvatarIndex];
     }
 
-    // ─────────────────────────────────────────────
     // Registro del Controller
-    // ─────────────────────────────────────────────
     /**
      * Asigna el Controller y conecta los listeners de los botones.
      *

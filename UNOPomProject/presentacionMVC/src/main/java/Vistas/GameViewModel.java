@@ -13,7 +13,7 @@ import java.util.List;
  * <p>
  * Contiene exactamente los datos que {@link GameView} necesita para dibujarse.
  * Ni más ni menos. Se construye a partir del {@link GameState} en el
- * {@link GameController} y se le entrega a la View para que la renderice.
+ * GameController y se le entrega a la View para que la renderice.
  *
  * <p>
  * <b>¿Por qué existe este objeto?</b><br>

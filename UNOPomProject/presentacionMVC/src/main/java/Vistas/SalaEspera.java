@@ -34,15 +34,15 @@ import java.util.List;
  */
 public class SalaEspera extends JPanel {
 
-    // ─── Header ──────────────────────────────────────────────────────────────
+    //Header
     private final JLabel roomCodeLabel;
     private final JLabel playerCountLabel;
     private final JLabel waitingStatusLabel;
 
-    // ─── Lista de jugadores ──────────────────────────────────────────────────
+    //Lista de jugadores 
     private final JPanel playerListPanel;
 
-    // ─── Botones ─────────────────────────────────────────────────────────────
+    //Botones
     private final JButton readyButton;
     private final JButton startButton;
     private final JButton requestStartButton;
@@ -224,28 +224,37 @@ public class SalaEspera extends JPanel {
     }
 
     /**
-     * Actualiza el código de sala en el header.
+     * Actualiza el código de sala mostrado en el encabezado.
+     *
+     * @param code Código actual de la sala.
      */
     public void setRoomCode(String code) {
         roomCodeLabel.setText("Código de Sala: " + code);
     }
 
     /**
-     * Actualiza el contador de jugadores.
+     * Actualiza el contador de jugadores conectados.
+     *
+     * @param current Cantidad actual de jugadores.
+     * @param capacity Capacidad máxima permitida en la sala.
      */
     public void setPlayerCount(int current, int capacity) {
         playerCountLabel.setText("Jugadores: " + current + "/" + capacity);
     }
 
     /**
-     * Habilita o deshabilita el botón Iniciar Partida.
+     * Habilita o deshabilita el botón de iniciar partida.
+     *
+     * @param enabled true para habilitar el botón.
      */
     public void setStartEnabled(boolean enabled) {
         startButton.setEnabled(enabled);
     }
 
     /**
-     * Configura visibilidad de botones según el rol.
+     * Configura la visibilidad de botones según el rol del jugador.
+     *
+     * @param isHost true si el jugador local es el Host.
      */
     public void configureForRole(boolean isHost) {
         startButton.setVisible(isHost);
@@ -255,21 +264,27 @@ public class SalaEspera extends JPanel {
     }
 
     /**
-     * Muestra el estado de espera en el header.
+     * Actualiza el mensaje de estado de espera mostrado en el encabezado.
+     *
+     * @param text Texto de estado a mostrar.
      */
     public void setWaitingStatus(String text) {
         waitingStatusLabel.setText(text);
     }
 
     /**
-     * Habilita o deshabilita el botón Solicitar Inicio.
+     * Habilita o deshabilita el botón de solicitar inicio.
+     *
+     * @param enabled true para habilitar el botón.
      */
     public void setRequestStartEnabled(boolean enabled) {
         requestStartButton.setEnabled(enabled);
     }
 
     /**
-     * Cambia el texto y color del botón Listo/Cancelar según el estado.
+     * Actualiza el texto y color del botón Ready según el estado actual.
+     *
+     * @param isReady true si el jugador está listo.
      */
     public void updateReadyButton(boolean isReady) {
         readyButton.setText(isReady ? "✗ Cancelar Listo" : "✓ Estoy Listo");

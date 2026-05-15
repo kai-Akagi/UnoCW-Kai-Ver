@@ -18,6 +18,12 @@ import Vistas.SalaEspera;
 import javax.swing.*;
 
 /**
+ * Controlador encargado de gestionar la lógica del lobby multijugador.
+ *
+ * Coordina la interacción entre las vistas del lobby, el estado compartido de
+ * la sala, la sesión local del jugador y la capa de red. También maneja la
+ * sincronización de jugadores conectados, estados ready, configuración de
+ * capacidad e inicialización de eventos necesarios antes de iniciar la partida.
  *
  * @author Héctor Javier Alonso Zaragoza
  * @author Alejandro Rodríguez Lugo
@@ -38,6 +44,15 @@ public class LobbyController {
 
     private boolean localPlayerReady;
 
+    /**
+     * Crea un controlador para la vista principal del lobby.
+     *
+     * @param view Vista principal del lobby.
+     * @param mainWindow Ventana principal de la aplicación.
+     * @param session Sesión actual del juego.
+     * @param lobbyState Estado compartido del lobby.
+     * @param networkLayer Capa de comunicación en red.
+     */
     public LobbyController(LobbyView view, MainWindow mainWindow,
             GameSession session, LobbyState lobbyState,
             NetworkLayer networkLayer) {
@@ -52,6 +67,15 @@ public class LobbyController {
         this.localPlayerReady = session.isHost();
     }
 
+    /**
+     * Crea un controlador para la vista de configuración de sala.
+     *
+     * @param view Vista CrearSala utilizada para configurar la partida.
+     * @param mainWindow Ventana principal de la aplicación.
+     * @param session Sesión actual del juego.
+     * @param lobbyState Estado compartido del lobby.
+     * @param networkLayer Capa de comunicación en red.
+     */
     public LobbyController(CrearSala view, MainWindow mainWindow,
             GameSession session, LobbyState lobbyState,
             NetworkLayer networkLayer) {
@@ -66,6 +90,15 @@ public class LobbyController {
         this.localPlayerReady = session.isHost();
     }
 
+    /**
+     * Crea un controlador para la sala de espera del lobby.
+     *
+     * @param lobbyView Vista de sala de espera.
+     * @param mainWindow Ventana principal de la aplicación.
+     * @param session Sesión actual del juego.
+     * @param lobbyState Estado compartido del lobby.
+     * @param networkLayer Capa de comunicación en red.
+     */
     public LobbyController(SalaEspera lobbyView, MainWindow mainWindow,
             GameSession session, LobbyState lobbyState,
             NetworkLayer networkLayer) {
@@ -80,6 +113,10 @@ public class LobbyController {
         this.localPlayerReady = session.isHost();
     }
 
+    /**
+     * Inicializa el lobby local sincronizando el estado ready, configurando la
+     * vista y registrando los listeners de eventos.
+     */
     public void initialize() {
         session.getLocalPlayer().setReady(localPlayerReady);
         lobbyState.getConnectedPlayers().stream()
@@ -105,6 +142,8 @@ public class LobbyController {
      * Llamado cuando el usuario hace clic en una carta de tamaño en CrearSala.
      * Configura la capacidad del lobby Y navega directamente al lobby sin
      * necesidad de un boton "Siguiente" separado.
+     *
+     * @param size Cantidad máxima de jugadores permitidos en la sala.
      */
     public void onCardSizeClicked(int size) {
         lobbyState.setCapacity(size);
@@ -112,6 +151,10 @@ public class LobbyController {
                 -> mainWindow.showLobby(session, lobbyState, networkLayer));
     }
 
+    /**
+     * Cambia el estado ready del jugador local y notifica el cambio al resto de
+     * jugadores del lobby.
+     */
     public void onReadyClicked() {
         localPlayerReady = !localPlayerReady;
         session.getLocalPlayer().setReady(localPlayerReady);
@@ -130,6 +173,9 @@ public class LobbyController {
         checkStartCondition();
     }
 
+    /**
+     * Solicita al Host iniciar la partida si el jugador local está listo.
+     */
     public void onRequestStartClicked() {
         if (session.isHost() || !localPlayerReady) {
             return;
@@ -138,6 +184,10 @@ public class LobbyController {
                 session.getLocalPlayer().getName()));
     }
 
+    /**
+     * Inicia la partida si el jugador local es el Host y se cumplen las
+     * condiciones necesarias del lobby.
+     */
     public void onStartClicked() {
         if (!session.isHost() || !lobbyState.canStart()) {
             return;
@@ -146,6 +196,10 @@ public class LobbyController {
         eventBus.publish(GameEventFactory.gameStarted());
     }
 
+    /**
+     * Solicita confirmación para abandonar la sala y notifica la desconexión
+     * del jugador local.
+     */
     public void onLeaveClicked() {
         int confirm = JOptionPane.showConfirmDialog(mainWindow,
                 "¿Estás seguro de que deseas salir de la sala?",
@@ -157,6 +211,12 @@ public class LobbyController {
         }
     }
 
+    /**
+     * Actualiza la capacidad máxima del lobby y sincroniza el nuevo valor con
+     * los jugadores conectados.
+     *
+     * @param newCapacity Nueva capacidad máxima de jugadores.
+     */
     public void onCapacityChanged(int newCapacity) {
         if (!session.isHost()) {
             return;
@@ -172,6 +232,10 @@ public class LobbyController {
         checkStartCondition();
     }
 
+    /**
+     * Registra todos los listeners de eventos utilizados para sincronizar el
+     * estado del lobby y la interfaz gráfica.
+     */
     private void registerEventListeners() {
         eventBus.subscribe(PlayerJoinedEvent.class, event
                 -> SwingUtilities.invokeLater(() -> {
@@ -249,6 +313,10 @@ public class LobbyController {
                 -> SwingUtilities.invokeLater(mainWindow::showGame));
     }
 
+    /**
+     * Actualiza visualmente la lista de jugadores conectados en las vistas del
+     * lobby.
+     */
     private void refreshPlayerList() {
         String localName = session.getLocalPlayer().getName();
         boolean isHost = session.isHost();
@@ -260,6 +328,10 @@ public class LobbyController {
         }
     }
 
+    /**
+     * Verifica si la partida puede iniciar y actualiza el estado visual
+     * correspondiente en la interfaz.
+     */
     private void checkStartCondition() {
         boolean canStart = lobbyState.canStart();
         if (session.isHost()) {
@@ -277,6 +349,12 @@ public class LobbyController {
         }
     }
 
+    /**
+     * Verifica si un nombre de jugador pertenece al Host actual.
+     *
+     * @param name Nombre del jugador a verificar.
+     * @return true si el jugador corresponde al Host.
+     */
     private boolean isHostName(String name) {
         return lobbyState.getConnectedPlayers().stream()
                 .filter(Player::isHost).map(Player::getName).anyMatch(n -> n.equals(name));

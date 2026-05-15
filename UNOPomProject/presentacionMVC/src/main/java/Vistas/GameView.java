@@ -332,7 +332,10 @@ public class GameView extends JPanel {
     }
 
     /**
+     * Deshabilita la mano del jugador y el botón de robo.
      *
+     * Se utiliza cuando el jugador debe elegir un color antes de continuar con
+     * su turno.
      */
     public void disableHand() {
         // Deshabilitar cartas y el robo de carta del mazo — el jugador debe elegir color para continuar
@@ -405,9 +408,7 @@ public class GameView extends JPanel {
         directionLabel.setText(clockwise ? "→" : "←");
     }
 
-    // ─────────────────────────────────────────────
     // Registro del Controller
-    // ─────────────────────────────────────────────
     /**
      * Inicia el temporizador de turno con el número de segundos configurado. Si
      * ya había un temporizador corriendo, lo detiene primero.
@@ -528,9 +529,7 @@ public class GameView extends JPanel {
         leaveButton.addActionListener(e -> controller.onLeaveClicked());
     }
 
-    // ─────────────────────────────────────────────
     // Utilidades
-    // ─────────────────────────────────────────────
     /**
      * Convierte un color de carta UNO a un color de Swing para el fondo.
      *
