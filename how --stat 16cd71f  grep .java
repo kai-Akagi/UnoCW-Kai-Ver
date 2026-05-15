@@ -1,0 +1,101 @@
+[33mcommit 16cd71f231949d1d798c5d1b5f56148d8f014ea1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 6b510db 1f13474
+Author: kai-Akagi <hector.alonso252039@potros.itson.edu.mx>
+Date:   Thu May 14 23:58:00 2026 -0700
+
+    Merge pull request #2 from kai-Akagi/pom-project-cus
+    
+    Pom project cus
+
+ .../target/cardfactory-1.0-SNAPSHOT.jar            | Bin [31m0[m -> [32m2814[m bytes
+ .../target/classes/Logica/CardFactory.class        | Bin [31m0[m -> [32m1885[m bytes
+ .../target/maven-archiver/pom.properties           |   3 [32m++[m
+ .../compile/default-compile/createdFiles.lst       |   1 [32m+[m
+ .../compile/default-compile/inputFiles.lst         |   1 [32m+[m
+ .../target/classes/Logica/CardEffectFactory.class  | Bin [31m0[m -> [32m777[m bytes
+ .../target/classes/Logica/DrawTwoEffect.class      | Bin [31m0[m -> [32m752[m bytes
+ .../target/classes/Logica/ReverseEffect.class      | Bin [31m0[m -> [32m826[m bytes
+ .../target/classes/Logica/SkipEffect.class         | Bin [31m0[m -> [32m625[m bytes
+ .../target/classes/Logica/WildDrawFourEffect.class | Bin [31m0[m -> [32m789[m bytes
+ .../target/classes/Logica/WildEffect.class         | Bin [31m0[m -> [32m625[m bytes
+ .../target/effectrevolver-1.0-SNAPSHOT.jar         | Bin [31m0[m -> [32m5124[m bytes
+ .../target/maven-archiver/pom.properties           |   3 [32m++[m
+ .../compile/default-compile/createdFiles.lst       |   6 [32m++++[m
+ .../compile/default-compile/inputFiles.lst         |   2 [32m++[m
+ .../target/classes/Dominio/Card$Color.class        | Bin [31m0[m -> [32m1237[m bytes
+ .../eventbus/target/classes/Dominio/Card.class     | Bin [31m0[m -> [32m2097[m bytes
+ .../eventbus/target/classes/Dominio/Deck.class     | Bin [31m0[m -> [32m1863[m bytes
+ .../target/classes/Dominio/GameState.class         | Bin [31m0[m -> [32m3697[m bytes
+ .../target/classes/Dominio/LobbyState.class        | Bin [31m0[m -> [32m4542[m bytes
+ .../eventbus/target/classes/Dominio/Player.class   | Bin [31m0[m -> [32m3046[m bytes
+ .../classes/Eventos/CardDrawnPrivateEvent.class    | Bin [31m0[m -> [32m655[m bytes
+ .../classes/Eventos/CardDrawnPublicEvent.class     | Bin [31m0[m -> [32m487[m bytes
+ .../target/classes/Eventos/CardPlayedEvent.class   | Bin [31m0[m -> [32m637[m bytes
+ .../target/classes/Eventos/ColorChosenEvent.class  | Bin [31m0[m -> [32m753[m bytes
+ .../classes/Eventos/DrawCardRequestEvent.class     | Bin [31m0[m -> [32m487[m bytes
+ .../eventbus/target/classes/Eventos/EventBus.class | Bin [31m0[m -> [32m3083[m bytes
+ .../target/classes/Eventos/GameEvent.class         | Bin [31m0[m -> [32m451[m bytes
+ .../target/classes/Eventos/GameEventFactory.class  | Bin [31m0[m -> [32m4381[m bytes
+ .../target/classes/Eventos/GameEventListener.class | Bin [31m0[m -> [32m240[m bytes
+ .../target/classes/Eventos/GameOverEvent.class     | Bin [31m0[m -> [32m466[m bytes
+ .../target/classes/Eventos/GameStartedEvent.class  | Bin [31m0[m -> [32m290[m bytes
+ .../target/classes/Eventos/InvalidPlayEvent.class  | Bin [31m0[m -> [32m294[m bytes
+ .../target/classes/Eventos/LobbyClosedEvent.class  | Bin [31m0[m -> [32m481[m bytes
+ .../Eventos/NetworkCardDrawnPrivateEvent.class     | Bin [31m0[m -> [32m666[m bytes
+ .../Eventos/NetworkPlayerRejectedEvent.class       | Bin [31m0[m -> [32m511[m bytes
+ .../classes/Eventos/NetworkTurnChangedEvent.class  | Bin [31m0[m -> [32m1576[m bytes
+ .../classes/Eventos/NetworkUnoCalledEvent.class    | Bin [31m0[m -> [32m504[m bytes
+ .../classes/Eventos/PlayerDisconnectedEvent.class  | Bin [31m0[m -> [32m510[m bytes
+ .../target/classes/Eventos/PlayerJoinedEvent.class | Bin [31m0[m -> [32m478[m bytes
+ .../target/classes/Eventos/PlayerReadyEvent.class  | Bin [31m0[m -> [32m616[m bytes
+ .../classes/Eventos/StartRequestedEvent.class      | Bin [31m0[m -> [32m504[m bytes
+ .../target/classes/Eventos/TurnChangedEvent.class  | Bin [31m0[m -> [32m795[m bytes
+ .../target/classes/Eventos/UnoCalledEvent.class    | Bin [31m0[m -> [32m469[m bytes
+ .../classes/Eventos/UnoGracePeriodEvent.class      | Bin [31m0[m -> [32m484[m bytes
+ .../target/classes/Eventos/UnoPenaltyEvent.class   | Bin [31m0[m -> [32m472[m bytes
+ .../target/classes/Logica/CardEffect.class         | Bin [31m0[m -> [32m197[m bytes
+ .../eventbus/target/eventbus-1.0-SNAPSHOT.jar      | Bin [31m0[m -> [32m24408[m bytes
+ .../eventbus/target/maven-archiver/pom.properties  |   3 [32m++[m
+ .../compile/default-compile/createdFiles.lst       |  32 [32m+++++++++++++++++++++[m
+ .../compile/default-compile/inputFiles.lst         |  31 [32m++++++++++++++++++++[m
+ .../target/classes/Logica/GameModel.class          | Bin [31m0[m -> [32m10983[m bytes
+ .../gamemodel/target/gamemodel-1.0-SNAPSHOT.jar    | Bin [31m0[m -> [32m6942[m bytes
+ .../gamemodel/target/maven-archiver/pom.properties |   3 [32m++[m
+ .../compile/default-compile/createdFiles.lst       |   1 [32m+[m
+ .../compile/default-compile/inputFiles.lst         |   1 [32m+[m
+ .../target/classes/Controles/GameSession.class     | Bin [31m0[m -> [32m1101[m bytes
+ .../target/classes/Red/MessageSerializer.class     | Bin [31m0[m -> [32m10564[m bytes
+ .../target/classes/Red/NetworkLayer.class          | Bin [31m0[m -> [32m26080[m bytes
+ .../target/classes/Red/PeerConnection.class        | Bin [31m0[m -> [32m4037[m bytes
+ .../target/maven-archiver/pom.properties           |   3 [32m++[m
+ .../compile/default-compile/createdFiles.lst       |   4 [32m+++[m
+ .../compile/default-compile/inputFiles.lst         |   4 [32m+++[m
+ .../target/networklayer-1.0-SNAPSHOT.jar           | Bin [31m0[m -> [32m21702[m bytes
+ .../target/classes/Controles/GameController.class  | Bin [31m0[m -> [32m16699[m bytes
+ .../target/classes/Controles/LobbyController.class | Bin [31m0[m -> [32m12033[m bytes
+ .../classes/Controles/RegisterController$1.class   | Bin [31m0[m -> [32m1671[m bytes
+ .../classes/Controles/RegisterController$2.class   | Bin [31m0[m -> [32m2809[m bytes
+ .../classes/Controles/RegisterController.class     | Bin [31m0[m -> [32m9291[m bytes
+ .../target/classes/Main/MainWindow.class           | Bin [31m0[m -> [32m5358[m bytes
+ .../target/classes/Vistas/CrearSala$1.class        | Bin [31m0[m -> [32m1528[m bytes
+ .../target/classes/Vistas/CrearSala$2.class        | Bin [31m0[m -> [32m2381[m bytes
+ .../target/classes/Vistas/CrearSala.class          | Bin [31m0[m -> [32m7709[m bytes
+ .../target/classes/Vistas/GameView$1.class         | Bin [31m0[m -> [32m1266[m bytes
+ .../target/classes/Vistas/GameView$2.class         | Bin [31m0[m -> [32m769[m bytes
+ .../target/classes/Vistas/GameView.class           | Bin [31m0[m -> [32m13578[m bytes
+ .../target/classes/Vistas/GameViewModel.class      | Bin [31m0[m -> [32m2962[m bytes
+ .../target/classes/Vistas/LobbyView.class          | Bin [31m0[m -> [32m10524[m bytes
+ .../target/classes/Vistas/RegisterView.class       | Bin [31m0[m -> [32m11398[m bytes
+ .../target/classes/Vistas/SalaEspera.class         | Bin [31m0[m -> [32m10089[m bytes
+ .../target/classes/Vistas/ScoreboardView.class     | Bin [31m0[m -> [32m4779[m bytes
+ .../target/classes/imagenes/Tamanho2.png           | Bin [31m0[m -> [32m29011[m bytes
+ .../target/classes/imagenes/UNO_Log_pequenho.png   | Bin [31m0[m -> [32m20039[m bytes
+ .../target/classes/imagenes/UNO_Logo.png           | Bin [31m0[m -> [32m40758[m bytes
+ .../target/classes/imagenes/tamanho3.png           | Bin [31m0[m -> [32m24326[m bytes
+ .../target/classes/imagenes/tamanho4.png           | Bin [31m0[m -> [32m15142[m bytes
+ .../target/maven-archiver/pom.properties           |   3 [32m++[m
+ .../compile/default-compile/createdFiles.lst       |  17 [32m+++++++++++[m
+ .../compile/default-compile/inputFiles.lst         |  11 [32m+++++++[m
+ ...acionMVC-1.0-SNAPSHOT-jar-with-dependencies.jar | Bin [31m0[m -> [32m246550[m bytes
+ .../target/presentacionMVC-1.0-SNAPSHOT.jar        | Bin [31m0[m -> [32m188621[m bytes
+ 91 files changed, 129 insertions(+)
