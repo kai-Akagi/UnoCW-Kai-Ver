@@ -11,18 +11,26 @@ import java.util.List;
 /**
  * Sala de espera (lobby) antes de iniciar la partida.
  *
- * <p>Construida íntegramente con layouts nativos de Swing (BorderLayout,
- * BoxLayout, FlowLayout) — sin AbsoluteLayout ni dependencias externas.
- * Esto garantiza que la GUI escale correctamente a cualquier tamaño de ventana.
+ * <p>
+ * Construida íntegramente con layouts nativos de Swing (BorderLayout,
+ * BoxLayout, FlowLayout) — sin AbsoluteLayout ni dependencias externas. Esto
+ * garantiza que la GUI escale correctamente a cualquier tamaño de ventana.
  *
- * <p><b>Corrección de nombre extenso:</b> Los JLabel de la lista de jugadores
- * usan {@code setMinimumSize} con ancho suficiente y {@code setToolTipText}
- * para mostrar el nombre completo sin wrapping artificial. El texto nunca
- * se corta pero tampoco introduce saltos de línea donde no los hay.
+ * <p>
+ * <b>Corrección de nombre extenso:</b> Los JLabel de la lista de jugadores usan
+ * {@code setMinimumSize} con ancho suficiente y {@code setToolTipText} para
+ * mostrar el nombre completo sin wrapping artificial. El texto nunca se corta
+ * pero tampoco introduce saltos de línea donde no los hay.
  *
- * <p><b>Rol en MVC: View</b><br>
- * Solo dibuja. El {@link LobbyController} decide qué mostrar y cuándo
- * habilitar o deshabilitar botones.
+ * <p>
+ * <b>Rol en MVC: View</b><br>
+ * Solo dibuja. El {@link LobbyController} decide qué mostrar y cuándo habilitar
+ * o deshabilitar botones.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class SalaEspera extends JPanel {
 
@@ -46,14 +54,14 @@ public class SalaEspera extends JPanel {
      * Construye la sala de espera.
      */
     public SalaEspera() {
-        this.roomCodeLabel      = new JLabel("Código: ----");
-        this.playerCountLabel   = new JLabel("Jugadores: 0/?");
+        this.roomCodeLabel = new JLabel("Código: ----");
+        this.playerCountLabel = new JLabel("Jugadores: 0/?");
         this.waitingStatusLabel = new JLabel("Esperando jugadores...");
-        this.playerListPanel    = new JPanel();
-        this.readyButton        = new JButton("✓ Estoy Listo");
-        this.startButton        = new JButton("▶ Iniciar Partida");
+        this.playerListPanel = new JPanel();
+        this.readyButton = new JButton("✓ Estoy Listo");
+        this.startButton = new JButton("▶ Iniciar Partida");
         this.requestStartButton = new JButton("▶ Solicitar Inicio");
-        this.leaveButton        = new JButton("← Salir");
+        this.leaveButton = new JButton("← Salir");
         buildUI();
     }
 
@@ -62,15 +70,14 @@ public class SalaEspera extends JPanel {
         setBackground(new Color(30, 30, 46));
         setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        add(buildHeader(),   BorderLayout.NORTH);
-        add(buildList(),     BorderLayout.CENTER);
+        add(buildHeader(), BorderLayout.NORTH);
+        add(buildList(), BorderLayout.CENTER);
         add(buildControls(), BorderLayout.SOUTH);
     }
 
     // ─────────────────────────────────────────────
     // Construcción de sub-paneles
     // ─────────────────────────────────────────────
-
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout(6, 4));
         header.setBackground(new Color(30, 30, 46));
@@ -104,7 +111,7 @@ public class SalaEspera extends JPanel {
         center.add(Box.createVerticalStrut(2));
         center.add(waitingStatusLabel);
 
-        header.add(title,  BorderLayout.NORTH);
+        header.add(title, BorderLayout.NORTH);
         header.add(center, BorderLayout.CENTER);
         return header;
     }
@@ -125,10 +132,10 @@ public class SalaEspera extends JPanel {
         controls.setBackground(new Color(30, 30, 46));
         controls.setBorder(new EmptyBorder(10, 0, 0, 0));
 
-        styleButton(readyButton,        new Color(34, 197, 94));
-        styleButton(startButton,        new Color(59, 130, 246));
+        styleButton(readyButton, new Color(34, 197, 94));
+        styleButton(startButton, new Color(59, 130, 246));
         styleButton(requestStartButton, new Color(234, 179, 8));
-        styleButton(leaveButton,        new Color(71, 85, 105));
+        styleButton(leaveButton, new Color(71, 85, 105));
 
         startButton.setEnabled(false);
         requestStartButton.setEnabled(false);
@@ -140,25 +147,25 @@ public class SalaEspera extends JPanel {
         right.add(startButton);
 
         controls.add(leaveButton, BorderLayout.WEST);
-        controls.add(right,       BorderLayout.EAST);
+        controls.add(right, BorderLayout.EAST);
         return controls;
     }
 
     // ─────────────────────────────────────────────
     // Métodos que el Controller llama para actualizar la View
     // ─────────────────────────────────────────────
-
     /**
      * Actualiza la lista visual de jugadores conectados.
      *
-     * <p><b>Corrección de nombre extenso:</b> El JLabel del nombre nunca
-     * hace wrapping porque tiene HTML desactivado y usa
-     * {@code setMinimumSize} con un ancho mínimo garantizado.
-     * Nombres dentro del límite de 15 caracteres siempre caben en una sola línea.
+     * <p>
+     * <b>Corrección de nombre extenso:</b> El JLabel del nombre nunca hace
+     * wrapping porque tiene HTML desactivado y usa {@code setMinimumSize} con
+     * un ancho mínimo garantizado. Nombres dentro del límite de 15 caracteres
+     * siempre caben en una sola línea.
      *
-     * @param players   Lista actual de jugadores.
+     * @param players Lista actual de jugadores.
      * @param localName Nombre del jugador local (para resaltarlo).
-     * @param isHost    Si el jugador local es Host.
+     * @param isHost Si el jugador local es Host.
      */
     public void updatePlayerList(List<Player> players, String localName, boolean isHost) {
         playerListPanel.removeAll();
@@ -176,9 +183,11 @@ public class SalaEspera extends JPanel {
     /**
      * Construye la fila de un jugador.
      *
-     * <p>El nombre se renderiza como texto plano (sin HTML) dentro de un JLabel
+     * <p>
+     * El nombre se renderiza como texto plano (sin HTML) dentro de un JLabel
      * con ancho mínimo fijo para evitar el wrapping incorrecto que ocurría
-     * cuando nombres largos (hasta 15 chars) se recortaban o partían en varias líneas.
+     * cuando nombres largos (hasta 15 chars) se recortaban o partían en varias
+     * líneas.
      */
     private JPanel buildPlayerRow(Player player, boolean isLocal, boolean hostView) {
         JPanel row = new JPanel(new BorderLayout(10, 0));
@@ -186,9 +195,9 @@ public class SalaEspera extends JPanel {
         row.setBorder(new EmptyBorder(10, 14, 10, 14));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
 
-        String roleIcon  = player.isHost() ? "👑" : "🎮";
+        String roleIcon = player.isHost() ? "👑" : "🎮";
         String roleLabel = player.isHost() ? " [HOST]" : "";
-        String youLabel  = isLocal ? " (tú)" : "";
+        String youLabel = isLocal ? " (tú)" : "";
 
         // ── Corrección nombre extenso ──
         // Concatenamos en un solo String y lo asignamos con setText (sin HTML).
@@ -209,27 +218,35 @@ public class SalaEspera extends JPanel {
         readyLabel.setForeground(player.isReady() ? new Color(74, 222, 128) : new Color(148, 163, 184));
         readyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        row.add(nameLabel,  BorderLayout.WEST);
+        row.add(nameLabel, BorderLayout.WEST);
         row.add(readyLabel, BorderLayout.EAST);
         return row;
     }
 
-    /** Actualiza el código de sala en el header. */
+    /**
+     * Actualiza el código de sala en el header.
+     */
     public void setRoomCode(String code) {
         roomCodeLabel.setText("Código de Sala: " + code);
     }
 
-    /** Actualiza el contador de jugadores. */
+    /**
+     * Actualiza el contador de jugadores.
+     */
     public void setPlayerCount(int current, int capacity) {
         playerCountLabel.setText("Jugadores: " + current + "/" + capacity);
     }
 
-    /** Habilita o deshabilita el botón Iniciar Partida. */
+    /**
+     * Habilita o deshabilita el botón Iniciar Partida.
+     */
     public void setStartEnabled(boolean enabled) {
         startButton.setEnabled(enabled);
     }
 
-    /** Configura visibilidad de botones según el rol. */
+    /**
+     * Configura visibilidad de botones según el rol.
+     */
     public void configureForRole(boolean isHost) {
         startButton.setVisible(isHost);
         requestStartButton.setVisible(!isHost);
@@ -237,35 +254,42 @@ public class SalaEspera extends JPanel {
         repaint();
     }
 
-    /** Muestra el estado de espera en el header. */
+    /**
+     * Muestra el estado de espera en el header.
+     */
     public void setWaitingStatus(String text) {
         waitingStatusLabel.setText(text);
     }
 
-    /** Habilita o deshabilita el botón Solicitar Inicio. */
+    /**
+     * Habilita o deshabilita el botón Solicitar Inicio.
+     */
     public void setRequestStartEnabled(boolean enabled) {
         requestStartButton.setEnabled(enabled);
     }
 
-    /** Cambia el texto y color del botón Listo/Cancelar según el estado. */
+    /**
+     * Cambia el texto y color del botón Listo/Cancelar según el estado.
+     */
     public void updateReadyButton(boolean isReady) {
         readyButton.setText(isReady ? "✗ Cancelar Listo" : "✓ Estoy Listo");
         readyButton.setBackground(isReady ? new Color(71, 85, 105) : new Color(34, 197, 94));
     }
 
     /**
-     * Muestra el diálogo de confirmación al Host cuando un Peer solicita iniciar.
+     * Muestra el diálogo de confirmación al Host cuando un Peer solicita
+     * iniciar.
      *
      * @param requesterName Nombre del Peer solicitante.
      * @return {@code true} si el Host acepta.
      */
     public boolean showStartRequestDialog(String requesterName) {
         int result = JOptionPane.showConfirmDialog(
-            this,
-            requesterName + " solicita iniciar la partida.\n¿Deseas iniciar con los jugadores actuales?",
-            "Solicitud de inicio",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+                this,
+                requesterName + " solicita iniciar la partida.\n¿Deseas iniciar con los jugadores actuales?",
+                "Solicitud de inicio",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
         );
         return result == JOptionPane.YES_OPTION;
     }
@@ -273,7 +297,6 @@ public class SalaEspera extends JPanel {
     // ─────────────────────────────────────────────
     // Registro del Controller
     // ─────────────────────────────────────────────
-
     /**
      * Asigna el Controller y conecta los listeners de los botones.
      *
@@ -291,7 +314,6 @@ public class SalaEspera extends JPanel {
     // ─────────────────────────────────────────────
     // Utilidades
     // ─────────────────────────────────────────────
-
     private void styleButton(JButton btn, Color color) {
         btn.setBackground(color);
         btn.setForeground(Color.WHITE);

@@ -9,11 +9,18 @@ import Controles.RegisterController;
 /**
  * Pantalla de registro del jugador.
  *
- * <p>Muestra el formulario donde el jugador ingresa su nombre y selecciona
- * un avatar antes de entrar al lobby.
+ * <p>
+ * Muestra el formulario donde el jugador ingresa su nombre y selecciona un
+ * avatar antes de entrar al lobby.
  *
- * <p><b>Rol en MVC: View (Vista)</b><br>
+ * <p>
+ * <b>Rol en MVC: View (Vista)</b><br>
  * Solo dibuja componentes Swing y delega acciones al Controller.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class RegisterView extends JPanel {
 
@@ -36,30 +43,30 @@ public class RegisterView extends JPanel {
         new Color(173, 216, 230), // azul claro- pingüino
         new Color(255, 230, 150), // amarillo  - pollito
         new Color(200, 200, 200), // gris      - lobo
-        new Color(144, 238, 144)  // verde     - rana
+        new Color(144, 238, 144) // verde     - rana
     };
 
     // ─── Componentes Swing ───────────────────────────────────────────────────
     private final JTextField nameField;
-    private final JLabel     errorLabel;
-    private final JButton    continueButton;
-    private final JButton[]  avatarButtons;
+    private final JLabel errorLabel;
+    private final JButton continueButton;
+    private final JButton[] avatarButtons;
 
     private int selectedAvatarIndex = -1;
     private RegisterController controller;
 
     public RegisterView() {
-        this.avatarButtons  = new JButton[AVATAR_IDS.length];
-        this.nameField      = new JTextField();
-        this.errorLabel     = new JLabel(" ");
+        this.avatarButtons = new JButton[AVATAR_IDS.length];
+        this.nameField = new JTextField();
+        this.errorLabel = new JLabel(" ");
         this.continueButton = new JButton("SIGUIENTE");
         buildUI();
     }
 
     /**
-     * Construye la interfaz usando un panel central de ancho fijo dentro de
-     * un BorderLayout, lo que garantiza alineación consistente sin importar
-     * el tamaño de la ventana.
+     * Construye la interfaz usando un panel central de ancho fijo dentro de un
+     * BorderLayout, lo que garantiza alineación consistente sin importar el
+     * tamaño de la ventana.
      */
     private void buildUI() {
         setLayout(new GridBagLayout());
@@ -79,14 +86,14 @@ public class RegisterView extends JPanel {
         // ── Logo ──
         java.net.URL logoUrl = getClass().getResource("/imagenes/UNO_Logo.png");
         JLabel logoLabel;
-    if (logoUrl != null) {
+        if (logoUrl != null) {
             ImageIcon raw = new ImageIcon(logoUrl);          // URL → ícono
             Image scaled = raw.getImage()
-                .getScaledInstance(200, 110, Image.SCALE_SMOOTH);
+                    .getScaledInstance(200, 110, Image.SCALE_SMOOTH);
             logoLabel = new JLabel(new ImageIcon(scaled), SwingConstants.CENTER);
             logoLabel.setMaximumSize(new Dimension(560, 120));
         } else {
-        
+
             logoLabel = buildLogoLabel("");                  // cae al respaldo de texto
         }
         //logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -146,8 +153,8 @@ public class RegisterView extends JPanel {
     }
 
     /**
-     * Construye la etiqueta del logo UNO.
-     * Carga el asset de imagen si existe; si no, muestra texto de respaldo.
+     * Construye la etiqueta del logo UNO. Carga el asset de imagen si existe;
+     * si no, muestra texto de respaldo.
      *
      * @param logoPath Ruta relativa al archivo de imagen del logo.
      */
@@ -161,7 +168,8 @@ public class RegisterView extends JPanel {
                 lbl.setMaximumSize(new Dimension(560, 120));
                 return lbl;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         // Respaldo: texto "UNO" en rojo si no se encuentra el asset
         JLabel fallback = new JLabel("UNO", SwingConstants.CENTER);
         fallback.setFont(new Font("SansSerif", Font.BOLD, 64));
@@ -171,9 +179,9 @@ public class RegisterView extends JPanel {
     }
 
     /**
-     * Construye el campo de nombre con el ícono de lápiz a la derecha.
-     * Usa un JPanel con BorderLayout para que el campo se estire al ancho
-     * disponible automáticamente, sin coordenadas absolutas.
+     * Construye el campo de nombre con el ícono de lápiz a la derecha. Usa un
+     * JPanel con BorderLayout para que el campo se estire al ancho disponible
+     * automáticamente, sin coordenadas absolutas.
      */
     private JPanel buildNameRow() {
         JPanel row = new JPanel(new BorderLayout(0, 0));
@@ -181,31 +189,29 @@ public class RegisterView extends JPanel {
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
 
         nameField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-            new EmptyBorder(6, 12, 6, 8)
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+                new EmptyBorder(6, 12, 6, 8)
         ));
         nameField.setFont(new Font("SansSerif", Font.PLAIN, 15));
         nameField.setBackground(new Color(248, 248, 250));
         nameField.setForeground(new Color(30, 30, 30));
 
-       
-
         // Panel que agrupa campo + lápiz con borde compartido
         JPanel fieldWrapper = new JPanel(new BorderLayout());
         fieldWrapper.setBackground(new Color(248, 248, 250));
         fieldWrapper.setBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
         fieldWrapper.add(nameField, BorderLayout.CENTER);
-        
 
         row.add(fieldWrapper, BorderLayout.CENTER);
         return row;
     }
 
     /**
-     * Construye el panel de avatares usando GridLayout para garantizar que los 9
-     * avatares siempre aparezcan en una sola fila, sin importar el ancho de la ventana.
-     * GridLayout(1, N) distribuye el espacio equitativamente entre las N columnas.
+     * Construye el panel de avatares usando GridLayout para garantizar que los
+     * 9 avatares siempre aparezcan en una sola fila, sin importar el ancho de
+     * la ventana. GridLayout(1, N) distribuye el espacio equitativamente entre
+     * las N columnas.
      */
     private JPanel buildAvatarPanel() {
         // GridLayout de 1 fila y 9 columnas — los 9 avatares siempre en una sola fila
@@ -219,7 +225,9 @@ public class RegisterView extends JPanel {
             btn.putClientProperty("emoji", AVATAR_EMOJIS[i]);
             btn.putClientProperty("color", AVATAR_COLORS[i]);
             btn.addActionListener(e -> {
-                if (controller != null) controller.onAvatarSelected(index);
+                if (controller != null) {
+                    controller.onAvatarSelected(index);
+                }
             });
             avatarButtons[i] = btn;
             panel.add(btn);
@@ -228,10 +236,11 @@ public class RegisterView extends JPanel {
     }
 
     /**
-     * Crea un botón de avatar dibujando un círculo de color con el emoji centrado.
+     * Crea un botón de avatar dibujando un círculo de color con el emoji
+     * centrado.
      *
-     * @param emoji    El emoji a mostrar.
-     * @param bgColor  El color de fondo del círculo.
+     * @param emoji El emoji a mostrar.
+     * @param bgColor El color de fondo del círculo.
      * @param selected Si debe mostrarse con borde dorado de selección.
      */
     private JButton createAvatarButton(String emoji, Color bgColor, boolean selected) {
@@ -295,7 +304,6 @@ public class RegisterView extends JPanel {
     // ─────────────────────────────────────────────
     // Métodos que el Controller llama para actualizar la View
     // ─────────────────────────────────────────────
-
     /**
      * Resalta el avatar seleccionado con borde dorado y quita el de los demás.
      *
@@ -305,14 +313,16 @@ public class RegisterView extends JPanel {
         selectedAvatarIndex = index;
         for (int i = 0; i < avatarButtons.length; i++) {
             String emoji = (String) avatarButtons[i].getClientProperty("emoji");
-            Color  color = (Color)  avatarButtons[i].getClientProperty("color");
+            Color color = (Color) avatarButtons[i].getClientProperty("color");
             boolean selected = (i == index);
             JButton newBtn = createAvatarButton(emoji, color, selected);
             newBtn.putClientProperty("emoji", emoji);
             newBtn.putClientProperty("color", color);
             final int idx = i;
             newBtn.addActionListener(e -> {
-                if (controller != null) controller.onAvatarSelected(idx);
+                if (controller != null) {
+                    controller.onAvatarSelected(idx);
+                }
             });
             // Reemplazar el ícono sin reconstruir el botón
             avatarButtons[i].setIcon(newBtn.getIcon());
@@ -352,8 +362,8 @@ public class RegisterView extends JPanel {
                 FontMetrics fm = g2.getFontMetrics();
                 g2.setColor(new Color(120, 120, 120));
                 g2.drawString(emoji,
-                    2 + (54 - fm.stringWidth(emoji)) / 2,
-                    2 + (54 - fm.getHeight()) / 2 + fm.getAscent());
+                        2 + (54 - fm.stringWidth(emoji)) / 2,
+                        2 + (54 - fm.getHeight()) / 2 + fm.getAscent());
                 g2.dispose();
                 avatarButtons[i].setIcon(new ImageIcon(img));
             }
@@ -363,22 +373,26 @@ public class RegisterView extends JPanel {
     // ─────────────────────────────────────────────
     // Datos que el Controller lee de la View
     // ─────────────────────────────────────────────
-
-    /** @return El nombre ingresado sin espacios extremos. */
+    /**
+     * @return El nombre ingresado sin espacios extremos.
+     */
     public String getPlayerName() {
         return nameField.getText().trim();
     }
 
-    /** @return El ID del avatar seleccionado, o {@code null} si ninguno. */
+    /**
+     * @return El ID del avatar seleccionado, o {@code null} si ninguno.
+     */
     public String getSelectedAvatarId() {
-        if (selectedAvatarIndex < 0) return null;
+        if (selectedAvatarIndex < 0) {
+            return null;
+        }
         return AVATAR_IDS[selectedAvatarIndex];
     }
 
     // ─────────────────────────────────────────────
     // Registro del Controller
     // ─────────────────────────────────────────────
-
     /**
      * Asigna el Controller y conecta los listeners de los botones.
      *

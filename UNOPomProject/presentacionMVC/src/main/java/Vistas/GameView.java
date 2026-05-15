@@ -12,20 +12,29 @@ import Controles.GameController;
 /**
  * Pantalla principal del juego (la mesa de UNO).
  *
- * <p>Muestra:
+ * <p>
+ * Muestra:
  * <ul>
- *   <li>Los indicadores de los oponentes (nombre + cantidad de cartas) arriba.</li>
- *   <li>La carta activa en la mesa y el mazo de robo en el centro.</li>
- *   <li>El botón "UNO" y el indicador de turno.</li>
- *   <li>Las cartas del jugador local abajo.</li>
+ * <li>Los indicadores de los oponentes (nombre + cantidad de cartas)
+ * arriba.</li>
+ * <li>La carta activa en la mesa y el mazo de robo en el centro.</li>
+ * <li>El botón "UNO" y el indicador de turno.</li>
+ * <li>Las cartas del jugador local abajo.</li>
  * </ul>
  *
- * <p><b>Rol en MVC: View</b><br>
- * Solo dibuja. Recibe un {@link GameViewModel} con todos los datos ya preparados
- * y los renderiza. No toma ninguna decisión de juego.
+ * <p>
+ * <b>Rol en MVC: View</b><br>
+ * Solo dibuja. Recibe un {@link GameViewModel} con todos los datos ya
+ * preparados y los renderiza. No toma ninguna decisión de juego.
  *
- * <p>El único método público de actualización es {@link #render(GameViewModel)}.
+ * <p>
+ * El único método público de actualización es {@link #render(GameViewModel)}.
  * Todo lo que se ve en pantalla proviene de ese ViewModel.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class GameView extends JPanel {
 
@@ -35,38 +44,40 @@ public class GameView extends JPanel {
     private final JPanel handPanel;       // fila inferior: cartas del jugador
 
     // ─── Componentes del centro ──────────────────────────────────────────────
-    private final JPanel  topCardPanel;   // muestra la carta activa
-    private final JLabel  topCardLabel;   // texto de la carta activa
+    private final JPanel topCardPanel;   // muestra la carta activa
+    private final JLabel topCardLabel;   // texto de la carta activa
     private final JButton drawButton;     // botón para robar del mazo
     private final JButton unoButton;      // botón "¡UNO!"
-    private final JLabel  turnLabel;      // "Tu turno" o nombre del jugador activo
-    private final JLabel  directionLabel; // indicador de dirección
+    private final JLabel turnLabel;      // "Tu turno" o nombre del jugador activo
+    private final JLabel directionLabel; // indicador de dirección
     private final JButton leaveButton;  // botón para abandonar la partida
 
-    /** Controller de esta pantalla. */
+    /**
+     * Controller de esta pantalla.
+     */
     private GameController controller;
 
     /**
      * Temporizador de turno: cuenta regresivamente desde TURN_SECONDS hasta 0.
      * Al llegar a 0 notifica al Controller para pasar el turno automáticamente.
      */
-    private Timer  turnTimer;
-    private int    secondsLeft;
+    private Timer turnTimer;
+    private int secondsLeft;
     private static final int TURN_SECONDS = 30;
 
     /**
      * Construye la pantalla del juego con fondo verde oscuro (mesa de juego).
      */
     public GameView() {
-        this.opponentsPanel  = new JPanel();
-        this.centerPanel     = new JPanel();
-        this.handPanel       = new JPanel();
-        this.topCardPanel    = new JPanel();
-        this.topCardLabel    = new JLabel("?", SwingConstants.CENTER);
-        this.drawButton      = new JButton("🂠 ROBAR");
-        this.unoButton       = new JButton("¡UNO!");
-        this.turnLabel       = new JLabel("Esperando...", SwingConstants.CENTER);
-        this.directionLabel  = new JLabel("→", SwingConstants.CENTER);
+        this.opponentsPanel = new JPanel();
+        this.centerPanel = new JPanel();
+        this.handPanel = new JPanel();
+        this.topCardPanel = new JPanel();
+        this.topCardLabel = new JLabel("?", SwingConstants.CENTER);
+        this.drawButton = new JButton("🂠 ROBAR");
+        this.unoButton = new JButton("¡UNO!");
+        this.turnLabel = new JLabel("Esperando...", SwingConstants.CENTER);
+        this.directionLabel = new JLabel("→", SwingConstants.CENTER);
         this.leaveButton = new JButton("✖ Salir");
 
         buildUI();
@@ -115,12 +126,13 @@ public class GameView extends JPanel {
         handPanel.setPreferredSize(new Dimension(0, 130));
 
         add(opponentsPanel, BorderLayout.NORTH);
-        add(centerPanel,    BorderLayout.CENTER);
-        add(handPanel,      BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(handPanel, BorderLayout.SOUTH);
     }
 
     /**
-     * Construye el panel central donde están el mazo, la carta activa y los botones.
+     * Construye el panel central donde están el mazo, la carta activa y los
+     * botones.
      */
     private void buildCenterPanel() {
         centerPanel.setLayout(new GridBagLayout());
@@ -161,24 +173,34 @@ public class GameView extends JPanel {
         directionLabel.setForeground(new Color(134, 239, 172));
 
         // Ensamblar en el grid
-        gbc.gridx = 0; gbc.gridy = 0; centerPanel.add(drawButton, gbc);
-        gbc.gridx = 1; gbc.gridy = 0; centerPanel.add(topCardPanel, gbc);
-        gbc.gridx = 2; gbc.gridy = 0; centerPanel.add(unoButton, gbc);
-        gbc.gridx = 3; gbc.gridy = 0; centerPanel.add(directionLabel, gbc);
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        centerPanel.add(drawButton, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        centerPanel.add(topCardPanel, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        centerPanel.add(unoButton, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        centerPanel.add(directionLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 4;
         centerPanel.add(turnLabel, gbc);
     }
 
     // ─────────────────────────────────────────────
     // Método principal de actualización
     // ─────────────────────────────────────────────
-
     /**
      * Renderiza toda la pantalla con los datos del ViewModel.
      *
-     * <p>Este es el único método que la View expone para actualizarse.
-     * Siempre debe llamarse desde el hilo de Swing (EDT).
-     * El {@link GameController} lo envuelve con {@code invokeLater()}.
+     * <p>
+     * Este es el único método que la View expone para actualizarse. Siempre
+     * debe llamarse desde el hilo de Swing (EDT). El {@link GameController} lo
+     * envuelve con {@code invokeLater()}.
      *
      * @param vm El ViewModel con todos los datos a mostrar.
      */
@@ -219,7 +241,7 @@ public class GameView extends JPanel {
     /**
      * Actualiza el indicador de turno.
      *
-     * @param playerName  Nombre del jugador activo.
+     * @param playerName Nombre del jugador activo.
      * @param isLocalTurn Si es el turno del jugador local.
      */
     private void updateTurnIndicator(String playerName, boolean isLocalTurn) {
@@ -235,7 +257,7 @@ public class GameView extends JPanel {
     /**
      * Actualiza los paneles de oponentes en la parte superior.
      *
-     * @param names     Nombres de los oponentes.
+     * @param names Nombres de los oponentes.
      * @param handSizes Cantidad de cartas de cada oponente.
      */
     private void updateOpponents(List<String> names, List<Integer> handSizes) {
@@ -247,7 +269,9 @@ public class GameView extends JPanel {
                 break;
             }
         }
-        if (inner == null) return;
+        if (inner == null) {
+            return;
+        }
         inner.removeAll();
         for (int i = 0; i < names.size(); i++) {
             inner.add(buildOpponentPanel(names.get(i), handSizes.get(i)));
@@ -255,11 +279,11 @@ public class GameView extends JPanel {
         inner.revalidate();
         inner.repaint();
     }
-    
+
     /**
      * Construye el panel visual de un oponente (nombre + cantidad de cartas).
      *
-     * @param name     Nombre del oponente.
+     * @param name Nombre del oponente.
      * @param cardCount Cuántas cartas tiene.
      * @return El panel del oponente.
      */
@@ -267,8 +291,8 @@ public class GameView extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(4, 2));
         panel.setBackground(new Color(20, 83, 45));
         panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(74, 222, 128), 1),
-            new EmptyBorder(6, 10, 6, 10)
+                BorderFactory.createLineBorder(new Color(74, 222, 128), 1),
+                new EmptyBorder(6, 10, 6, 10)
         ));
         panel.setPreferredSize(new Dimension(130, 60));
 
@@ -279,21 +303,21 @@ public class GameView extends JPanel {
         JLabel countLabel = new JLabel(cardCount + " cartas", SwingConstants.CENTER);
         countLabel.setFont(new Font("Arial", Font.PLAIN, 11));
         countLabel.setForeground(cardCount == 1
-            ? new Color(250, 204, 21) // amarillo si tiene UNO
-            : new Color(134, 239, 172));
+                ? new Color(250, 204, 21) // amarillo si tiene UNO
+                : new Color(134, 239, 172));
 
-        panel.add(nameLabel,  BorderLayout.CENTER);
+        panel.add(nameLabel, BorderLayout.CENTER);
         panel.add(countLabel, BorderLayout.SOUTH);
 
         return panel;
     }
 
     /**
-     * Actualiza la fila de cartas en mano del jugador local.
-     * Cada carta es un botón que el jugador puede presionar para jugarla.
+     * Actualiza la fila de cartas en mano del jugador local. Cada carta es un
+     * botón que el jugador puede presionar para jugarla.
      *
-     * @param hand      La mano actual del jugador.
-     * @param isMyTurn  Si es el turno del jugador local (habilita los botones).
+     * @param hand La mano actual del jugador.
+     * @param isMyTurn Si es el turno del jugador local (habilita los botones).
      */
     private void updateHand(List<Card> hand, boolean isMyTurn) {
         handPanel.removeAll();
@@ -306,23 +330,24 @@ public class GameView extends JPanel {
         handPanel.revalidate();
         handPanel.repaint();
     }
+
     /**
-     * 
+     *
      */
-    public void disableHand(){
+    public void disableHand() {
         // Deshabilitar cartas y el robo de carta del mazo — el jugador debe elegir color para continuar
-            for (java.awt.Component c : handPanel.getComponents()) {
-                c.setEnabled(false);
-            }
-            drawButton.setEnabled(false);
-        
+        for (java.awt.Component c : handPanel.getComponents()) {
+            c.setEnabled(false);
+        }
+        drawButton.setEnabled(false);
+
     }
 
     /**
      * Construye un botón visual para una carta de la mano.
      *
-     * @param card     La carta a representar.
-     * @param enabled  Si el botón debe estar activo (es el turno del jugador).
+     * @param card La carta a representar.
+     * @param enabled Si el botón debe estar activo (es el turno del jugador).
      * @return El botón de la carta.
      */
     private JButton buildCardButton(Card card, boolean enabled) {
@@ -338,13 +363,16 @@ public class GameView extends JPanel {
 
         if (enabled) {
             btn.addActionListener(e -> {
-                if (controller != null) controller.onCardClicked(card);
+                if (controller != null) {
+                    controller.onCardClicked(card);
+                }
             });
             // Efecto hover: iluminar al pasar el mouse
             btn.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseEntered(java.awt.event.MouseEvent e) {
                     btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
                 }
+
                 public void mouseExited(java.awt.event.MouseEvent e) {
                     btn.setBorder(UIManager.getBorder("Button.border"));
                 }
@@ -355,16 +383,16 @@ public class GameView extends JPanel {
     }
 
     /**
-     * Habilita o deshabilita el botón "¡UNO!" según si el jugador
-     * tiene una carta y es su turno.
+     * Habilita o deshabilita el botón "¡UNO!" según si el jugador tiene una
+     * carta y es su turno.
      *
      * @param enabled {@code true} para habilitar el botón UNO.
      */
     private void updateUnoButton(boolean enabled) {
         unoButton.setEnabled(enabled);
         unoButton.setBackground(enabled
-            ? new Color(234, 179, 8)   // amarillo brillante si activo
-            : new Color(100, 100, 100) // gris si no
+                ? new Color(234, 179, 8) // amarillo brillante si activo
+                : new Color(100, 100, 100) // gris si no
         );
     }
 
@@ -380,12 +408,12 @@ public class GameView extends JPanel {
     // ─────────────────────────────────────────────
     // Registro del Controller
     // ─────────────────────────────────────────────
-
     /**
-     * Inicia el temporizador de turno con el número de segundos configurado.
-     * Si ya había un temporizador corriendo, lo detiene primero.
+     * Inicia el temporizador de turno con el número de segundos configurado. Si
+     * ya había un temporizador corriendo, lo detiene primero.
      *
-     * <p>El temporizador corre en el hilo de Swing (usa {@link Timer} de Swing),
+     * <p>
+     * El temporizador corre en el hilo de Swing (usa {@link Timer} de Swing),
      * por lo que es seguro actualizar la GUI directamente desde el callback.
      */
     public void startTurnTimer() {
@@ -418,16 +446,19 @@ public class GameView extends JPanel {
     /**
      * Activa o desactiva el modo de periodo de gracia UNO.
      *
-     * <p>En modo gracia ocurre lo siguiente:
+     * <p>
+     * En modo gracia ocurre lo siguiente:
      * <ul>
-     *   <li>El timer se reinicia a 5 segundos.</li>
-     *   <li>Todas las cartas de la mano se deshabilitan.</li>
-     *   <li>El botón UNO se habilita con color especial urgente.</li>
-     *   <li>El botón de robar se deshabilita.</li>
+     * <li>El timer se reinicia a 5 segundos.</li>
+     * <li>Todas las cartas de la mano se deshabilitan.</li>
+     * <li>El botón UNO se habilita con color especial urgente.</li>
+     * <li>El botón de robar se deshabilita.</li>
      * </ul>
-     * Al desactivar el modo, la interfaz vuelve al estado normal del siguiente turno.
+     * Al desactivar el modo, la interfaz vuelve al estado normal del siguiente
+     * turno.
      *
-     * @param graceMode {@code true} para entrar al modo gracia; {@code false} para salir.
+     * @param graceMode {@code true} para entrar al modo gracia; {@code false}
+     * para salir.
      */
     public void setUnoGraceMode(boolean graceMode) {
         if (graceMode) {
@@ -451,7 +482,9 @@ public class GameView extends JPanel {
                 updateTimerLabel();
                 if (secondsLeft <= 0) {
                     stopTurnTimer();
-                    if (controller != null) controller.onTurnTimerExpired();
+                    if (controller != null) {
+                        controller.onTurnTimerExpired();
+                    }
                 }
             });
             turnTimer.start();
@@ -464,8 +497,8 @@ public class GameView extends JPanel {
     }
 
     /**
-     * Actualiza la etiqueta del temporizador con el tiempo restante.
-     * Cambia a rojo cuando quedan 10 segundos o menos.
+     * Actualiza la etiqueta del temporizador con el tiempo restante. Cambia a
+     * rojo cuando quedan 10 segundos o menos.
      */
     private void updateTimerLabel() {
         String timeStr = String.format("%02d:%02d", secondsLeft / 60, secondsLeft % 60);
@@ -498,7 +531,6 @@ public class GameView extends JPanel {
     // ─────────────────────────────────────────────
     // Utilidades
     // ─────────────────────────────────────────────
-
     /**
      * Convierte un color de carta UNO a un color de Swing para el fondo.
      *
@@ -507,11 +539,16 @@ public class GameView extends JPanel {
      */
     private Color colorOf(Card.Color color) {
         switch (color) {
-            case RED:    return new Color(220, 38, 38);
-            case BLUE:   return new Color(37, 99, 235);
-            case GREEN:  return new Color(22, 163, 74);
-            case YELLOW: return new Color(202, 138, 4);
-            default:     return new Color(30, 30, 46); // WILD → oscuro
+            case RED:
+                return new Color(220, 38, 38);
+            case BLUE:
+                return new Color(37, 99, 235);
+            case GREEN:
+                return new Color(22, 163, 74);
+            case YELLOW:
+                return new Color(202, 138, 4);
+            default:
+                return new Color(30, 30, 46); // WILD → oscuro
         }
     }
 

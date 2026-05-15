@@ -12,34 +12,42 @@ import java.awt.event.MouseEvent;
 /**
  * Pantalla de selección del tamaño de sala.
  *
- * <p>El Host elige entre 2, 3 o 4 jugadores haciendo clic en la carta
- * correspondiente. El clic configura la capacidad Y navega directamente
- * al lobby, sin necesidad de pulsar un botón "Siguiente" separado.
+ * <p>
+ * El Host elige entre 2, 3 o 4 jugadores haciendo clic en la carta
+ * correspondiente. El clic configura la capacidad Y navega directamente al
+ * lobby, sin necesidad de pulsar un botón "Siguiente" separado.
  *
- * <p>Usa GridBagLayout con un panel central de ancho proporcional,
- * igual que RegisterView, para que la GUI escale correctamente tanto
- * en el tamaño por defecto de la ventana como en pantalla completa.
+ * <p>
+ * Usa GridBagLayout con un panel central de ancho proporcional, igual que
+ * RegisterView, para que la GUI escale correctamente tanto en el tamaño por
+ * defecto de la ventana como en pantalla completa.
  *
- * <p><b>Rol en MVC: View</b><br>
- * Solo dibuja. El {@link LobbyController} decide qué hacer cuando
- * el jugador selecciona un tamaño.
+ * <p>
+ * <b>Rol en MVC: View</b><br>
+ * Solo dibuja. El {@link LobbyController} decide qué hacer cuando el jugador
+ * selecciona un tamaño.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class CrearSala extends JPanel {
 
     // ─── Colores de las cartas UNO ───────────────────────────────────────────
-    private static final Color COLOR_2  = new Color(220, 38,  38);  // rojo
-    private static final Color COLOR_3  = new Color(22,  163, 74);  // verde
-    private static final Color COLOR_4  = new Color(37,  99,  235); // azul
-    private static final Color OVAL_BG  = Color.WHITE;
+    private static final Color COLOR_2 = new Color(220, 38, 38);  // rojo
+    private static final Color COLOR_3 = new Color(22, 163, 74);  // verde
+    private static final Color COLOR_4 = new Color(37, 99, 235); // azul
+    private static final Color OVAL_BG = Color.WHITE;
     private static final Color SELECTED_BORDER = new Color(248, 196, 50); // dorado
 
     private static final int[] SIZES = {2, 3, 4};
     private static final Color[] CARD_COLORS = {COLOR_2, COLOR_3, COLOR_4};
 
     // ─── Componentes ─────────────────────────────────────────────────────────
-    private final JPanel[]  cardPanels = new JPanel[3];
-    private final JLabel    errorLabel;
-    private final JButton   cancelButton;
+    private final JPanel[] cardPanels = new JPanel[3];
+    private final JLabel errorLabel;
+    private final JButton cancelButton;
 
     private LobbyController controller;
 
@@ -47,14 +55,14 @@ public class CrearSala extends JPanel {
      * Construye la pantalla de selección de tamaño de sala.
      */
     public CrearSala() {
-        this.errorLabel   = new JLabel(" ");
+        this.errorLabel = new JLabel(" ");
         this.cancelButton = new JButton("Cancelar");
         buildUI();
     }
 
     /**
-     * Construye la UI con GridBagLayout para centrar el contenido
-     * y adaptarse al tamaño de la ventana, igual que RegisterView.
+     * Construye la UI con GridBagLayout para centrar el contenido y adaptarse
+     * al tamaño de la ventana, igual que RegisterView.
      */
     private void buildUI() {
         setLayout(new GridBagLayout());
@@ -117,8 +125,8 @@ public class CrearSala extends JPanel {
     }
 
     /**
-     * Construye el logo UNO pequeño desde los recursos del módulo.
-     * Si no se encuentra la imagen, usa texto de respaldo.
+     * Construye el logo UNO pequeño desde los recursos del módulo. Si no se
+     * encuentra la imagen, usa texto de respaldo.
      */
     private JLabel buildLogoLabel() {
         try {
@@ -130,7 +138,8 @@ public class CrearSala extends JPanel {
                 lbl.setMaximumSize(new Dimension(700, 110));
                 return lbl;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         JLabel fallback = new JLabel("UNO", SwingConstants.CENTER);
         fallback.setFont(new Font("SansSerif", Font.BOLD, 48));
         fallback.setForeground(new Color(220, 38, 38));
@@ -139,9 +148,9 @@ public class CrearSala extends JPanel {
     }
 
     /**
-     * Construye la fila de tres cartas UNO (2, 3 y 4 jugadores).
-     * Cada carta es un panel clickeable que al pulsarse configura
-     * la capacidad y navega directamente al lobby.
+     * Construye la fila de tres cartas UNO (2, 3 y 4 jugadores). Cada carta es
+     * un panel clickeable que al pulsarse configura la capacidad y navega
+     * directamente al lobby.
      */
     private JPanel buildCardsRow() {
         JPanel row = new JPanel(new GridLayout(1, 3, 24, 0));
@@ -163,10 +172,12 @@ public class CrearSala extends JPanel {
                         controller.onCardSizeClicked(size);
                     }
                 }
+
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     cardPanel.setBorder(new LineBorder(SELECTED_BORDER, 4, true));
                 }
+
                 @Override
                 public void mouseExited(MouseEvent e) {
                     cardPanel.setBorder(new LineBorder(cardColor.darker(), 2, true));
@@ -179,13 +190,13 @@ public class CrearSala extends JPanel {
     }
 
     /**
-     * Construye la representación visual de una carta UNO.
-     * Intenta cargar la imagen PNG desde recursos; si no está disponible,
-     * dibuja la carta con colores y el número usando Swing nativo.
+     * Construye la representación visual de una carta UNO. Intenta cargar la
+     * imagen PNG desde recursos; si no está disponible, dibuja la carta con
+     * colores y el número usando Swing nativo.
      *
-     * @param size      El número de jugadores (2, 3 o 4).
+     * @param size El número de jugadores (2, 3 o 4).
      * @param cardColor El color base de la carta.
-     * @param imgName   Nombre del archivo PNG en /imagenes/.
+     * @param imgName Nombre del archivo PNG en /imagenes/.
      */
     private JPanel buildUnoCardPanel(int size, Color cardColor, String imgName) {
         JPanel panel = new JPanel(new BorderLayout());
@@ -203,7 +214,8 @@ public class CrearSala extends JPanel {
                 panel.add(imgLabel, BorderLayout.CENTER);
                 return panel;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // Respaldo: dibujar carta UNO con Swing puro
         panel.setPreferredSize(new Dimension(190, 310));
@@ -221,14 +233,14 @@ public class CrearSala extends JPanel {
                 g2.fillRoundRect(0, 0, w, h, 20, 20);
 
                 // Óvalo blanco central
-                int ow = (int)(w * 0.65), oh = (int)(h * 0.55);
+                int ow = (int) (w * 0.65), oh = (int) (h * 0.55);
                 int ox = (w - ow) / 2, oy = (h - oh) / 2;
                 g2.setColor(OVAL_BG);
                 g2.fillOval(ox, oy, ow, oh);
 
                 // Número grande en color de carta dentro del óvalo
                 g2.setColor(cardColor);
-                g2.setFont(new Font("Arial Black", Font.BOLD, (int)(h * 0.30)));
+                g2.setFont(new Font("Arial Black", Font.BOLD, (int) (h * 0.30)));
                 FontMetrics fm = g2.getFontMetrics();
                 String num = String.valueOf(size);
                 int tx = (w - fm.stringWidth(num)) / 2;
@@ -237,7 +249,7 @@ public class CrearSala extends JPanel {
 
                 // Número pequeño en esquinas
                 g2.setColor(Color.WHITE);
-                g2.setFont(new Font("Arial", Font.BOLD, (int)(h * 0.10)));
+                g2.setFont(new Font("Arial", Font.BOLD, (int) (h * 0.10)));
                 fm = g2.getFontMetrics();
                 g2.drawString(num, 10, fm.getAscent() + 4);
                 g2.drawString(num, w - fm.stringWidth(num) - 10,
@@ -263,7 +275,6 @@ public class CrearSala extends JPanel {
     // ─────────────────────────────────────────────
     // Métodos que el Controller llama
     // ─────────────────────────────────────────────
-
     /**
      * Muestra un mensaje de error debajo de las cartas.
      *
@@ -276,10 +287,9 @@ public class CrearSala extends JPanel {
     // ─────────────────────────────────────────────
     // Registro del Controller
     // ─────────────────────────────────────────────
-
     /**
-     * Asigna el Controller y conecta el botón Cancelar.
-     * Los clics en cartas ya se conectan internamente a {@code controller.onCardSizeClicked}.
+     * Asigna el Controller y conecta el botón Cancelar. Los clics en cartas ya
+     * se conectan internamente a {@code controller.onCardSizeClicked}.
      *
      * @param controller El Controller de esta pantalla.
      */

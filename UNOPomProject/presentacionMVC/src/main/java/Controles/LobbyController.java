@@ -17,14 +17,21 @@ import Vistas.SalaEspera;
 
 import javax.swing.*;
 
+/**
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
+ */
 public class LobbyController {
 
-    private final LobbyView  view;
+    private final LobbyView view;
     private final SalaEspera lobbyView;
-    private final CrearSala  configurationView;
+    private final CrearSala configurationView;
     private final MainWindow mainWindow;
     private final GameSession session;
-    private final EventBus   eventBus;
+    private final EventBus eventBus;
     private final LobbyState lobbyState;
     private final NetworkLayer networkLayer;
     private String hostPlayerName;
@@ -32,31 +39,43 @@ public class LobbyController {
     private boolean localPlayerReady;
 
     public LobbyController(LobbyView view, MainWindow mainWindow,
-                           GameSession session, LobbyState lobbyState,
-                           NetworkLayer networkLayer) {
-        this.view = view; this.lobbyView = null; this.configurationView = null;
-        this.mainWindow = mainWindow; this.session = session;
-        this.lobbyState = lobbyState; this.networkLayer = networkLayer;
+            GameSession session, LobbyState lobbyState,
+            NetworkLayer networkLayer) {
+        this.view = view;
+        this.lobbyView = null;
+        this.configurationView = null;
+        this.mainWindow = mainWindow;
+        this.session = session;
+        this.lobbyState = lobbyState;
+        this.networkLayer = networkLayer;
         this.eventBus = EventBus.getInstance();
         this.localPlayerReady = session.isHost();
     }
 
     public LobbyController(CrearSala view, MainWindow mainWindow,
-                           GameSession session, LobbyState lobbyState,
-                           NetworkLayer networkLayer) {
-        this.configurationView = view; this.view = null; this.lobbyView = null;
-        this.mainWindow = mainWindow; this.session = session;
-        this.lobbyState = lobbyState; this.networkLayer = networkLayer;
+            GameSession session, LobbyState lobbyState,
+            NetworkLayer networkLayer) {
+        this.configurationView = view;
+        this.view = null;
+        this.lobbyView = null;
+        this.mainWindow = mainWindow;
+        this.session = session;
+        this.lobbyState = lobbyState;
+        this.networkLayer = networkLayer;
         this.eventBus = EventBus.getInstance();
         this.localPlayerReady = session.isHost();
     }
 
     public LobbyController(SalaEspera lobbyView, MainWindow mainWindow,
-                           GameSession session, LobbyState lobbyState,
-                           NetworkLayer networkLayer) {
-        this.lobbyView = lobbyView; this.view = null; this.configurationView = null;
-        this.mainWindow = mainWindow; this.session = session;
-        this.lobbyState = lobbyState; this.networkLayer = networkLayer;
+            GameSession session, LobbyState lobbyState,
+            NetworkLayer networkLayer) {
+        this.lobbyView = lobbyView;
+        this.view = null;
+        this.configurationView = null;
+        this.mainWindow = mainWindow;
+        this.session = session;
+        this.lobbyState = lobbyState;
+        this.networkLayer = networkLayer;
         this.eventBus = EventBus.getInstance();
         this.localPlayerReady = session.isHost();
     }
@@ -64,8 +83,8 @@ public class LobbyController {
     public void initialize() {
         session.getLocalPlayer().setReady(localPlayerReady);
         lobbyState.getConnectedPlayers().stream()
-            .filter(p -> p.getName().equals(session.getLocalPlayer().getName()))
-            .findFirst().ifPresent(p -> p.setReady(localPlayerReady));
+                .filter(p -> p.getName().equals(session.getLocalPlayer().getName()))
+                .findFirst().ifPresent(p -> p.setReady(localPlayerReady));
 
         lobbyView.configureForRole(session.isHost());
         lobbyView.setRoomCode(session.getRoomCode());
@@ -73,14 +92,13 @@ public class LobbyController {
         lobbyView.updateReadyButton(localPlayerReady);
         refreshPlayerList();
         registerEventListeners();
-        
+
         lobbyState.getConnectedPlayers().stream()
-        .filter(Player::isHost)
-        .map(Player::getName)
-        .findFirst()
-        .ifPresent(name -> this.hostPlayerName = name);
-        
-        
+                .filter(Player::isHost)
+                .map(Player::getName)
+                .findFirst()
+                .ifPresent(name -> this.hostPlayerName = name);
+
     }
 
     /**
@@ -90,8 +108,8 @@ public class LobbyController {
      */
     public void onCardSizeClicked(int size) {
         lobbyState.setCapacity(size);
-        SwingUtilities.invokeLater(() ->
-            mainWindow.showLobby(session, lobbyState, networkLayer));
+        SwingUtilities.invokeLater(()
+                -> mainWindow.showLobby(session, lobbyState, networkLayer));
     }
 
     public void onReadyClicked() {
@@ -100,23 +118,30 @@ public class LobbyController {
         lobbyState.getConnectedPlayers().stream()
                 .filter(p -> p.getName().equals(session.getLocalPlayer().getName()))
                 .findFirst().ifPresent(p -> p.setReady(localPlayerReady));
-        if (lobbyView != null) lobbyView.updateReadyButton(localPlayerReady);
+        if (lobbyView != null) {
+            lobbyView.updateReadyButton(localPlayerReady);
+        }
         eventBus.publish(GameEventFactory.playerReady(
                 session.getLocalPlayer().getName(), localPlayerReady));
-        if (!session.isHost() && lobbyView != null)
+        if (!session.isHost() && lobbyView != null) {
             lobbyView.setRequestStartEnabled(localPlayerReady);
+        }
         refreshPlayerList();
         checkStartCondition();
     }
 
     public void onRequestStartClicked() {
-        if (session.isHost() || !localPlayerReady) return;
+        if (session.isHost() || !localPlayerReady) {
+            return;
+        }
         eventBus.publish(GameEventFactory.startRequested(
                 session.getLocalPlayer().getName()));
     }
 
     public void onStartClicked() {
-        if (!session.isHost() || !lobbyState.canStart()) return;
+        if (!session.isHost() || !lobbyState.canStart()) {
+            return;
+        }
         lobbyState.markGameStarted();
         eventBus.publish(GameEventFactory.gameStarted());
     }
@@ -133,22 +158,32 @@ public class LobbyController {
     }
 
     public void onCapacityChanged(int newCapacity) {
-        if (!session.isHost()) return;
+        if (!session.isHost()) {
+            return;
+        }
         lobbyState.setCapacity(newCapacity);
-        if (lobbyView != null) lobbyView.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
-        if (view != null)      view.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
+        if (lobbyView != null) {
+            lobbyView.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
+        }
+        if (view != null) {
+            view.setPlayerCount(lobbyState.getPlayerCount(), newCapacity);
+        }
         networkLayer.broadcast("{\"type\":\"LOBBY_STATE\",\"capacity\":\"" + newCapacity + "\"}\n");
         checkStartCondition();
     }
 
     private void registerEventListeners() {
-        eventBus.subscribe(PlayerJoinedEvent.class, event ->
-            SwingUtilities.invokeLater(() -> {
-                refreshPlayerList();
-                if (lobbyView != null) lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
-                if (view != null)      view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
-                checkStartCondition();
-            }));
+        eventBus.subscribe(PlayerJoinedEvent.class, event
+                -> SwingUtilities.invokeLater(() -> {
+                    refreshPlayerList();
+                    if (lobbyView != null) {
+                        lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                    }
+                    if (view != null) {
+                        view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                    }
+                    checkStartCondition();
+                }));
 
         eventBus.subscribe(PlayerReadyEvent.class, event -> {
             PlayerReadyEvent e = (PlayerReadyEvent) event;
@@ -158,11 +193,17 @@ public class LobbyController {
             SwingUtilities.invokeLater(() -> {
                 if (e.getPlayerName().equals(session.getLocalPlayer().getName())) {
                     localPlayerReady = e.isReady();
-                    if (lobbyView != null) lobbyView.updateReadyButton(localPlayerReady);
+                    if (lobbyView != null) {
+                        lobbyView.updateReadyButton(localPlayerReady);
+                    }
                 }
                 refreshPlayerList();
-                if (lobbyView != null) lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
-                if (view != null)      view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                if (lobbyView != null) {
+                    lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                }
+                if (view != null) {
+                    view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                }
                 checkStartCondition();
             });
         });
@@ -175,8 +216,12 @@ public class LobbyController {
             lobbyState.removePlayer(e.getPlayerName());
             SwingUtilities.invokeLater(() -> {
                 refreshPlayerList();
-                if (lobbyView != null) lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
-                if (view != null)      view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                if (lobbyView != null) {
+                    lobbyView.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                }
+                if (view != null) {
+                    view.setPlayerCount(lobbyState.getPlayerCount(), lobbyState.getCapacity());
+                }
                 if (hostLeft && !session.isHost()) {
                     JOptionPane.showMessageDialog(mainWindow,
                             "El Host abandonó la sala.",
@@ -187,35 +232,49 @@ public class LobbyController {
         });
 
         eventBus.subscribe(StartRequestedEvent.class, event -> {
-            if (!session.isHost()) return;
+            if (!session.isHost()) {
+                return;
+            }
             StartRequestedEvent e = (StartRequestedEvent) event;
             SwingUtilities.invokeLater(() -> {
                 boolean accept = (lobbyView != null && lobbyView.showStartRequestDialog(e.getRequesterName()))
-                              || (view != null && view.showStartRequestDialog(e.getRequesterName()));
-                if (accept) onStartClicked();
+                        || (view != null && view.showStartRequestDialog(e.getRequesterName()));
+                if (accept) {
+                    onStartClicked();
+                }
             });
         });
 
-        eventBus.subscribe(GameStartedEvent.class, event ->
-                SwingUtilities.invokeLater(mainWindow::showGame));
+        eventBus.subscribe(GameStartedEvent.class, event
+                -> SwingUtilities.invokeLater(mainWindow::showGame));
     }
 
     private void refreshPlayerList() {
         String localName = session.getLocalPlayer().getName();
-        boolean isHost   = session.isHost();
-        if (lobbyView != null) lobbyView.updatePlayerList(lobbyState.getConnectedPlayers(), localName, isHost);
-        if (view != null)      view.updatePlayerList(lobbyState.getConnectedPlayers(), localName, isHost);
+        boolean isHost = session.isHost();
+        if (lobbyView != null) {
+            lobbyView.updatePlayerList(lobbyState.getConnectedPlayers(), localName, isHost);
+        }
+        if (view != null) {
+            view.updatePlayerList(lobbyState.getConnectedPlayers(), localName, isHost);
+        }
     }
 
     private void checkStartCondition() {
         boolean canStart = lobbyState.canStart();
         if (session.isHost()) {
-            if (lobbyView != null) lobbyView.setStartEnabled(canStart);
-            if (view != null)      view.setStartEnabled(canStart);
+            if (lobbyView != null) {
+                lobbyView.setStartEnabled(canStart);
+            }
+            if (view != null) {
+                view.setStartEnabled(canStart);
+            }
         }
         String status = canStart ? "Todos los jugadores están listos."
-            : (lobbyState.allPlayersReady() ? "Esperando más jugadores..." : "Esperando jugadores...");
-        if (lobbyView != null) lobbyView.setWaitingStatus(status);
+                : (lobbyState.allPlayersReady() ? "Esperando más jugadores..." : "Esperando jugadores...");
+        if (lobbyView != null) {
+            lobbyView.setWaitingStatus(status);
+        }
     }
 
     private boolean isHostName(String name) {

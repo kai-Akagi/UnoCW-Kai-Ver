@@ -19,31 +19,38 @@ import java.awt.*;
 /**
  * La ventana principal de la aplicación.
  *
- * <p>Es el único {@link JFrame} del programa. Usa {@link CardLayout}
- * para cambiar entre pantallas sin abrir nuevas ventanas.
+ * <p>
+ * Es el único {@link JFrame} del programa. Usa {@link CardLayout} para cambiar
+ * entre pantallas sin abrir nuevas ventanas.
  *
- * <p>Incluye la pantalla de selección de tamaño de sala (CrearSala)
- * entre el registro y el lobby. El Host pasa por ella antes de llegar
- * a la SalaEspera; los Peers van directamente al lobby al unirse.
+ * <p>
+ * Incluye la pantalla de selección de tamaño de sala (CrearSala) entre el
+ * registro y el lobby. El Host pasa por ella antes de llegar a la SalaEspera;
+ * los Peers van directamente al lobby al unirse.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class MainWindow extends JFrame {
 
-    public static final String SCREEN_REGISTER      = "register";
-    public static final String SCREEN_ROOM_CONFIG   = "roomConfig";
-    public static final String SCREEN_LOBBY         = "lobby";
-    public static final String SCREEN_GAME          = "game";
-    public static final String SCREEN_SCOREBOARD    = "scoreboard";
+    public static final String SCREEN_REGISTER = "register";
+    public static final String SCREEN_ROOM_CONFIG = "roomConfig";
+    public static final String SCREEN_LOBBY = "lobby";
+    public static final String SCREEN_GAME = "game";
+    public static final String SCREEN_SCOREBOARD = "scoreboard";
 
     private final CardLayout cardLayout;
-    private final JPanel     screenContainer;
+    private final JPanel screenContainer;
 
-    private GameSession  session;
+    private GameSession session;
     private NetworkLayer networkLayer;
-    private LobbyState   lobbyState;
+    private LobbyState lobbyState;
 
     public MainWindow() {
         super("UNO");
-        this.cardLayout      = new CardLayout();
+        this.cardLayout = new CardLayout();
         this.screenContainer = new JPanel(cardLayout);
         configureWindow();
         buildScreens();
@@ -59,7 +66,7 @@ public class MainWindow extends JFrame {
     }
 
     private void buildScreens() {
-        RegisterView       registerView       = new RegisterView();
+        RegisterView registerView = new RegisterView();
         RegisterController registerController = new RegisterController(registerView, this);
         registerView.setController(registerController);
 
@@ -73,21 +80,21 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Navega a la pantalla de selección de tamaño de sala.
-     * Solo el Host pasa por aquí, justo después de registrarse.
+     * Navega a la pantalla de selección de tamaño de sala. Solo el Host pasa
+     * por aquí, justo después de registrarse.
      *
-     * @param session    La sesión recién creada en RegisterController.
+     * @param session La sesión recién creada en RegisterController.
      * @param lobbyState El LobbyState del Host (con código ya asignado).
-     * @param network    La NetworkLayer ya iniciada como Host.
+     * @param network La NetworkLayer ya iniciada como Host.
      */
     public void showRoomConfiguration(GameSession session, LobbyState lobbyState,
-                                      NetworkLayer network) {
-        this.session      = session;
+            NetworkLayer network) {
+        this.session = session;
         this.networkLayer = network;
-        this.lobbyState   = lobbyState;
+        this.lobbyState = lobbyState;
 
-        CrearSala       configView  = new CrearSala();
-        LobbyController lobbyCtrl  = new LobbyController(
+        CrearSala configView = new CrearSala();
+        LobbyController lobbyCtrl = new LobbyController(
                 configView, this, session, lobbyState, network);
         configView.setController(lobbyCtrl);
 
@@ -96,19 +103,20 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Navega al lobby (SalaEspera) con la sesión, el estado de sala y la red ya creados.
+     * Navega al lobby (SalaEspera) con la sesión, el estado de sala y la red ya
+     * creados.
      *
-     * @param session    La sesión del jugador registrado.
+     * @param session La sesión del jugador registrado.
      * @param lobbyState El estado de sala ya inicializado.
-     * @param network    La capa de red ya conectada.
+     * @param network La capa de red ya conectada.
      */
     public void showLobby(GameSession session, LobbyState lobbyState, NetworkLayer network) {
-        this.session      = session;
+        this.session = session;
         this.networkLayer = network;
-        this.lobbyState   = lobbyState;
+        this.lobbyState = lobbyState;
 
-        SalaEspera      lobbyView  = new SalaEspera();
-        LobbyController lobbyCtrl  = new LobbyController(
+        SalaEspera lobbyView = new SalaEspera();
+        LobbyController lobbyCtrl = new LobbyController(
                 lobbyView, this, session, lobbyState, network);
         lobbyView.setController(lobbyCtrl);
 
@@ -118,10 +126,12 @@ public class MainWindow extends JFrame {
         lobbyCtrl.initialize();
     }
 
-    /** Navega a la mesa de juego. */
+    /**
+     * Navega a la mesa de juego.
+     */
     public void showGame() {
-        GameView       gameView   = new GameView();
-        GameController gameCtrl   = new GameController(
+        GameView gameView = new GameView();
+        GameController gameCtrl = new GameController(
                 gameView, this, session, networkLayer, lobbyState);
         gameView.setController(gameCtrl);
 
@@ -131,7 +141,9 @@ public class MainWindow extends JFrame {
         gameCtrl.initialize();
     }
 
-    /** Navega al scoreboard al terminar la partida. */
+    /**
+     * Navega al scoreboard al terminar la partida.
+     */
     public void showScoreboard(String winnerName) {
         ScoreboardView scoreboardView = new ScoreboardView(winnerName, session, this);
         screenContainer.add(scoreboardView, SCREEN_SCOREBOARD);
@@ -146,9 +158,9 @@ public class MainWindow extends JFrame {
             networkLayer.shutdown();
         }
         Eventos.EventBus.getInstance().clearAll();
-        this.session      = null;
+        this.session = null;
         this.networkLayer = null;
-        this.lobbyState   = null;
+        this.lobbyState = null;
         cardLayout.show(screenContainer, SCREEN_REGISTER);
     }
 
@@ -156,8 +168,13 @@ public class MainWindow extends JFrame {
         cardLayout.show(screenContainer, screenName);
     }
 
-    public GameSession  getSession()      { return session; }
-    public NetworkLayer getNetworkLayer() { return networkLayer; }
+    public GameSession getSession() {
+        return session;
+    }
+
+    public NetworkLayer getNetworkLayer() {
+        return networkLayer;
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
