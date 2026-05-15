@@ -6,16 +6,25 @@ import Dominio.Player;
 /**
  * Evento público: un jugador robó una carta del mazo.
  *
- * <p>Este evento llega a <b>todos</b> los jugadores. Solo informa
- * quién robó y cuántas cartas tiene ahora. La carta real no se incluye
- * porque los demás jugadores no deben saber qué carta fue.
+ * <p>
+ * Este evento llega a <b>todos</b> los jugadores. Solo informa quién robó y
+ * cuántas cartas tiene ahora. La carta real no se incluye porque los demás
+ * jugadores no deben saber qué carta fue.
  *
- * <p>El jugador que robó recibe adicionalmente un {@link CardDrawnPrivateEvent}
+ * <p>
+ * El jugador que robó recibe adicionalmente un {@link CardDrawnPrivateEvent}
  * con la carta real.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class CardDrawnPublicEvent extends GameEvent {
 
-    /** El jugador que robó. */
+    /**
+     * El jugador que robó.
+     */
     private final Player player;
 
     /**
@@ -26,6 +35,10 @@ public class CardDrawnPublicEvent extends GameEvent {
         this.player = player;
     }
 
-    /** @return El jugador que robó. */
-    public Player getPlayer() { return player; }
+    /**
+     * @return El jugador que robó.
+     */
+    public Player getPlayer() {
+        return player;
+    }
 }

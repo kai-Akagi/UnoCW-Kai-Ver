@@ -9,20 +9,18 @@ import Dominio.Card;
 import Dominio.Player;
 
 /**
- * Evento publicado cuando un jugador intenta una jugada inválida.
-     * El GameController lo usa para rehabilitar la mano sin necesitar
-     * saber el motivo específico del rechazo.
-     
- * @author Elite
+ * Evento publicado cuando un jugador intenta una jugada inválida. El
+ * GameController lo usa para rehabilitar la mano sin necesitar saber el motivo
+ * específico del rechazo.
+ *
+ * @author Héctor Javier Alonso Zaragoza
+ * @author Alejandro Rodríguez Lugo
+ * @author Katia Ximena Navarez Espinoza
+ * @author Luis Carlos Manjarrez Gonzalez
  */
 public class InvalidPlayEvent extends GameEvent {
-    
 
     public InvalidPlayEvent() {
         super();
     }
 }
-    
-    
-    
-
