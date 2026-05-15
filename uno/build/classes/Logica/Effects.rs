@@ -1,5 +1,0 @@
-Logica.SkipEffect
-Logica.WildDrawFourEffect
-Logica.WildEffect
-Logica.DrawTwoEffect
-Logica.ReverseEffect
