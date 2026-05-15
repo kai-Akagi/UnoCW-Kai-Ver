@@ -172,14 +172,18 @@ public class NetworkLayer {
      */
     public void registerLobbyListeners() {
         // El jugador local cambió estado "Listo" → enviar al Host
-        // Solo los Peers envían su estado listo al Host.
-        // El Host NO se envía a sí mismo por socket: causaría un bucle infinito
-        // porque publishToLocalBus volvería a publicar PlayerReadyEvent en el bus
-        // local, que dispararía este mismo listener indefinidamente.
         eventBus.subscribe(PlayerReadyEvent.class, event -> {
             PlayerReadyEvent e = (PlayerReadyEvent) event;
-            if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
-                sendToHost(MessageSerializer.serialize(e));
+            if (session.isLocalPlayer(e.getPlayerName())) {
+                if (!session.isHost()) {
+                    // Peer → envía su cambio de estado al Host por socket
+                    sendToHost(MessageSerializer.serialize(e));
+                } else {
+                    // Host → hace broadcast de su propio cambio de estado a todos los Peers.
+                    // El Host no pasa por handleAsHost porque su evento es local,
+                    // por eso hay que hacer el broadcast directamente aquí.
+                    broadcast(MessageSerializer.serialize(e));
+                }
             }
         });
         
@@ -189,9 +193,19 @@ public class NetworkLayer {
         // en lugar de depender del cierre abrupto del socket.
         eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
-            if (!session.isHost() && session.isLocalPlayer(e.getPlayerName())) {
-                sendToHost(MessageSerializer.serialize(
-                GameEventFactory.playerDisconnected(e.getPlayerName())));
+            if (session.isLocalPlayer(e.getPlayerName())) {
+                if (!session.isHost()) {
+                    // Peer → notifica al Host de su salida por socket
+                    sendToHost(MessageSerializer.serialize(
+                            GameEventFactory.playerDisconnected(e.getPlayerName())));
+                } else {
+                    // Host → avisa a todos los Peers que la sala fue cerrada.
+                    // Usamos TYPE_PLAYER_LEFT con player="HOST" como señal convenida:
+                    // publishToLocalBus en cada Peer publica PlayerDisconnectedEvent("HOST"),
+                    // que LobbyController detecta con isHostName() y redirige al registro.
+                    broadcast(MessageSerializer.serialize(
+                            GameEventFactory.playerDisconnected(e.getPlayerName())));
+                }
             }
         });
  
