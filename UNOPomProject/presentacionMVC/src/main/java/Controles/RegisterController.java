@@ -295,8 +295,7 @@ public class RegisterController {
                                 rejectListener[0]);
                         NetworkPlayerRejectedEvent e = (NetworkPlayerRejectedEvent) rejEvent;
                         SwingUtilities.invokeLater(()
-                                -> view.showError(e.getReason()
-                                        + "." + " Por favor elige otro nombre o avatar."));
+                                -> view.showError(e.getReason()));
                     }
                 };
 
