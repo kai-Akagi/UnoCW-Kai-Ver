@@ -174,4 +174,40 @@ public class Card {
     public String toString() {
         return (color == Color.WILD) ? value : color + "-" + value;
     }
+
+    /**
+     * Devuelve la clave que identifica el archivo de imagen para esta carta.
+     *
+     * <p>
+     * Las cartas especiales y comodines tienen imagen propia guardada en
+     * {@code /img/<clave>.png} dentro del classpath. Las cartas numéricas
+     * devuelven {@code null} porque se renderizan como rectángulos de color.
+     *
+     * <p>
+     * Convención de nombres de archivo:
+     * <ul>
+     * <li>Cartas con color: {@code VALOR_COLOR} → ej. {@code SKIP_RED},
+     * {@code DRAW_TWO_BLUE}, {@code REVERSE_GREEN}</li>
+     * <li>Comodines: {@code WILD}, {@code WILD_DRAW_FOUR}</li>
+     * </ul>
+     *
+     * @return La clave de imagen (sin extensión), o {@code null} si la carta es
+     * numérica y no tiene imagen asociada.
+     */
+    public String getImageKey() {
+        switch (value) {
+            case "SKIP":
+                return "SKIP_" + color.name();          
+            case "REVERSE":
+                return "REVERSE_" + color.name();      
+            case "DRAW_TWO":
+                return "DRAW_TWO_" + color.name();      
+            case "WILD":
+                return "WILD";
+            case "WILD_DRAW_FOUR":
+                return "WILD_DRAW_FOUR";
+            default:
+                return null; 
+        }
+    }
 }
