@@ -8,6 +8,10 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.List;
 import Controles.GameController;
+import static Dominio.Card.Color.BLUE;
+import static Dominio.Card.Color.GREEN;
+import static Dominio.Card.Color.RED;
+import static Dominio.Card.Color.YELLOW;
 
 /**
  * Pantalla principal del juego (la mesa de UNO).
@@ -233,9 +237,32 @@ public class GameView extends JPanel {
      * @param value El valor o nombre de la carta (ej. "7", "SKIP").
      * @param color El color de la carta.
      */
+    /**
+     * Actualiza la carta activa en la mesa.
+     *
+     * <p>Si la carta es especial o comodín, carga su imagen desde el classpath
+     * y la muestra como {@link JLabel} con icono. Si es numérica, muestra el
+     * número centrado sobre el fondo de color correspondiente.
+     *
+     * @param value El valor/nombre de la carta (ej. "7", "SKIP", "WILD").
+     * @param color El color de la carta activa.
+     */
     private void updateTopCard(String value, Card.Color color) {
-        topCardLabel.setText(value);
+        // Crear una carta temporal para obtener la clave de imagen
+        // (no necesitamos efecto, solo color y valor para la imagen)
+        Dominio.Card tempCard = new Dominio.Card(color, value, null);
+        ImageIcon icon = CardImageHelper.getScaledIcon(tempCard, 68, 96);
+
         topCardPanel.setBackground(colorOf(color));
+
+        if (icon != null) {
+            topCardLabel.setIcon(icon);
+            topCardLabel.setText("");
+        } else {
+            // Carta numérica: mostrar número sin icono
+            topCardLabel.setIcon(null);
+            topCardLabel.setText(value);
+        }
     }
 
     /**
@@ -345,13 +372,34 @@ public class GameView extends JPanel {
      * Se utiliza cuando el jugador debe elegir un color antes de continuar con
      * su turno.
      */
+    /**
+     * Deshabilita la mano del jugador y el botón de robo.
+     *
+     * <p>Para botones con imagen (cartas especiales) no se usa
+     * {@code setEnabled(false)} porque Swing aplica un GrayFilter automático
+     * que grisea la imagen. En su lugar se elimina el borde interactivo y
+     * se retiran los listeners existentes mediante el truco de reemplazar el
+     * componente en el EventDispatchThread. La solución práctica aquí es
+     * simplemente no agregar el listener cuando {@code enabled=false} en
+     * {@link #buildCardButton}, lo que ya se hace; este método solo asegura
+     * que el cursor cambie y el borde se actualice para los botones de imagen.
+     */
     public void disableHand() {
-        // Deshabilitar cartas y el robo de carta del mazo — el jugador debe elegir color para continuar
         for (java.awt.Component c : handPanel.getComponents()) {
-            c.setEnabled(false);
+            if (c instanceof JButton) {
+                JButton btn = (JButton) c;
+                if (btn.getIcon() != null) {
+                    // Carta con imagen: dejar colores intactos, solo cambiar borde
+                    btn.setBorder(BorderFactory.createLineBorder(
+                            new Color(255, 255, 255, 60), 1));
+                    btn.setCursor(Cursor.getDefaultCursor());
+                } else {
+                    // Carta numérica: setEnabled normal (no hay ImageIcon que grisearse)
+                    btn.setEnabled(false);
+                }
+            }
         }
         drawButton.setEnabled(false);
-
     }
 
     /**
@@ -361,16 +409,57 @@ public class GameView extends JPanel {
      * @param enabled Si el botón debe estar activo (es el turno del jugador).
      * @return El botón de la carta.
      */
+    /**
+     * Construye un botón visual para una carta de la mano.
+     *
+     * <p>Si la carta tiene imagen (especial o comodín) se muestra como
+     * {@link ImageIcon} escalada al tamaño del botón. Las cartas numéricas
+     * se renderizan como rectángulo de color con el número centrado.
+     *
+     * @param card    La carta a representar.
+     * @param enabled Si el botón debe estar activo (es el turno del jugador).
+     * @return El botón de la carta.
+     */
     private JButton buildCardButton(Card card, boolean enabled) {
-        JButton btn = new JButton("<html><center>" + card.getValue() + "</center></html>");
-        btn.setPreferredSize(new Dimension(60, 90));
-        btn.setBackground(colorOf(card.getColor()));
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 13));
+        final int CARD_W = 60;
+        final int CARD_H = 90;
+
+        JButton btn = new JButton();
+        btn.setPreferredSize(new Dimension(CARD_W, CARD_H));
         btn.setFocusPainted(false);
         btn.setBorderPainted(true);
-        btn.setEnabled(enabled);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // ── Imagen si existe (cartas especiales / comodines) ──────────────
+        ImageIcon icon = CardImageHelper.getScaledIcon(card, CARD_W, CARD_H);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setText("");
+            btn.setBackground(colorOf(card.getColor()));
+            // Fondo transparente: solo se ve la imagen
+            btn.setContentAreaFilled(false);
+            btn.setOpaque(false);
+        } else {
+            // ── Carta numérica → rectángulo de color + número ─────────────
+            btn.setText("<html><center>" + card.getValue() + "</center></html>");
+            btn.setBackground(colorOf(card.getColor()));
+            btn.setForeground(Color.WHITE);
+            btn.setFont(new Font("Arial", Font.BOLD, 13));
+            btn.setContentAreaFilled(true);
+            btn.setOpaque(true);
+        }
+
+        // ── Indicar turno con borde, NO con setEnabled(false) ──────────────
+        // setEnabled(false) en Swing grisea los ImageIcon automáticamente.
+        // En su lugar: el botón siempre está "enabled" a nivel Swing para
+        // preservar los colores; el ActionListener solo se agrega cuando es
+        // el turno del jugador, por lo que clicar fuera de turno no hace nada.
+        btn.setEnabled(true);
+        if (!enabled) {
+            // Borde tenue para indicar visualmente que no es interactuable
+            btn.setBorder(BorderFactory.createLineBorder(
+                    new Color(255, 255, 255, 60), 1));
+        }
 
         if (enabled) {
             btn.addActionListener(e -> {
@@ -471,9 +560,21 @@ public class GameView extends JPanel {
      */
     public void setUnoGraceMode(boolean graceMode) {
         if (graceMode) {
-            // Deshabilitar cartas y robar — el jugador solo puede presionar UNO
+            // Deshabilitar cartas y robar — el jugador solo puede presionar UNO.
+            // Para botones con imagen: solo cambiar borde (no setEnabled) para no grisearse.
             for (java.awt.Component c : handPanel.getComponents()) {
-                c.setEnabled(false);
+                if (c instanceof JButton) {
+                    JButton btn = (JButton) c;
+                    if (btn.getIcon() != null) {
+                        btn.setBorder(BorderFactory.createLineBorder(
+                                new Color(255, 255, 255, 60), 1));
+                        btn.setCursor(Cursor.getDefaultCursor());
+                    } else {
+                        btn.setEnabled(false);
+                    }
+                } else {
+                    c.setEnabled(false);
+                }
             }
             drawButton.setEnabled(false);
 
