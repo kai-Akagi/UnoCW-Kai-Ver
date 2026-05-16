@@ -346,12 +346,23 @@ public class GameController {
                     oppSizes.add(p.getHandSize());
                 }
             }
+            List<String> oppAvatarIds = new ArrayList<>();
+            for (Dominio.Player p : lobbyState.getConnectedPlayers()) {
+                if (!p.getName().equals(session.getLocalPlayer().getName())) {
+                    oppAvatarIds.add(p.getAvatarId());
+                }
+            }
 
+          
             GameViewModel vm = new GameViewModel(
-                    currentName, topValue, topColor,
-                    new ArrayList<>(session.getLocalPlayer().getHand()),
-                    session.getLocalPlayer().getName(),
-                    oppNames, oppSizes, tce.isClockwise()
+                currentName,
+                topValue,
+                topColor,
+                new ArrayList<>(session.getLocalPlayer().getHand()),
+                session.getLocalPlayer().getName(),
+                oppNames, oppSizes,
+                oppAvatarIds,
+                tce.isClockwise()
             );
             System.out.println("[GameController] TurnChanged → current='" + currentName
                     + "' local='" + session.getLocalPlayer().getName()
@@ -405,21 +416,24 @@ public class GameController {
 
                 List<String> oppNames = new ArrayList<>();
                 List<Integer> oppSizes = new ArrayList<>();
+                List<String> oppAvatarIds = new ArrayList<>();
                 for (Dominio.Player p : lobbyState.getConnectedPlayers()) {
                     if (!p.getName().equals(session.getLocalPlayer().getName())) {
                         oppNames.add(p.getName());
                         oppSizes.add(peerOpponentHandSizes.getOrDefault(p.getName(), 7));
+                        oppAvatarIds.add(p.getAvatarId());
                     }
                 }
 
                 GameViewModel vm = new GameViewModel(
-                        currentPlayerName,
-                        topValue,
-                        topColor,
-                        new ArrayList<>(session.getLocalPlayer().getHand()),
-                        session.getLocalPlayer().getName(),
-                        oppNames, oppSizes,
-                        eventClockwise
+                    currentPlayerName,
+                    topValue,
+                    topColor,
+                    new ArrayList<>(session.getLocalPlayer().getHand()),
+                    session.getLocalPlayer().getName(),
+                    oppNames, oppSizes,
+                    oppAvatarIds,        // ← añadido
+                    eventClockwise
                 );
                 lastViewModel = vm;
                 view.render(vm);
@@ -515,13 +529,23 @@ public class GameController {
                             names.remove(idx);
                             sizes.remove(idx);
                         }
+                        List<String> updatedAvatarIds = new ArrayList<>();
+                        if (lastViewModel.opponentAvatarIds != null) {
+                            updatedAvatarIds.addAll(lastViewModel.opponentAvatarIds);
+                            int avatarIdx = lastViewModel.opponentNames.indexOf(leavingName);
+                            if (avatarIdx >= 0 && avatarIdx < updatedAvatarIds.size()) {
+                                updatedAvatarIds.remove(avatarIdx);
+                            }
+                        }
                         GameViewModel updated = new GameViewModel(
                                 lastViewModel.currentPlayerName,
                                 lastViewModel.topCardValue,
                                 lastViewModel.topCardColor,
                                 new ArrayList<>(session.getLocalPlayer().getHand()),
                                 session.getLocalPlayer().getName(),
-                                names, sizes, lastViewModel.clockwise
+                                names, sizes,
+                                updatedAvatarIds,   // ← añadido
+                                lastViewModel.clockwise
                         );
                         lastViewModel = updated;
                         view.render(updated);

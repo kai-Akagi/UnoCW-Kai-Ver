@@ -207,7 +207,7 @@ public class GameView extends JPanel {
     public void render(GameViewModel vm) {
         updateTopCard(vm.topCardValue, vm.topCardColor);
         updateTurnIndicator(vm.currentPlayerName, vm.isMyTurn);
-        updateOpponents(vm.opponentNames, vm.opponentHandSizes);
+        updateOpponents(vm.opponentNames, vm.opponentHandSizes, vm.opponentAvatarIds);
         updateHand(vm.localHand, vm.isMyTurn);
         updateUnoButton(vm.localPlayerHasUno && vm.isMyTurn);
         updateDirection(vm.clockwise);
@@ -260,7 +260,7 @@ public class GameView extends JPanel {
      * @param names Nombres de los oponentes.
      * @param handSizes Cantidad de cartas de cada oponente.
      */
-    private void updateOpponents(List<String> names, List<Integer> handSizes) {
+    private void updateOpponents(List<String> names, List<Integer> handSizes, List<String> avatarIds) {
         // Buscar el panel interno por nombre para no afectar el botón Salir
         JPanel inner = null;
         for (java.awt.Component c : opponentsPanel.getComponents()) {
@@ -274,10 +274,16 @@ public class GameView extends JPanel {
         }
         inner.removeAll();
         for (int i = 0; i < names.size(); i++) {
-            inner.add(buildOpponentPanel(names.get(i), handSizes.get(i)));
+            String avatarId = (avatarIds != null && i < avatarIds.size()) ? avatarIds.get(i) : "";
+            inner.add(buildOpponentPanel(names.get(i), handSizes.get(i), avatarId));
         }
+        
         inner.revalidate();
         inner.repaint();
+        
+        
+        
+        
     }
 
     /**
@@ -285,9 +291,10 @@ public class GameView extends JPanel {
      *
      * @param name Nombre del oponente.
      * @param cardCount Cuántas cartas tiene.
+     * @param avatarId id del avatar
      * @return El panel del oponente.
      */
-    private JPanel buildOpponentPanel(String name, int cardCount) {
+   private JPanel buildOpponentPanel(String name, int cardCount, String avatarId) {
         JPanel panel = new JPanel(new BorderLayout(4, 2));
         panel.setBackground(new Color(20, 83, 45));
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -296,8 +303,9 @@ public class GameView extends JPanel {
         ));
         panel.setPreferredSize(new Dimension(130, 60));
 
-        JLabel nameLabel = new JLabel("🎮 " + name, SwingConstants.CENTER);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        String emoji = AvatarHelper.emojiFor(avatarId);
+        JLabel nameLabel = new JLabel(emoji + " " + name, SwingConstants.CENTER);
+        nameLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 12));
         nameLabel.setForeground(Color.WHITE);
 
         JLabel countLabel = new JLabel(cardCount + " cartas", SwingConstants.CENTER);
