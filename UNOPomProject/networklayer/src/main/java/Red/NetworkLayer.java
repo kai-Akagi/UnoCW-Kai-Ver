@@ -497,6 +497,11 @@ public class NetworkLayer {
                     Player cardPlyr = findPlayerByName(fields.get("player"));
                     if (cardPlyr != null && cardStr != null) {
                         boolean valid = false;
+                        // Evita que el listener del GameModel llame playCard() de nuevo
+                        // cuando la jugada ya está siendo procesada directamente aquí.
+                        // Sin esto, si el jugador tiene dos cartas iguales, el listener
+                        // encuentra la segunda y la elimina también.
+                        gameModel.setProcessingPlay(true);
                         int dashIdx = cardStr.indexOf('-');
                         if (dashIdx > 0) {
                             Dominio.Card.Color col = parseCardColor(cardStr.substring(0, dashIdx));
@@ -508,6 +513,7 @@ public class NetworkLayer {
                             valid = gameModel.playCard(cardPlyr,
                                     new Dominio.Card(Dominio.Card.Color.WILD, cardStr, null));
                         }
+                        gameModel.setProcessingPlay(false);
                         if (!valid && gameModel.getGameState() != null) {
                             Dominio.GameState st = gameModel.getGameState();
                             String topText = st.getTopCard() != null ? st.getTopCard().toString() : "?";
