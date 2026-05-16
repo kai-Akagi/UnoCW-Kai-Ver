@@ -492,12 +492,26 @@ public class GameController {
             );
         });
 
+        // Notificación de UNO recibida por la red (para los demás jugadores)
+        eventBus.subscribe(NetworkUnoCalledEvent.class, event -> {
+            NetworkUnoCalledEvent e = (NetworkUnoCalledEvent) event;
+            if (!session.isLocalPlayer(e.getPlayerName())) {
+                SwingUtilities.invokeLater(() ->
+                    JOptionPane.showMessageDialog(mainWindow,
+                        "¡" + e.getPlayerName() + " gritó UNO!",
+                        "UNO", JOptionPane.INFORMATION_MESSAGE)
+                );
+            }
+        });
+
         // Un jugador abandonó la partida en curso.
         eventBus.subscribe(PlayerDisconnectedEvent.class, event -> {
             PlayerDisconnectedEvent e = (PlayerDisconnectedEvent) event;
             String leavingName = e.getPlayerName();
 
-            if ("HOST".equals(leavingName)) {
+            boolean leavingIsHost = lobbyState.getConnectedPlayers().stream()
+                .anyMatch(p -> p.getName().equals(leavingName) && p.isHost());
+            if (leavingIsHost) {
                 // El Host salió: todos los Peers regresan al registro
                 SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(mainWindow,

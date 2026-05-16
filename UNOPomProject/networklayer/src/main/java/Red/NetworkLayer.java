@@ -549,6 +549,8 @@ public class NetworkLayer {
 
             case MessageSerializer.TYPE_UNO_CALLED:
                 publishToLocalBus(type, fields);
+                // Notificar a los demás peers que este jugador gritó UNO
+                broadcastExcept(senderName, MessageSerializer.serializeFields(type, fields));
                 // El Peer declaró UNO: avanzar el turno en el GameModel del Host
                 if (gameModel != null) {
                     gameModel.onUnoDeclared();
@@ -623,8 +625,15 @@ public class NetworkLayer {
                 break;
 
             case MessageSerializer.TYPE_PLAYER_LEFT:
-                lobbyState.removePlayer(fields.get("player"));
-                eventBus.publish(GameEventFactory.playerDisconnected(fields.get("player")));
+                String leftName = fields.get("player");
+                if ("HOST".equals(leftName)) {
+                    leftName = lobbyState.getConnectedPlayers().stream()
+                        .filter(Dominio.Player::isHost)
+                        .map(Dominio.Player::getName)
+                        .findFirst().orElse("HOST");
+                }
+                eventBus.publish(GameEventFactory.playerDisconnected(leftName));
+                lobbyState.removePlayer(leftName);
                 break;
 
             case MessageSerializer.TYPE_GAME_STARTED:
