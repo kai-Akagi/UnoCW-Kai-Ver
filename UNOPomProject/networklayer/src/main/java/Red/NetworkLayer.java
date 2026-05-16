@@ -138,7 +138,8 @@ public class NetworkLayer {
         Socket socket = new Socket(hostIp, hostPort);
         System.out.println("[Peer] Conexión establecida.");
 
-        PeerConnection hostConn = new PeerConnection("HOST", socket, this::onMessageReceived);
+        PeerConnection hostConn = new PeerConnection("HOST", socket,
+        (sender, msg) -> onMessageReceived(sender, msg, null));
         connections.put("HOST", hostConn);
         hostConn.startListening();
 
@@ -360,7 +361,8 @@ public class NetworkLayer {
      * @param senderName Nombre del peer que envió el mensaje.
      * @param message Texto JSON recibido.
      */
-    private void onMessageReceived(String senderName, String message) {
+    private void onMessageReceived(String senderName, String message,
+                               PeerConnection senderConn) {
         System.out.println("[" + (session.isHost() ? "Host" : "Peer")
                 + "] Mensaje recibido de '" + senderName + "': " + message);
 
@@ -368,11 +370,12 @@ public class NetworkLayer {
         String type = MessageSerializer.getType(fields);
 
         if (session.isHost()) {
-            handleAsHost(type, fields, senderName);
+            handleAsHost(type, fields, senderName, senderConn);
         } else {
             publishToLocalBus(type, fields);
         }
     }
+      
 
     /**
      * El Host procesa un mensaje entrante de un Peer.
@@ -389,7 +392,8 @@ public class NetworkLayer {
      * @param fields Campos del mensaje.
      * @param senderName Nombre del peer que lo envió.
      */
-    private void handleAsHost(String type, Map<String, String> fields, String senderName) {
+    private void handleAsHost(String type, Map<String, String> fields,
+                          String senderName, PeerConnection senderConn) {
         switch (type) {
 
             case MessageSerializer.TYPE_PLAYER_JOINED:
@@ -468,18 +472,30 @@ public class NetworkLayer {
                 System.out.println("[Host] Jugador registrado en lobby: " + newPlayer.getName()
                         + " | Total: " + lobbyState.getPlayerCount());
 
-                // Publicar en el bus local del Host → LobbyController del Host lo ve
+                // Publicar en el bus local del Host -> LobbyController del Host lo ve
                 eventBus.publish(GameEventFactory.playerJoined(newPlayer));
 
-                // Broadcast a todos los otros peers para que actualicen su lista
+//                // Broadcast a todos los otros peers para que actualicen su lista
+//                broadcastExcept(senderName, MessageSerializer.serialize(
+//                GameEventFactory.playerJoined(newPlayer)));
+
+                // Construir el mensaje PLAYER_JOINED con la capacidad incluida
+                String confirmMsg = MessageSerializer.serialize(
+                        GameEventFactory.playerJoined(newPlayer));
+                // Añadir capacity al JSON antes del cierre }
+                confirmMsg = confirmMsg.trim();
+                if (confirmMsg.endsWith("}")) {
+                    confirmMsg = confirmMsg.substring(0, confirmMsg.length() - 1)
+                            + ",\"capacity\":\"" + lobbyState.getCapacity() + "\"}\n";
+                }
+                System.out.println("[Host] Enviando confirmacion con capacidad a '"
+                        + senderName + "': " + confirmMsg.trim());
                 broadcastExcept(senderName, MessageSerializer.serialize(
                         GameEventFactory.playerJoined(newPlayer)));
-
-                // Enviar al peer recién unido la lista actual de jugadores
-                sendPrivate(senderName, MessageSerializer.serialize(
-                        GameEventFactory.playerJoined(newPlayer)));
+                senderConn.sendMessage(confirmMsg);
                 sendCurrentLobbyState(senderName);
                 break;
+
 
             case MessageSerializer.TYPE_PLAYER_READY:
                 // El Host procesa el cambio de estado "Listo" en su bus local
@@ -603,10 +619,7 @@ public class NetworkLayer {
     private void publishToLocalBus(String type, Map<String, String> fields) {
         switch (type) {
 
-            case MessageSerializer.TYPE_PLAYER_JOINED:
-                // El Peer recibe notificación de que otro jugador se unió.
-                // También restauramos el estado "Listo" para que el Peer
-                // vea correctamente si el Host ya estaba listo.
+            case MessageSerializer.TYPE_PLAYER_JOINED: {
                 Player joined = new Player(
                         fields.get("player"),
                         fields.getOrDefault("avatarId", "avatar_1"),
@@ -616,8 +629,20 @@ public class NetworkLayer {
                 if (!lobbyState.isNameTaken(joined.getName())) {
                     lobbyState.addPlayer(joined);
                 }
+
+                // Leer capacidad si viene en el mismo mensaje
+                String capStr = fields.get("capacity");
+                if (capStr != null) {
+                    try {
+                        int cap = Integer.parseInt(capStr.trim());
+                        lobbyState.setCapacity(cap);
+                        System.out.println("[Peer] Capacidad recibida: " + cap);
+                    } catch (NumberFormatException ignored) {}
+                }
+
                 eventBus.publish(GameEventFactory.playerJoined(joined));
                 break;
+}
 
             case MessageSerializer.TYPE_PLAYER_READY:
                 // Actualizar estado "Listo" en el LobbyState local del Peer
@@ -768,6 +793,24 @@ public class NetworkLayer {
                 System.out.println("[Peer] Conexion rechazada: " + rejReason);
                 eventBus.publish(new Eventos.NetworkPlayerRejectedEvent(rejReason));
                 break;
+                
+            case MessageSerializer.TYPE_LOBBY_STATE: {
+                String capacityStr = fields.get("capacity");
+                if (capacityStr != null) {
+                    try {
+                        int cap = Integer.parseInt(capacityStr.trim());
+                        lobbyState.setCapacity(cap);
+                        System.out.println("[Peer] Capacidad recibida: " + cap);
+                        // Publicar PlayerJoinedEvent para que LobbyController
+                        // llame a setPlayerCount() y actualice la GUI
+                        eventBus.publish(new Eventos.PlayerJoinedEvent(
+                                session.getLocalPlayer()));
+                    } catch (NumberFormatException ex) {
+                        System.out.println("[Peer] Capacidad inválida: " + capacityStr);
+                    }
+                }
+                break;
+}
 
             default:
                 System.out.println("[Peer] Tipo de mensaje ignorado: " + type);
@@ -792,15 +835,14 @@ public class NetworkLayer {
     private void sendCurrentLobbyState(String targetPeerName) {
         PeerConnection target = connections.get(targetPeerName);
         if (target == null) {
+            System.out.println("[Host] sendCurrentLobbyState: no se encontró conexión para '"
+                    + targetPeerName + "'");
             return;
         }
-
         for (Player p : lobbyState.getConnectedPlayers()) {
-            // No enviar al peer su propia información de vuelta
             if (p.getName().equals(targetPeerName)) {
                 continue;
             }
-
             String msg = MessageSerializer.serialize(GameEventFactory.playerJoined(p));
             System.out.println("[Host] Enviando jugador existente a '"
                     + targetPeerName + "': " + p.getName());
@@ -893,7 +935,7 @@ public class NetworkLayer {
                         System.out.println("[Host] Peer renombrado: "
                                 + tempName + " → " + realName);
                     }
-                    onMessageReceived(holder[0].getName(), msg);
+                    onMessageReceived(holder[0].getName(), msg, holder[0]);
                 });
 
         connections.put(tempName, holder[0]);
