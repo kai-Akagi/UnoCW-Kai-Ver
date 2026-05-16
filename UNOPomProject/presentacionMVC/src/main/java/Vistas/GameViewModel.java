@@ -71,6 +71,12 @@ public class GameViewModel {
      * Cuántas cartas tiene cada oponente (en el mismo orden que opponentNames).
      */
     public final List<Integer> opponentHandSizes;
+    
+    /**
+    * Avatares de los oponentes, en el mismo orden que opponentNames.
+    * Se usa para mostrar el emoji correcto en la barra de oponentes.
+    */
+    public final List<String> opponentAvatarIds;
 
     /**
      * Si el jugador local tiene exactamente una carta (debe gritar UNO).
@@ -108,11 +114,13 @@ public class GameViewModel {
         // Filtrar oponentes: solo nombre y cantidad de cartas
         this.opponentNames = new ArrayList<>();
         this.opponentHandSizes = new ArrayList<>();
+        this.opponentAvatarIds = new ArrayList<>();
 
         for (Player p : state.getPlayers()) {
             if (!p.getName().equals(localPlayer.getName())) {
                 opponentNames.add(p.getName());
                 opponentHandSizes.add(p.getHandSize());
+                opponentAvatarIds.add(p.getAvatarId());
             }
         }
     }
@@ -128,13 +136,15 @@ public class GameViewModel {
      * @param localPlayerName Nombre del jugador local.
      * @param opponentNames Nombres de oponentes.
      * @param opponentHandSizes Cantidad de cartas de cada oponente.
+     * @param opponentAvatarIds Avatares de los rivales
      * @param clockwise Dirección del juego.
      */
     public GameViewModel(
-            String currentPlayerName, String topCardValue, Card.Color topCardColor,
-            List<Card> localHand, String localPlayerName,
-            List<String> opponentNames, List<Integer> opponentHandSizes,
-            boolean clockwise) {
+        String currentPlayerName, String topCardValue, Card.Color topCardColor,
+        List<Card> localHand, String localPlayerName,
+        List<String> opponentNames, List<Integer> opponentHandSizes,
+        List<String> opponentAvatarIds,
+        boolean clockwise) {
         this.currentPlayerName = currentPlayerName;
         this.isMyTurn = currentPlayerName.equals(localPlayerName);
         this.topCardValue = topCardValue;
@@ -144,5 +154,7 @@ public class GameViewModel {
         this.opponentNames = opponentNames;
         this.opponentHandSizes = opponentHandSizes;
         this.clockwise = clockwise;
+        this.opponentAvatarIds = opponentAvatarIds != null
+        ? opponentAvatarIds : new ArrayList<>();
     }
 }

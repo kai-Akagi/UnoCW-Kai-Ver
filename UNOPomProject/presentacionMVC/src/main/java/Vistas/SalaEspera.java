@@ -195,7 +195,8 @@ public class SalaEspera extends JPanel {
         row.setBorder(new EmptyBorder(10, 14, 10, 14));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
 
-        String roleIcon = player.isHost() ? "👑" : "🎮";
+        String avatarEmoji = AvatarHelper.emojiFor(player.getAvatarId());
+        String roleIcon    = player.isHost() ? "👑 " + avatarEmoji : avatarEmoji;
         String roleLabel = player.isHost() ? " [HOST]" : "";
         String youLabel = isLocal ? " (tú)" : "";
 
@@ -203,9 +204,9 @@ public class SalaEspera extends JPanel {
         // Concatenamos en un solo String y lo asignamos con setText (sin HTML).
         // setMinimumSize garantiza que el label no colapse a un ancho mínimo
         // que forzaría al Look&Feel a partir el texto con saltos artificiales.
-        String fullName = roleIcon + " " + player.getName() + roleLabel + youLabel;
+        String fullName    = roleIcon + " " + player.getName() + roleLabel + youLabel;
         JLabel nameLabel = new JLabel(fullName);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        nameLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         nameLabel.setForeground(player.isHost() ? new Color(248, 216, 71) : Color.WHITE);
         // Ancho mínimo calculado: 15 chars * ~10px/char + extras = 260px suficiente
         nameLabel.setMinimumSize(new Dimension(260, 20));
