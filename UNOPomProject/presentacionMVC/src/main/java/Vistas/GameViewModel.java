@@ -53,9 +53,18 @@ public class GameViewModel {
     public final String topCardValue;
 
     /**
-     * Color de la carta activa en la mesa.
+     * Color de la carta activa en la mesa (puede ser WILD si es comodín sin
+     * color elegido).
      */
     public final Card.Color topCardColor;
+
+    /**
+     * Color activo que rige el juego. Cuando la última carta jugada fue un
+     * comodín, este campo contiene el color elegido por el jugador (RED, BLUE,
+     * GREEN o YELLOW). Para cartas normales coincide con topCardColor. Nunca es
+     * WILD una vez que se eligió un color.
+     */
+    public final Card.Color activeColor;
 
     /**
      * Las cartas que tiene el jugador local en su mano.
@@ -71,11 +80,11 @@ public class GameViewModel {
      * Cuántas cartas tiene cada oponente (en el mismo orden que opponentNames).
      */
     public final List<Integer> opponentHandSizes;
-    
+
     /**
-    * Avatares de los oponentes, en el mismo orden que opponentNames.
-    * Se usa para mostrar el emoji correcto en la barra de oponentes.
-    */
+     * Avatares de los oponentes, en el mismo orden que opponentNames. Se usa
+     * para mostrar el emoji correcto en la barra de oponentes.
+     */
     public final List<String> opponentAvatarIds;
 
     /**
@@ -107,6 +116,11 @@ public class GameViewModel {
                 ? state.getTopCard().getValue() : "?";
         this.topCardColor = state.getTopCard() != null
                 ? state.getTopCard().getColor() : Card.Color.WILD;
+        // activeColor: si la carta es comodín, usar el color elegido por el jugador;
+        // si es carta normal, coincide con topCardColor.
+        Card.Color ac = state.getActiveColor();
+        this.activeColor = (ac != null && ac != Card.Color.WILD)
+                ? ac : this.topCardColor;
         this.localHand = new ArrayList<>(localPlayer.getHand());
         this.localPlayerHasUno = localPlayer.hasUno();
         this.clockwise = state.isClockwise();
@@ -140,21 +154,24 @@ public class GameViewModel {
      * @param clockwise Dirección del juego.
      */
     public GameViewModel(
-        String currentPlayerName, String topCardValue, Card.Color topCardColor,
-        List<Card> localHand, String localPlayerName,
-        List<String> opponentNames, List<Integer> opponentHandSizes,
-        List<String> opponentAvatarIds,
-        boolean clockwise) {
+            String currentPlayerName, String topCardValue, Card.Color topCardColor,
+            Card.Color activeColor,
+            List<Card> localHand, String localPlayerName,
+            List<String> opponentNames, List<Integer> opponentHandSizes,
+            List<String> opponentAvatarIds,
+            boolean clockwise) {
         this.currentPlayerName = currentPlayerName;
         this.isMyTurn = currentPlayerName.equals(localPlayerName);
         this.topCardValue = topCardValue;
         this.topCardColor = topCardColor;
+        this.activeColor = (activeColor != null && activeColor != Card.Color.WILD)
+                ? activeColor : topCardColor;
         this.localHand = localHand;
         this.localPlayerHasUno = localHand.size() == 1;
         this.opponentNames = opponentNames;
         this.opponentHandSizes = opponentHandSizes;
         this.clockwise = clockwise;
         this.opponentAvatarIds = opponentAvatarIds != null
-        ? opponentAvatarIds : new ArrayList<>();
+                ? opponentAvatarIds : new ArrayList<>();
     }
 }

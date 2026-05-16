@@ -353,16 +353,22 @@ public class GameController {
                 }
             }
 
-          
+            // Resolver el color activo (puede diferir de topColor cuando es comodín)
+            Card.Color resolvedActive = state.getActiveColor();
+            if (resolvedActive == null || resolvedActive == Card.Color.WILD) {
+                resolvedActive = topColor;
+            }
+            final Card.Color finalActiveColor = resolvedActive;
             GameViewModel vm = new GameViewModel(
-                currentName,
-                topValue,
-                topColor,
-                new ArrayList<>(session.getLocalPlayer().getHand()),
-                session.getLocalPlayer().getName(),
-                oppNames, oppSizes,
-                oppAvatarIds,
-                tce.isClockwise()
+                    currentName,
+                    topValue,
+                    topColor,
+                    finalActiveColor,
+                    new ArrayList<>(session.getLocalPlayer().getHand()),
+                    session.getLocalPlayer().getName(),
+                    oppNames, oppSizes,
+                    oppAvatarIds,
+                    tce.isClockwise()
             );
             System.out.println("[GameController] TurnChanged → current='" + currentName
                     + "' local='" + session.getLocalPlayer().getName()
@@ -425,15 +431,20 @@ public class GameController {
                     }
                 }
 
+                // activeColor ya fue resuelto arriba (networkActiveColor o topColor)
+                Card.Color peerActiveColor = (networkActiveColor != null
+                        && networkActiveColor != Card.Color.WILD)
+                                ? networkActiveColor : topColor;
                 GameViewModel vm = new GameViewModel(
-                    currentPlayerName,
-                    topValue,
-                    topColor,
-                    new ArrayList<>(session.getLocalPlayer().getHand()),
-                    session.getLocalPlayer().getName(),
-                    oppNames, oppSizes,
-                    oppAvatarIds,        // ← añadido
-                    eventClockwise
+                        currentPlayerName,
+                        topValue,
+                        topColor,
+                        peerActiveColor,
+                        new ArrayList<>(session.getLocalPlayer().getHand()),
+                        session.getLocalPlayer().getName(),
+                        oppNames, oppSizes,
+                        oppAvatarIds,
+                        eventClockwise
                 );
                 lastViewModel = vm;
                 view.render(vm);
@@ -496,10 +507,10 @@ public class GameController {
         eventBus.subscribe(NetworkUnoCalledEvent.class, event -> {
             NetworkUnoCalledEvent e = (NetworkUnoCalledEvent) event;
             if (!session.isLocalPlayer(e.getPlayerName())) {
-                SwingUtilities.invokeLater(() ->
-                    JOptionPane.showMessageDialog(mainWindow,
-                        "¡" + e.getPlayerName() + " gritó UNO!",
-                        "UNO", JOptionPane.INFORMATION_MESSAGE)
+                SwingUtilities.invokeLater(()
+                        -> JOptionPane.showMessageDialog(mainWindow,
+                                "¡" + e.getPlayerName() + " gritó UNO!",
+                                "UNO", JOptionPane.INFORMATION_MESSAGE)
                 );
             }
         });
@@ -510,7 +521,7 @@ public class GameController {
             String leavingName = e.getPlayerName();
 
             boolean leavingIsHost = lobbyState.getConnectedPlayers().stream()
-                .anyMatch(p -> p.getName().equals(leavingName) && p.isHost());
+                    .anyMatch(p -> p.getName().equals(leavingName) && p.isHost());
             if (leavingIsHost) {
                 // El Host salió: todos los Peers regresan al registro
                 SwingUtilities.invokeLater(() -> {
@@ -555,10 +566,11 @@ public class GameController {
                                 lastViewModel.currentPlayerName,
                                 lastViewModel.topCardValue,
                                 lastViewModel.topCardColor,
+                                lastViewModel.activeColor,
                                 new ArrayList<>(session.getLocalPlayer().getHand()),
                                 session.getLocalPlayer().getName(),
                                 names, sizes,
-                                updatedAvatarIds,   // ← añadido
+                                updatedAvatarIds,
                                 lastViewModel.clockwise
                         );
                         lastViewModel = updated;

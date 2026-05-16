@@ -48,13 +48,15 @@ public class GameView extends JPanel {
     private final JPanel handPanel;       // fila inferior: cartas del jugador
 
     // ─── Componentes del centro ──────────────────────────────────────────────
-    private final JPanel topCardPanel;   // muestra la carta activa
-    private final JLabel topCardLabel;   // texto de la carta activa
+    private final JPanel topCardPanel;    // muestra la carta activa
+    private final JLabel topCardLabel;    // texto de la carta activa
     private final JButton drawButton;     // botón para robar del mazo
     private final JButton unoButton;      // botón "¡UNO!"
-    private final JLabel turnLabel;      // "Tu turno" o nombre del jugador activo
-    private final JLabel directionLabel; // indicador de dirección
-    private final JButton leaveButton;  // botón para abandonar la partida
+    private final JLabel turnLabel;       // "Tu turno" o nombre del jugador activo
+    private final JLabel directionLabel;  // indicador de dirección
+    private final JButton leaveButton;    // botón para abandonar la partida
+    private final JPanel activeColorPanel; // pastilla de color activo (visible tras comodín)
+    private final JLabel activeColorLabel; // texto "Color: ROJO" etc.
 
     /**
      * Controller de esta pantalla.
@@ -83,6 +85,8 @@ public class GameView extends JPanel {
         this.turnLabel = new JLabel("Esperando...", SwingConstants.CENTER);
         this.directionLabel = new JLabel("→", SwingConstants.CENTER);
         this.leaveButton = new JButton("✖ Salir");
+        this.activeColorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 2));
+        this.activeColorLabel = new JLabel("", SwingConstants.CENTER);
 
         buildUI();
     }
@@ -129,8 +133,32 @@ public class GameView extends JPanel {
         handPanel.setBackground(new Color(15, 100, 50));
         handPanel.setPreferredSize(new Dimension(0, 130));
 
+        // Pastilla de color activo — esquina inferior izquierda del área central
+        activeColorLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        activeColorLabel.setForeground(Color.WHITE);
+        activeColorPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        activeColorPanel.setOpaque(true);
+        activeColorPanel.setBackground(new Color(30, 30, 46));
+        activeColorPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 100), 1),
+                BorderFactory.createEmptyBorder(1, 6, 1, 6)
+        ));
+        activeColorPanel.add(activeColorLabel);
+        activeColorPanel.setVisible(false);
+
+        // Tira inferior del área central: solo lleva la pastilla a la izquierda
+        JPanel centerSouth = new JPanel(new BorderLayout());
+        centerSouth.setBackground(new Color(21, 128, 61));
+        centerSouth.add(activeColorPanel, BorderLayout.WEST);
+
+        // Wrapper que envuelve el área de juego + la tira de color
+        JPanel centerWrapper = new JPanel(new BorderLayout(0, 0));
+        centerWrapper.setBackground(new Color(21, 128, 61));
+        centerWrapper.add(centerPanel, BorderLayout.CENTER);
+        centerWrapper.add(centerSouth, BorderLayout.SOUTH);
+
         add(opponentsPanel, BorderLayout.NORTH);
-        add(centerPanel, BorderLayout.CENTER);
+        add(centerWrapper, BorderLayout.CENTER);
         add(handPanel, BorderLayout.SOUTH);
     }
 
@@ -193,6 +221,7 @@ public class GameView extends JPanel {
         gbc.gridy = 1;
         gbc.gridwidth = 4;
         centerPanel.add(turnLabel, gbc);
+
     }
 
     // ─────────────────────────────────────────────
@@ -210,6 +239,7 @@ public class GameView extends JPanel {
      */
     public void render(GameViewModel vm) {
         updateTopCard(vm.topCardValue, vm.topCardColor);
+        updateActiveColor(vm.topCardValue, vm.activeColor);
         updateTurnIndicator(vm.currentPlayerName, vm.isMyTurn);
         updateOpponents(vm.opponentNames, vm.opponentHandSizes, vm.opponentAvatarIds);
         updateHand(vm.localHand, vm.isMyTurn);
@@ -240,8 +270,9 @@ public class GameView extends JPanel {
     /**
      * Actualiza la carta activa en la mesa.
      *
-     * <p>Si la carta es especial o comodín, carga su imagen desde el classpath
-     * y la muestra como {@link JLabel} con icono. Si es numérica, muestra el
+     * <p>
+     * Si la carta es especial o comodín, carga su imagen desde el classpath y
+     * la muestra como {@link JLabel} con icono. Si es numérica, muestra el
      * número centrado sobre el fondo de color correspondiente.
      *
      * @param value El valor/nombre de la carta (ej. "7", "SKIP", "WILD").
@@ -262,6 +293,60 @@ public class GameView extends JPanel {
             // Carta numérica: mostrar número sin icono
             topCardLabel.setIcon(null);
             topCardLabel.setText(value);
+        }
+    }
+
+    /**
+     * Muestra u oculta la pastilla de color activo.
+     *
+     * <p>
+     * Cuando la carta en la mesa es un comodín (WILD o WILD_DRAW_FOUR), el
+     * color real que rige el juego no es el de la carta sino el elegido por el
+     * jugador que la jugó. Esta pastilla lo hace visible para todos.
+     *
+     * <p>
+     * Si la carta activa no es comodín, la pastilla se oculta porque el color
+     * ya se ve en el fondo de la propia carta.
+     *
+     * @param topCardColor Color de la carta en la mesa (puede ser WILD).
+     * @param activeColor Color activo que rige el juego.
+     */
+    private void updateActiveColor(String topCardValue, Card.Color activeColor) {
+        // Detectar comodín por el VALOR de la carta, no por su color.
+        // El GameController ya reemplaza topCardColor con el color elegido,
+        // así que topCardColor nunca llega como WILD aquí. El valor sí es
+        // "WILD" o "WILD_DRAW_FOUR" cuando hay un comodín en la mesa.
+        boolean isWild = "WILD".equals(topCardValue) || "WILD_DRAW_FOUR".equals(topCardValue);
+        boolean hasChosenColor = (activeColor != null && activeColor != Card.Color.WILD);
+
+        if (isWild && hasChosenColor) {
+            activeColorPanel.setBackground(colorOf(activeColor));
+            activeColorLabel.setText("Color activo: " + colorName(activeColor));
+            activeColorPanel.setVisible(true);
+        } else {
+            activeColorPanel.setVisible(false);
+        }
+    }
+
+    /**
+     * Convierte un color de carta al nombre en español para mostrarlo al
+     * jugador.
+     *
+     * @param color El color.
+     * @return El nombre en español ("ROJO", "AZUL", "VERDE", "AMARILLO").
+     */
+    private String colorName(Card.Color color) {
+        switch (color) {
+            case RED:
+                return "ROJO";
+            case BLUE:
+                return "AZUL";
+            case GREEN:
+                return "VERDE";
+            case YELLOW:
+                return "AMARILLO";
+            default:
+                return "";
         }
     }
 
@@ -304,13 +389,10 @@ public class GameView extends JPanel {
             String avatarId = (avatarIds != null && i < avatarIds.size()) ? avatarIds.get(i) : "";
             inner.add(buildOpponentPanel(names.get(i), handSizes.get(i), avatarId));
         }
-        
+
         inner.revalidate();
         inner.repaint();
-        
-        
-        
-        
+
     }
 
     /**
@@ -321,7 +403,7 @@ public class GameView extends JPanel {
      * @param avatarId id del avatar
      * @return El panel del oponente.
      */
-   private JPanel buildOpponentPanel(String name, int cardCount, String avatarId) {
+    private JPanel buildOpponentPanel(String name, int cardCount, String avatarId) {
         JPanel panel = new JPanel(new BorderLayout(4, 2));
         panel.setBackground(new Color(20, 83, 45));
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -375,14 +457,15 @@ public class GameView extends JPanel {
     /**
      * Deshabilita la mano del jugador y el botón de robo.
      *
-     * <p>Para botones con imagen (cartas especiales) no se usa
+     * <p>
+     * Para botones con imagen (cartas especiales) no se usa
      * {@code setEnabled(false)} porque Swing aplica un GrayFilter automático
-     * que grisea la imagen. En su lugar se elimina el borde interactivo y
-     * se retiran los listeners existentes mediante el truco de reemplazar el
+     * que grisea la imagen. En su lugar se elimina el borde interactivo y se
+     * retiran los listeners existentes mediante el truco de reemplazar el
      * componente en el EventDispatchThread. La solución práctica aquí es
      * simplemente no agregar el listener cuando {@code enabled=false} en
-     * {@link #buildCardButton}, lo que ya se hace; este método solo asegura
-     * que el cursor cambie y el borde se actualice para los botones de imagen.
+     * {@link #buildCardButton}, lo que ya se hace; este método solo asegura que
+     * el cursor cambie y el borde se actualice para los botones de imagen.
      */
     public void disableHand() {
         for (java.awt.Component c : handPanel.getComponents()) {
@@ -412,11 +495,12 @@ public class GameView extends JPanel {
     /**
      * Construye un botón visual para una carta de la mano.
      *
-     * <p>Si la carta tiene imagen (especial o comodín) se muestra como
-     * {@link ImageIcon} escalada al tamaño del botón. Las cartas numéricas
-     * se renderizan como rectángulo de color con el número centrado.
+     * <p>
+     * Si la carta tiene imagen (especial o comodín) se muestra como
+     * {@link ImageIcon} escalada al tamaño del botón. Las cartas numéricas se
+     * renderizan como rectángulo de color con el número centrado.
      *
-     * @param card    La carta a representar.
+     * @param card La carta a representar.
      * @param enabled Si el botón debe estar activo (es el turno del jugador).
      * @return El botón de la carta.
      */
