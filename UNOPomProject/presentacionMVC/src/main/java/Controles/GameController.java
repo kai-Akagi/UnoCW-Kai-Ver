@@ -160,7 +160,7 @@ public class GameController {
     private Card.Color showColorChooser() {
         Object[] options = {"🔴 Rojo", "🔵 Azul", "🟢 Verde", "🟡 Amarillo"};
         int choice = javax.swing.JOptionPane.showOptionDialog(
-                null,
+                mainWindow,
                 "Elige el color que continuará:",
                 "¿Qué color?",
                 javax.swing.JOptionPane.DEFAULT_OPTION,
