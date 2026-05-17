@@ -10,33 +10,41 @@ import java.awt.Color;
  * Utilidad central para convertir un avatarId en su emoji y color
  * correspondientes.
  *
- * <p>Los mismos 9 avatares que el jugador elige en RegisterView deben
- * mostrarse correctamente en SalaEspera y GameView. Esta clase centraliza
- * esa conversión para que no haya que duplicar los arreglos en cada vista.</p>
+ * <p>
+ * Los mismos 9 avatares que el jugador elige en RegisterView deben mostrarse
+ * correctamente en SalaEspera y GameView. Esta clase centraliza esa conversión
+ * para que no haya que duplicar los arreglos en cada vista.</p>
  *
- * <p>Si en el futuro se añade un avatar nuevo, solo se modifica esta clase.</p>
- * 
+ * <p>
+ * Si en el futuro se añade un avatar nuevo, solo se modifica esta clase.</p>
+ *
  * @author Héctor Javier Alonso Zaragoza
  * @author Alejandro Rodríguez Lugo
  * @author Katia Ximena Navarez Espinoza
  * @author Luis Carlos Manjarrez Gonzalez
- * 
- * 
+ *
+ *
  */
 public class AvatarHelper {
 
-    /** Identificadores de avatar en el mismo orden que los arreglos. */
+    /**
+     * Identificadores de avatar en el mismo orden que los arreglos.
+     */
     private static final String[] AVATAR_IDS = {
         "avatar_pig", "avatar_bear", "avatar_panda", "avatar_bunny",
         "avatar_fox", "avatar_penguin", "avatar_chick", "avatar_wolf", "avatar_frog"
     };
 
-    /** Emoji que corresponde a cada avatarId. */
+    /**
+     * Emoji que corresponde a cada avatarId.
+     */
     private static final String[] AVATAR_EMOJIS = {
         "🐷", "🐻", "🐼", "🐰", "🦊", "🐧", "🐥", "🐺", "🐸"
     };
 
-    /** Color de fondo que corresponde a cada avatarId. */
+    /**
+     * Color de fondo que corresponde a cada avatarId.
+     */
     private static final Color[] AVATAR_COLORS = {
         new Color(255, 182, 193),
         new Color(210, 180, 140),
@@ -49,13 +57,18 @@ public class AvatarHelper {
         new Color(144, 238, 144)
     };
 
-    /** Emoji de respaldo cuando el avatarId no se reconoce. */
+    /**
+     * Emoji de respaldo cuando el avatarId no se reconoce.
+     */
     private static final String FALLBACK_EMOJI = "🎮";
 
-    /** Color de respaldo. */
+    /**
+     * Color de respaldo.
+     */
     private static final Color FALLBACK_COLOR = new Color(180, 180, 180);
 
-    private AvatarHelper() {}
+    private AvatarHelper() {
+    }
 
     /**
      * Devuelve el emoji que corresponde al avatarId dado.

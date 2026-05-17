@@ -13,23 +13,9 @@ import java.util.Map;
  * Cargador y caché de imágenes para las cartas especiales de UNO.
  *
  * <p>
- * Las imágenes viven en {@code src/main/resources/img/} y Maven las copia al
- * classpath en compilación. Esta clase las carga <b>una sola vez</b> y las
- * guarda en un mapa para no releer disco en cada render.
- *
+ * Esta clase carga las imagenes <b>una sola vez</b> y las guarda en un mapa
+ * para no releer disco en cada render.
  * <p>
- * <b>Decisiones de diseño:</b>
- * <ul>
- * <li><b>Sin preservación de proporción:</b> las imágenes se estiran para
- * rellenar exactamente el rectángulo de la carta (width x height). Así todas
- * las cartas llenan el mismo espacio sin importar las dimensiones originales
- * del PNG (las REVERSE eran 512x512 cuadradas, las demás ~2:3); todas quedan
- * igual de grandes.</li>
- * <li><b>Sin gris al deshabilitar:</b> Swing aplica automáticamente un
- * GrayFilter a los ImageIcon cuando el botón está deshabilitado. Para evitarlo,
- * dibujamos la imagen sobre un BufferedImage propio; Swing no reconoce ese
- * bitmap como "el mismo icono" y no lo filtra.</li>
- * </ul>
  *
  * @author Héctor Javier Alonso Zaragoza
  * @author Alejandro Rodríguez Lugo
@@ -39,16 +25,11 @@ import java.util.Map;
 public class CardImageHelper {
 
     private static final String IMG_PATH = "/img/";
-
-    /**
-     * Caché: imageKey → Image original. null = recurso no existe.
-     */
     private static final Map<String, Image> originalCache = new HashMap<>();
 
     private CardImageHelper() {
     }
 
-    // ── API pública ───────────────────────────────────────────────────────
     /**
      * Devuelve un ImageIcon escalado EXACTAMENTE a width x height, sin gris
      * aunque el botón esté deshabilitado.
